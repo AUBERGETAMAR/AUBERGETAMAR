@@ -2167,20 +2167,9 @@ window.dispatchEvent(new Event('firebaseReady'));
       </div>
     </div>
     <div id="bilanApercu" style="background:var(--bg);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:11.5px;color:var(--text)"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
-      <button class="print-export-btn" onclick="genererBilanMensuelPDF()">
-        <span style="font-size:28px">📄</span>
-        <span class="peb-label">PDF</span>
-      </button>
-      <button class="print-export-btn" onclick="genererBilanMensuelExcel()">
-        <span style="font-size:28px">📊</span>
-        <span class="peb-label">Excel</span>
-      </button>
-      <button class="print-export-btn" onclick="genererBilanMensuelWord()">
-        <span style="font-size:28px">📝</span>
-        <span class="peb-label">Word</span>
-      </button>
-    </div>
+    <button class="action-btn" id="btnGenererBilan" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));box-shadow:0 4px 16px rgba(26,58,92,.35)" onclick="genererBilanMensuelPDF()">
+      ✅ Générer le PDF
+    </button>
     <button class="action-btn" onclick="closeModal('modalBilan')" style="background:var(--border);color:var(--text);box-shadow:none;margin-bottom:0">Annuler</button>
   </div>
 </div>
@@ -2198,20 +2187,9 @@ window.dispatchEvent(new Event('firebaseReady'));
       <select class="form-select" id="bilanAnneeAnnuel"></select>
     </div>
     <div id="bilanAnnuelApercu" style="background:var(--bg);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:11.5px;color:var(--text)"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
-      <button class="print-export-btn" onclick="genererBilanAnnuelPDF()">
-        <span style="font-size:28px">📄</span>
-        <span class="peb-label">PDF</span>
-      </button>
-      <button class="print-export-btn" onclick="genererBilanAnnuelExcel()">
-        <span style="font-size:28px">📊</span>
-        <span class="peb-label">Excel</span>
-      </button>
-      <button class="print-export-btn" onclick="genererBilanAnnuelWord()">
-        <span style="font-size:28px">📝</span>
-        <span class="peb-label">Word</span>
-      </button>
-    </div>
+    <button class="action-btn" id="btnGenererBilanAnnuel" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));box-shadow:0 4px 16px rgba(26,58,92,.35)" onclick="genererBilanAnnuelPDF()">
+      ✅ Générer le PDF
+    </button>
     <button class="action-btn" onclick="closeModal('modalBilanAnnuel')" style="background:var(--border);color:var(--text);box-shadow:none;margin-bottom:0">Annuler</button>
   </div>
 </div>
@@ -6038,8 +6016,6 @@ async function reinitialiserToutesLesEcritures(){
 
   showToast('🗑️ Suppression en cours…');
   const collectionsAEffacer = ['saisies','chambres','historique_chambres','banque','ajustements','passes','points_passes','documents'];
-  try { await window._deleteDoc(window._doc(window._db, 'systemFlags', 'aubergeTamar')); } catch(e) {}
-  window._migFlags = {};
   let totalSupprimes = 0;
   let erreurs = [];
 
@@ -12884,38 +12860,11 @@ function refreshAllFromSync(toastMsg){
   _refreshAllSyncTimer = setTimeout(() => { _refreshAllSyncTimer = null; refreshAll(toastMsg); }, 300);
 }
 
-// ── Verrous de migration "une seule fois", stockés sur Firestore (et plus en localStorage) ──
-// Auparavant ces verrous vivaient dans localStorage, propre à CHAQUE navigateur/appareil/onglet
-// privé. Résultat : en navigation privée (ou sur un nouvel appareil/navigateur), localStorage est
-// vide au démarrage, donc ces scripts de migration "une seule fois" (réinjection de dépenses/recettes
-// historiques) se relançaient à CHAQUE ouverture, recréant les mêmes doublons qu'on venait de
-// supprimer manuellement. En stockant le verrou dans Firestore (document partagé, visible de tous
-// les appareils), chaque migration ne s'exécute plus qu'UNE SEULE fois, pour de bon, quel que soit
-// l'appareil, le navigateur ou le mode (normal/privé) utilisé.
-window._migFlags = {};
-window._migFlagsLoaded = false;
-async function loadMigFlags(db) {
-  try {
-    const snap = await window._getDoc(window._doc(db, 'systemFlags', 'aubergeTamar'));
-    window._migFlags = snap.exists() ? (snap.data() || {}) : {};
-  } catch (e) {
-    window._migFlags = {};
-  }
-  window._migFlagsLoaded = true;
-}
-function saveMigFlag(db, name) {
-  window._migFlags[name] = true;
-  try {
-    window._setDoc(window._doc(db, 'systemFlags', 'aubergeTamar'), { [name]: true }, { merge: true }).catch(() => {});
-  } catch (e) {}
-}
-
 // Écoute temps réel Firestore → saisieLog
-async function startFirebaseSync() {
+function startFirebaseSync() {
   if (!window._db) { setConnStatus(false); return; }
   setConnStatus(true);
   fbReady = true;
-  if (!window._migFlagsLoaded) await loadMigFlags(window._db);
 
   // ── 1. Écoute saisies ──
   const q = window._query(
@@ -12929,8 +12878,8 @@ async function startFirebaseSync() {
     persistSaisieLog(); // garde une copie locale en cas de perte de connexion
     refreshAllFromSync('🔄 Données synchronisées');
     // Injection unique des données de test 2026 si la base est encore vide sur ce projet
-    if (snap.empty && TEST_DATA_2026_SEED.length && !window._migFlags['seed2026Done']) {
-      saveMigFlag(window._db, 'seed2026Done');
+    if (snap.empty && TEST_DATA_2026_SEED.length && !localStorage.getItem('aubergeTamar_seed2026Done')) {
+      try { localStorage.setItem('aubergeTamar_seed2026Done', '1'); } catch(e) {}
       Promise.all(TEST_DATA_2026_SEED.map(entry => {
         const { _localId, ...data } = entry;
         return window._addDoc(window._collection(window._db, 'saisies'), data);
@@ -12940,8 +12889,8 @@ async function startFirebaseSync() {
     // jour) : écrase toutes les Recettes existantes de Juin 2026 (ex: données de test) par les montants
     // réels du registre papier fourni par l'utilisateur (chambres 1 à 8, 01→30 juin 2026), puis se
     // synchronise normalement ensuite comme n'importe quelle saisie.
-    if (AUBERGE_TAMAR_RECETTES_JUIN2026.length && !window._migFlags['recettesJuin2026Loaded_v2']) {
-      saveMigFlag(window._db, 'recettesJuin2026Loaded_v2');
+    if (AUBERGE_TAMAR_RECETTES_JUIN2026.length && !localStorage.getItem('aubergeTamar_recettesJuin2026Loaded_v2')) {
+      try { localStorage.setItem('aubergeTamar_recettesJuin2026Loaded_v2', '1'); } catch(e) {}
       const idsJuin2026 = [];
       snap.forEach(d => {
         const data = d.data();
@@ -12951,8 +12900,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Juillet 2026 (chambres 1 à 8, 01→31 juillet 2026).
-    if (AUBERGE_TAMAR_RECETTES_JUILLET2026.length && !window._migFlags['recettesJuillet2026Loaded_v2']) {
-      saveMigFlag(window._db, 'recettesJuillet2026Loaded_v2');
+    if (AUBERGE_TAMAR_RECETTES_JUILLET2026.length && !localStorage.getItem('aubergeTamar_recettesJuillet2026Loaded_v2')) {
+      try { localStorage.setItem('aubergeTamar_recettesJuillet2026Loaded_v2', '1'); } catch(e) {}
       const idsJuillet2026 = [];
       snap.forEach(d => {
         const data = d.data();
@@ -12962,8 +12911,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Août 2026 (chambres 1,2,3,6,7,8, 01→31 août 2026).
-    if (AUBERGE_TAMAR_RECETTES_AOUT2026.length && !window._migFlags['recettesAout2026Loaded_v2']) {
-      saveMigFlag(window._db, 'recettesAout2026Loaded_v2');
+    if (AUBERGE_TAMAR_RECETTES_AOUT2026.length && !localStorage.getItem('aubergeTamar_recettesAout2026Loaded_v2')) {
+      try { localStorage.setItem('aubergeTamar_recettesAout2026Loaded_v2', '1'); } catch(e) {}
       const idsAout2026 = [];
       snap.forEach(d => {
         const data = d.data();
@@ -12973,8 +12922,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Septembre 2026 (01→08 septembre 2026).
-    if (AUBERGE_TAMAR_RECETTES_SEPTEMBRE2026.length && !window._migFlags['recettesSept2026Loaded_v3']) {
-      saveMigFlag(window._db, 'recettesSept2026Loaded_v3');
+    if (AUBERGE_TAMAR_RECETTES_SEPTEMBRE2026.length && !localStorage.getItem('aubergeTamar_recettesSept2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_recettesSept2026Loaded_v3', '1'); } catch(e) {}
       const idsSept2026 = [];
       snap.forEach(d => {
         const data = d.data();
@@ -12989,8 +12938,8 @@ async function startFirebaseSync() {
     // comptés deux fois) et faussait le Net (recettes − dépenses) de Juin/Juillet 2026 en négatif.
     // Le bloc est conservé ci-dessous en commentaire pour mémoire mais ne s'exécute plus jamais
     // (condition à `false`) afin qu'un nouvel appareil ne puisse pas réinjecter ces doublons.
-    if (false && AUBERGE_TAMAR_DEPENSES_REELLES_JANV_SUR_FEV_AOUT2026.length && !window._migFlags['depensesReellesJanvFevAout2026_v1']) {
-      saveMigFlag(window._db, 'depensesReellesJanvFevAout2026_v1');
+    if (false && AUBERGE_TAMAR_DEPENSES_REELLES_JANV_SUR_FEV_AOUT2026.length && !localStorage.getItem('aubergeTamar_depensesReellesJanvFevAout2026_v1')) {
+      try { localStorage.setItem('aubergeTamar_depensesReellesJanvFevAout2026_v1', '1'); } catch(e) {}
       Promise.all(AUBERGE_TAMAR_DEPENSES_REELLES_JANV_SUR_FEV_AOUT2026.map(entry => {
         const { _localId, ...data } = entry;
         return window._addDoc(window._collection(window._db, 'saisies'), data);
@@ -13002,109 +12951,32 @@ async function startFirebaseSync() {
     // catégorie/fonction/montant) parmi les dépenses Firestore et on la supprime. Cela annule
     // exactement l'ajout en double, sans jamais toucher aux saisies réelles de l'utilisateur (si un
     // doublon strict existe, l'une des deux copies identiques est supprimée et l'autre reste).
-    // REMPLACEMENT CANONIQUE UNIQUE des dépenses de Janvier à Août 2026 (13/09/2026, sur demande de
-    // l'utilisateur) : supprime TOUTES les dépenses actuellement enregistrées pour ces 8 mois — quel
-    // qu'en soit le contenu (saisies réelles, lignes injectées par erreur, doublons...) — et les
-    // remplace par UNE SEULE série fixe de 12 lignes par mois, totalisant 1 450 500 F/mois : Salaires
-    // (Sécurité 40 000 F, Buanderie 35 000 F, Réceptionniste 35 000 F, Gérant 40 000 F), Impôt
-    // synthétique (37 500 F), Fournitures (Serviette 5 000 F, Literie-Draps 10 000 F, Omo 10 000 F,
-    // Papier Hygiénique 40 000 F, Déodorant 6 000 F), Remboursement dettes (Baobab San Pedro 517 000 F,
-    // Coopec San Pedro 675 000 F). Les dépenses des AUTRES mois (Septembre 2026 et au-delà) ne sont
-    // pas touchées. Remplace l'ancien nettoyage "lignes injectées" (v4, obsolète après ce remplacement
-    // complet). Protégé par un flag localStorage pour ne s'exécuter qu'UNE SEULE fois par appareil.
-    // v2 (13/09/2026) : le Remboursement dettes Coopec San Pedro n'est PAS un montant fixe de
-    // 675 000 F — c'est 25 000 F par jour du mois, SAUF le dimanche (non compté). Calculé ici plutôt
-    // que codé en dur, pour que le total corresponde exactement au nombre réel de jours non-dimanche
-    // de chaque mois (ex. 675 000 F en Janvier et Juillet, 600 000 F en Février, 650 000 F les autres
-    // mois de cette période — cohérent avec les montants réels déjà constatés par l'utilisateur).
-    // Nouveau nom de flag (_v2) : force la ré-exécution du remplacement même sur un appareil où la
-    // v1 (qui utilisait à tort un montant fixe de 675 000 F pour Coopec) a déjà tourné — la v2
-    // supprime d'abord TOUTES les lignes existantes de Coopec (et des autres catégories) pour
-    // Janvier→Août avant de réinsérer la bonne valeur, donc aucune ligne en double n'est créée.
-    if (!window._migFlags['depensesCanoniquesJanvAout2026_v2']) {
-      saveMigFlag(window._db, 'depensesCanoniquesJanvAout2026_v2');
-      function joursNonDimancheDuMois(annee, moisIdx) {
-        const nbJours = new Date(annee, moisIdx + 1, 0).getDate();
-        let n = 0;
-        for (let j = 1; j <= nbJours; j++) { if (new Date(annee, moisIdx, j).getDay() !== 0) n++; }
-        return n;
-      }
-      const moisCanon = [
-        { mois: 'Janvier',  moisIdx: 0, date: '31/01/2026' },
-        { mois: 'Février',  moisIdx: 1, date: '28/02/2026' },
-        { mois: 'Mars',     moisIdx: 2, date: '31/03/2026' },
-        { mois: 'Avril',    moisIdx: 3, date: '30/04/2026' },
-        { mois: 'Mai',      moisIdx: 4, date: '31/05/2026' },
-        { mois: 'Juin',     moisIdx: 5, date: '30/06/2026' },
-        { mois: 'Juillet',  moisIdx: 6, date: '31/07/2026' },
-        { mois: 'Août',     moisIdx: 7, date: '31/08/2026' }
-      ];
-      const lignesFixes = [
-        { categorie: 'Salaire du personnel', sousCategorie: '', fonction: 'Sécurité',       montant: 40000 },
-        { categorie: 'Salaire du personnel', sousCategorie: '', fonction: 'Buanderie',      montant: 35000 },
-        { categorie: 'Salaire du personnel', sousCategorie: '', fonction: 'RÉCEPTIONNISTE', montant: 35000 },
-        { categorie: 'Salaire du personnel', sousCategorie: '', fonction: 'Gérant',         montant: 40000 },
-        { categorie: 'Impôts',      sousCategorie: 'Impôt synthétique',  fonction: '', montant: 37500 },
-        { categorie: 'Fournitures', sousCategorie: 'Serviette',         fonction: '', montant: 5000 },
-        { categorie: 'Fournitures', sousCategorie: 'Literie - Draps',   fonction: '', montant: 10000 },
-        { categorie: 'Fournitures', sousCategorie: 'Omo',               fonction: '', montant: 10000 },
-        { categorie: 'Fournitures', sousCategorie: 'Papier Hygiénique', fonction: '', montant: 40000 },
-        { categorie: 'Fournitures', sousCategorie: 'Déodorant',         fonction: '', montant: 6000 },
-        { categorie: 'Remboursement dettes', sousCategorie: 'Baobab San Pedro', fonction: '', montant: 517000 }
-      ];
-      const idsADeleter = [];
-      snap.forEach(d => {
-        const data = d.data();
-        if (data.type === 'depenses' && /\/(0[1-8])\/2026$/.test(data.date || '')) idsADeleter.push(d.id);
-      });
-      const nouvellesEntrees = [];
-      let tsBase = Date.now();
-      moisCanon.forEach(m => {
-        lignesFixes.forEach(l => {
-          nouvellesEntrees.push({
-            type: 'depenses', mois: m.mois, moisIdx: m.moisIdx, annee: 2026, montant: l.montant,
-            date: m.date, categorie: l.categorie, sousCategorie: l.sousCategorie, fonction: l.fonction,
-            nomPersonnel: '', contact: '', ts: tsBase++
-          });
-        });
-        const montantCoopec = joursNonDimancheDuMois(2026, m.moisIdx) * 25000;
-        nouvellesEntrees.push({
-          type: 'depenses', mois: m.mois, moisIdx: m.moisIdx, annee: 2026, montant: montantCoopec,
-          date: m.date, categorie: 'Remboursement dettes', sousCategorie: 'Coopec San Pedro', fonction: '',
-          nomPersonnel: '', contact: '', ts: tsBase++
-        });
-      });
-      replaceCollectionEntriesBatched('saisies', idsADeleter, nouvellesEntrees)
-        .then(() => showToast('✅ Dépenses Janvier→Août 2026 réinitialisées (Coopec calculé à 25 000 F/jour hors dimanche) — Auberge Tamar'))
-        .catch(() => {});
-    }
-    // Nettoyage GÉNÉRIQUE PERMANENT (v3) : contrairement au v1/v2 ci-dessus qui ne s'exécutaient
-    // qu'UNE SEULE fois (via un flag localStorage) et se limitaient à Juin/Juillet 2026, ce bloc
-    // s'exécute à CHAQUE mise à jour Firestore (pas de flag "une seule fois"), sur TOUTES les
-    // dépenses, tous mois et toutes années confondus — passés, présents et à venir. Il regroupe les
-    // dépenses par (catégorie + sous-catégorie + fonction + montant + date) et, dès qu'un groupe
-    // contient plus d'une écriture identique, supprime automatiquement les copies en trop en ne
-    // conservant que la première. Un verrou en mémoire (dedupDepensesEnCours) évite les exécutions
-    // concurrentes pendant qu'une suppression est déjà en cours (chaque suppression redéclenche ce
-    // même listener onSnapshot).
-    if (!window._dedupDepensesEnCours) {
-      const groups = {};
+    if (AUBERGE_TAMAR_DEPENSES_REELLES_JANV_SUR_FEV_AOUT2026.length && !localStorage.getItem('aubergeTamar_depensesReellesJanvFevAout2026_DEDUP_v1')) {
+      try { localStorage.setItem('aubergeTamar_depensesReellesJanvFevAout2026_DEDUP_v1', '1'); } catch(e) {}
+      const docsByMonth = {};
       snap.forEach(d => {
         const data = d.data();
         if (data.type !== 'depenses' || !data.date) return;
-        const key = [data.categorie||'', data.sousCategorie||'', data.fonction||'', data.montant, data.date].join('|');
-        (groups[key] = groups[key] || []).push(d.id);
+        const mm = data.date.slice(3); // "MM/AAAA"
+        (docsByMonth[mm] = docsByMonth[mm] || []).push({ id: d.id, data });
       });
       const idsToDelete = [];
-      Object.values(groups).forEach(ids => {
-        if (ids.length > 1) idsToDelete.push(...ids.slice(1)); // garde la 1ère occurrence, supprime le reste
+      AUBERGE_TAMAR_DEPENSES_REELLES_JANV_SUR_FEV_AOUT2026.forEach(entry => {
+        const mm = entry.date.slice(3);
+        const pool = docsByMonth[mm] || [];
+        const idx = pool.findIndex(x =>
+          !idsToDelete.includes(x.id) &&
+          x.data.montant === entry.montant &&
+          x.data.categorie === entry.categorie &&
+          (x.data.sousCategorie || '') === (entry.sousCategorie || '') &&
+          (x.data.fonction || '') === (entry.fonction || '')
+        );
+        if (idx !== -1) idsToDelete.push(pool[idx].id);
       });
       if (idsToDelete.length) {
-        window._dedupDepensesEnCours = true;
         Promise.all(idsToDelete.map(id => window._deleteDoc(window._doc(window._db, 'saisies', id)).catch(() => {})))
-          .then(() => showToast(`✅ ${idsToDelete.length} doublon(s) de dépenses supprimé(s) automatiquement — Auberge Tamar`))
-          .catch(() => {})
-          .finally(() => { window._dedupDepensesEnCours = false; });
+          .then(() => showToast('✅ Doublons de dépenses (Février→Août) supprimés — Auberge Tamar'))
+          .catch(() => {});
       }
     }
   }, () => setConnStatus(false));
@@ -13192,24 +13064,24 @@ async function startFirebaseSync() {
     scheduleRoomHistoryRenderAndPersist();
     // Correctif UNIQUE : écrase uniquement les nuitées de Janvier 2026 déjà présentes par la
     // retranscription fusionnée et complète fournie par l'utilisateur, sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_JANV2026_CORRECTIF.length && !window._migFlags['histJanv2026Correctif_v1']) {
-      saveMigFlag(window._db, 'histJanv2026Correctif_v1');
+    if (AUBERGE_TAMAR_HISTORIQUE_JANV2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histJanv2026Correctif_v1')) {
+      try { localStorage.setItem('aubergeTamar_histJanv2026Correctif_v1', '1'); } catch(e) {}
       const idsJanv2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-01')).map(h => h._docId);
       replaceCollectionEntriesBatched('historique_chambres', idsJanv2026Correctif, AUBERGE_TAMAR_HISTORIQUE_JANV2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Janvier 2026 chargé — Auberge Tamar'))
         .catch(() => {});
     }
     // Correctif UNIQUE : écrase uniquement les nuitées de Février 2026 déjà présentes par la
     // retranscription mise à jour fournie par l'utilisateur, sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_FEV2026_CORRECTIF.length && !window._migFlags['histFev2026Correctif_v1']) {
-      saveMigFlag(window._db, 'histFev2026Correctif_v1');
+    if (AUBERGE_TAMAR_HISTORIQUE_FEV2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histFev2026Correctif_v1')) {
+      try { localStorage.setItem('aubergeTamar_histFev2026Correctif_v1', '1'); } catch(e) {}
       const idsFev2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-02')).map(h => h._docId);
       replaceCollectionEntriesBatched('historique_chambres', idsFev2026Correctif, AUBERGE_TAMAR_HISTORIQUE_FEV2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Février 2026 chargé — Auberge Tamar'))
         .catch(() => {});
     }
     // Correctif UNIQUE : écrase uniquement les nuitées de Mars 2026 déjà présentes par la
     // retranscription du cahier papier fournie par l'utilisateur, sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_MARS2026_CORRECTIF.length && !window._migFlags['histMars2026Correctif_v1']) {
-      saveMigFlag(window._db, 'histMars2026Correctif_v1');
+    if (AUBERGE_TAMAR_HISTORIQUE_MARS2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histMars2026Correctif_v1')) {
+      try { localStorage.setItem('aubergeTamar_histMars2026Correctif_v1', '1'); } catch(e) {}
       const idsMars2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-03')).map(h => h._docId);
       replaceCollectionEntriesBatched('historique_chambres', idsMars2026Correctif, AUBERGE_TAMAR_HISTORIQUE_MARS2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Mars 2026 chargé — Auberge Tamar'))
         .catch(() => {});
@@ -13217,16 +13089,16 @@ async function startFirebaseSync() {
     // Correctif UNIQUE : écrase uniquement les nuitées d'Avril 2026 déjà présentes par la
     // retranscription fidèle du cahier papier fournie par l'utilisateur (y compris la fusion du 27
     // avril dans le 26 avril), sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_AVRIL2026_CORRECTIF.length && !window._migFlags['histAvril2026Correctif_v1']) {
-      saveMigFlag(window._db, 'histAvril2026Correctif_v1');
+    if (AUBERGE_TAMAR_HISTORIQUE_AVRIL2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histAvril2026Correctif_v1')) {
+      try { localStorage.setItem('aubergeTamar_histAvril2026Correctif_v1', '1'); } catch(e) {}
       const idsAvril2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-04')).map(h => h._docId);
       replaceCollectionEntriesBatched('historique_chambres', idsAvril2026Correctif, AUBERGE_TAMAR_HISTORIQUE_AVRIL2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Avril 2026 chargé — Auberge Tamar'))
         .catch(() => {});
     }
     // Correctif UNIQUE : écrase uniquement les nuitées de Mai 2026 déjà présentes par la
     // retranscription fidèle du cahier papier fournie par l'utilisateur, sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_MAI2026_CORRECTIF.length && !window._migFlags['histMai2026Correctif_v1']) {
-      saveMigFlag(window._db, 'histMai2026Correctif_v1');
+    if (AUBERGE_TAMAR_HISTORIQUE_MAI2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histMai2026Correctif_v1')) {
+      try { localStorage.setItem('aubergeTamar_histMai2026Correctif_v1', '1'); } catch(e) {}
       const idsMai2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-05')).map(h => h._docId);
       replaceCollectionEntriesBatched('historique_chambres', idsMai2026Correctif, AUBERGE_TAMAR_HISTORIQUE_MAI2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Mai 2026 chargé — Auberge Tamar'))
         .catch(() => {});
@@ -13235,10 +13107,10 @@ async function startFirebaseSync() {
     // lors d'une version antérieure de l'app) par la retranscription complète et mise à jour du
     // registre papier fournie par l'utilisateur le 11/09/2026, intégrant les "passes" journalières
     // et la correction du 30 juin (v6 — remplace la précédente v5), sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_JUIN2026_CORRECTIF.length && !window._migFlags['histJuin2026Correctif_v6']) {
+    if (AUBERGE_TAMAR_HISTORIQUE_JUIN2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histJuin2026Correctif_v6')) {
       const idsJuin2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-06')).map(h => h._docId);
       replaceCollectionEntriesBatched('historique_chambres', idsJuin2026Correctif, AUBERGE_TAMAR_HISTORIQUE_JUIN2026_CORRECTIF).then(() => {
-        saveMigFlag(window._db, 'histJuin2026Correctif_v6');
+        try { localStorage.setItem('aubergeTamar_histJuin2026Correctif_v6', '1'); } catch(e) {}
         showToast('✅ Correctif nuitées Juin 2026 chargé — Auberge Tamar');
       }).catch(() => {});
     }
@@ -13246,23 +13118,23 @@ async function startFirebaseSync() {
     // lors d'une version antérieure de l'app) par la retranscription complète et révisée du
     // registre papier fournie par l'utilisateur le 11/09/2026 (v3 — remplace la précédente v2),
     // sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_JUILLET2026_CORRECTIF.length && !window._migFlags['histJuillet2026Correctif_v4']) {
+    if (AUBERGE_TAMAR_HISTORIQUE_JUILLET2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histJuillet2026Correctif_v4')) {
       const idsJuillet2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-07')).map(h => h._docId);
       replaceCollectionEntriesBatched('historique_chambres', idsJuillet2026Correctif, AUBERGE_TAMAR_HISTORIQUE_JUILLET2026_CORRECTIF).then(() => {
-        saveMigFlag(window._db, 'histJuillet2026Correctif_v4');
+        try { localStorage.setItem('aubergeTamar_histJuillet2026Correctif_v4', '1'); } catch(e) {}
         showToast('✅ Correctif nuitées Juillet 2026 chargé — Auberge Tamar');
       }).catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Août 2026 (chambres 1,2,3,6,7,8, 01→31 août 2026).
-    if (AUBERGE_TAMAR_HISTORIQUE_AOUT2026.length && !window._migFlags['histAout2026Loaded_v2']) {
-      saveMigFlag(window._db, 'histAout2026Loaded_v2');
+    if (AUBERGE_TAMAR_HISTORIQUE_AOUT2026.length && !localStorage.getItem('aubergeTamar_histAout2026Loaded_v2')) {
+      try { localStorage.setItem('aubergeTamar_histAout2026Loaded_v2', '1'); } catch(e) {}
       const idsAout2026 = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-08')).map(h => h._docId);
       replaceCollectionEntriesBatched('historique_chambres', idsAout2026, AUBERGE_TAMAR_HISTORIQUE_AOUT2026).then(() => showToast('✅ Historique Août 2026 chargé — Auberge Tamar'))
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Septembre 2026 (01→08 septembre 2026).
-    if (AUBERGE_TAMAR_HISTORIQUE_SEPTEMBRE2026.length && !window._migFlags['histSept2026Loaded_v3']) {
-      saveMigFlag(window._db, 'histSept2026Loaded_v3');
+    if (AUBERGE_TAMAR_HISTORIQUE_SEPTEMBRE2026.length && !localStorage.getItem('aubergeTamar_histSept2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_histSept2026Loaded_v3', '1'); } catch(e) {}
       const idsSept2026 = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-09')).map(h => h._docId);
       replaceCollectionEntriesBatched('historique_chambres', idsSept2026, AUBERGE_TAMAR_HISTORIQUE_SEPTEMBRE2026).then(() => showToast('✅ Historique Septembre 2026 chargé — Auberge Tamar'))
         .catch(() => {});
@@ -13318,8 +13190,8 @@ async function startFirebaseSync() {
     // jour) : écrase les Points de Passes de Nuit déjà présents pour Janvier 2026 par les montants
     // réels du registre papier fournis par l'utilisateur (chambres N°2 à N°7, 01→31 janvier 2026), puis
     // se synchronise normalement ensuite comme n'importe quelle saisie.
-    if (AUBERGE_TAMAR_PASSESNUIT_JANV2026.length && !window._migFlags['passesNuitJanv2026Loaded_v3']) {
-      saveMigFlag(window._db, 'passesNuitJanv2026Loaded_v3');
+    if (AUBERGE_TAMAR_PASSESNUIT_JANV2026.length && !localStorage.getItem('aubergeTamar_passesNuitJanv2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_passesNuitJanv2026Loaded_v3', '1'); } catch(e) {}
       const idsJanv2026Nuit = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13329,8 +13201,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Février 2026 (chambres N°2 à N°7, 01→28 février 2026).
-    if (AUBERGE_TAMAR_PASSESNUIT_FEV2026.length && !window._migFlags['passesNuitFev2026Loaded_v3']) {
-      saveMigFlag(window._db, 'passesNuitFev2026Loaded_v3');
+    if (AUBERGE_TAMAR_PASSESNUIT_FEV2026.length && !localStorage.getItem('aubergeTamar_passesNuitFev2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_passesNuitFev2026Loaded_v3', '1'); } catch(e) {}
       const idsFev2026Nuit = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13340,8 +13212,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Mars 2026 (chambres N°2 à N°9, 01→31 mars 2026).
-    if (AUBERGE_TAMAR_PASSESNUIT_MARS2026.length && !window._migFlags['passesNuitMars2026Loaded_v3']) {
-      saveMigFlag(window._db, 'passesNuitMars2026Loaded_v3');
+    if (AUBERGE_TAMAR_PASSESNUIT_MARS2026.length && !localStorage.getItem('aubergeTamar_passesNuitMars2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_passesNuitMars2026Loaded_v3', '1'); } catch(e) {}
       const idsMars2026Nuit = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13351,8 +13223,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Avril 2026 (chambres N°1 à N°10, 01→30 avril 2026).
-    if (AUBERGE_TAMAR_PASSESNUIT_AVRIL2026.length && !window._migFlags['passesNuitAvril2026Loaded_v3']) {
-      saveMigFlag(window._db, 'passesNuitAvril2026Loaded_v3');
+    if (AUBERGE_TAMAR_PASSESNUIT_AVRIL2026.length && !localStorage.getItem('aubergeTamar_passesNuitAvril2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_passesNuitAvril2026Loaded_v3', '1'); } catch(e) {}
       const idsAvril2026Nuit = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13362,8 +13234,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Mai 2026 (chambres N°1 à N°9, 01→31 mai 2026).
-    if (AUBERGE_TAMAR_PASSESNUIT_MAI2026.length && !window._migFlags['passesNuitMai2026Loaded_v4']) {
-      saveMigFlag(window._db, 'passesNuitMai2026Loaded_v4');
+    if (AUBERGE_TAMAR_PASSESNUIT_MAI2026.length && !localStorage.getItem('aubergeTamar_passesNuitMai2026Loaded_v4')) {
+      try { localStorage.setItem('aubergeTamar_passesNuitMai2026Loaded_v4', '1'); } catch(e) {}
       const idsMai2026Nuit = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13373,8 +13245,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Juin 2026 (chambres N°1 à N°9, 01→30 juin 2026).
-    if (AUBERGE_TAMAR_PASSESNUIT_JUIN2026.length && !window._migFlags['passesNuitJuin2026Loaded_v4']) {
-      saveMigFlag(window._db, 'passesNuitJuin2026Loaded_v4');
+    if (AUBERGE_TAMAR_PASSESNUIT_JUIN2026.length && !localStorage.getItem('aubergeTamar_passesNuitJuin2026Loaded_v4')) {
+      try { localStorage.setItem('aubergeTamar_passesNuitJuin2026Loaded_v4', '1'); } catch(e) {}
       const idsJuin2026Nuit = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13385,8 +13257,8 @@ async function startFirebaseSync() {
     }
     // Remplacement UNIQUE : Passes de Jour Juin 2026 (01→30 juin 2026, totaux journaliers issus du
     // récapitulatif détaillé fourni par l'utilisateur le 12/09/2026).
-    if (AUBERGE_TAMAR_PASSESJOUR_JUIN2026.length && !window._migFlags['passesJourJuin2026Loaded_v3']) {
-      saveMigFlag(window._db, 'passesJourJuin2026Loaded_v3');
+    if (AUBERGE_TAMAR_PASSESJOUR_JUIN2026.length && !localStorage.getItem('aubergeTamar_passesJourJuin2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_passesJourJuin2026Loaded_v3', '1'); } catch(e) {}
       const idsJuin2026Jour = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13396,8 +13268,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Juillet 2026 (chambres N°1 à N°9, 01→31 juillet 2026).
-    if (AUBERGE_TAMAR_PASSESNUIT_JUILLET2026.length && !window._migFlags['passesNuitJuillet2026Loaded_v3']) {
-      saveMigFlag(window._db, 'passesNuitJuillet2026Loaded_v3');
+    if (AUBERGE_TAMAR_PASSESNUIT_JUILLET2026.length && !localStorage.getItem('aubergeTamar_passesNuitJuillet2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_passesNuitJuillet2026Loaded_v3', '1'); } catch(e) {}
       const idsJuillet2026Nuit = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13407,8 +13279,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Août 2026 (chambres N°1 à N°9, 01→31 août 2026).
-    if (AUBERGE_TAMAR_PASSESNUIT_AOUT2026.length && !window._migFlags['passesNuitAout2026Loaded_v4']) {
-      saveMigFlag(window._db, 'passesNuitAout2026Loaded_v4');
+    if (AUBERGE_TAMAR_PASSESNUIT_AOUT2026.length && !localStorage.getItem('aubergeTamar_passesNuitAout2026Loaded_v4')) {
+      try { localStorage.setItem('aubergeTamar_passesNuitAout2026Loaded_v4', '1'); } catch(e) {}
       const idsAout2026Nuit = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13418,8 +13290,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : idem pour Septembre 2026 (01→08 septembre 2026).
-    if (AUBERGE_TAMAR_PASSESNUIT_SEPTEMBRE2026.length && !window._migFlags['passesNuitSeptembre2026Loaded_v6']) {
-      saveMigFlag(window._db, 'passesNuitSeptembre2026Loaded_v6');
+    if (AUBERGE_TAMAR_PASSESNUIT_SEPTEMBRE2026.length && !localStorage.getItem('aubergeTamar_passesNuitSeptembre2026Loaded_v6')) {
+      try { localStorage.setItem('aubergeTamar_passesNuitSeptembre2026Loaded_v6', '1'); } catch(e) {}
       const idsSeptembre2026Nuit = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13429,8 +13301,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : Passes de Jour Septembre 2026 (01→07 septembre 2026, totaux journaliers).
-    if (AUBERGE_TAMAR_PASSESJOUR_SEPTEMBRE2026.length && !window._migFlags['passesJourSeptembre2026Loaded_v3']) {
-      saveMigFlag(window._db, 'passesJourSeptembre2026Loaded_v3');
+    if (AUBERGE_TAMAR_PASSESJOUR_SEPTEMBRE2026.length && !localStorage.getItem('aubergeTamar_passesJourSeptembre2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_passesJourSeptembre2026Loaded_v3', '1'); } catch(e) {}
       const idsSeptembre2026Jour = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13440,8 +13312,8 @@ async function startFirebaseSync() {
         .catch(() => {});
     }
     // Remplacement UNIQUE : Passes de Jour Juillet 2026 (01→31 juillet 2026, totaux journaliers).
-    if (AUBERGE_TAMAR_PASSESJOUR_JUILLET2026.length && !window._migFlags['passesJourJuillet2026Loaded']) {
-      saveMigFlag(window._db, 'passesJourJuillet2026Loaded');
+    if (AUBERGE_TAMAR_PASSESJOUR_JUILLET2026.length && !localStorage.getItem('aubergeTamar_passesJourJuillet2026Loaded')) {
+      try { localStorage.setItem('aubergeTamar_passesJourJuillet2026Loaded', '1'); } catch(e) {}
       const idsJuillet2026Jour = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13452,8 +13324,8 @@ async function startFirebaseSync() {
     }
     // Remplacement UNIQUE : Passes de Jour Août 2026 (01→31 août 2026, totaux journaliers corrigés
     // le 12/09/2026 d'après le récapitulatif détaillé fourni par l'utilisateur).
-    if (AUBERGE_TAMAR_PASSESJOUR_AOUT2026.length && !window._migFlags['passesJourAout2026Loaded_v3']) {
-      saveMigFlag(window._db, 'passesJourAout2026Loaded_v3');
+    if (AUBERGE_TAMAR_PASSESJOUR_AOUT2026.length && !localStorage.getItem('aubergeTamar_passesJourAout2026Loaded_v3')) {
+      try { localStorage.setItem('aubergeTamar_passesJourAout2026Loaded_v3', '1'); } catch(e) {}
       const idsAout2026Jour = [];
       snap.forEach(d => {
         const data = d.data();
@@ -13465,8 +13337,8 @@ async function startFirebaseSync() {
     // Remplacement UNIQUE : Passes de Jour Janvier 2026 (01→31 janvier 2026, totaux journaliers issus
     // du récapitulatif quotidien fourni par l'utilisateur le 11/09/2026). Écrase uniquement les Points
     // de Passes de Jour déjà présents pour Janvier 2026, sans toucher à la Nuit ni aux autres mois.
-    if (AUBERGE_TAMAR_PASSESJOUR_JANV2026.length && !window._migFlags['passesJourJanv2026Loaded_v1']) {
-      saveMigFlag(window._db, 'passesJourJanv2026Loaded_v1');
+    if (AUBERGE_TAMAR_PASSESJOUR_JANV2026.length && !localStorage.getItem('aubergeTamar_passesJourJanv2026Loaded_v1')) {
+      try { localStorage.setItem('aubergeTamar_passesJourJanv2026Loaded_v1', '1'); } catch(e) {}
       const idsJanv2026Jour = [];
       snap.forEach(d => {
         const data = d.data();
@@ -16190,236 +16062,6 @@ function buildBilanMensuelPDF(year, monthIdx) {
   showToast(`📄 Bilan de ${d.monthLabel} ${year} généré`);
 }
 
-// ===== BILAN MENSUEL EXPERT — EXCEL & WORD =====
-// Construit le contenu HTML du bilan mensuel (mêmes sections que le PDF : synthèse, recettes
-// journalières, dépenses détaillées par catégorie, synthèse par catégorie, journal des
-// transactions). Ce HTML sert de source commune à l'export Word (converti génériquement en
-// tableaux docx.js, comme buildPrintContent()) et reprend le format des autres rapports.
-function buildBilanMensuelHTML(year, monthIdx) {
-  const d = getBilanMensuelData(year, monthIdx);
-  const now = new Date().toLocaleDateString('fr-FR');
-  let html = `<h1>BILAN FINANCIER MENSUEL</h1>
-    <p style="text-align:center;font-size:11px;color:#666;margin:-8px 0 16px">${d.monthLabel} ${year} — Édité le ${now}</p>`;
-
-  html += `<h2>Synthèse du mois</h2>
-    <table><thead><tr><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead>
-    <tbody><tr><td>${fmtFull(d.totalR)}</td><td>${fmtFull(d.totalD)}</td><td>${fmtFull(d.net)}</td><td>${d.margeVal.toFixed(1)}%</td></tr></tbody></table>`;
-
-  html += `<h2>1 · Recettes journalières — Nuitées &amp; Passes</h2>`;
-  if (d.dailyRows.length) {
-    html += `<table><thead><tr><th style="text-align:left">Date</th><th>Nuitées (FCFA)</th><th>Passes Jour (FCFA)</th><th>Passes Nuit (FCFA)</th><th>Total Passes (FCFA)</th><th>Total Général (FCFA)</th></tr></thead><tbody>`;
-    d.dailyRows.forEach(r => {
-      html += `<tr><td style="text-align:left">${r.dateLabel}</td><td>${fmtFull(r.nuitees)}</td><td>${fmtFull(r.passesJour)}</td><td>${fmtFull(r.passesNuit)}</td><td>${fmtFull(r.totalPassesJournee)}</td><td>${fmtFull(r.total)}</td></tr>`;
-    });
-    html += `</tbody><tfoot><tr><td style="text-align:left">TOTAL</td><td>${fmtFull(d.totalChambres)}</td><td>${fmtFull(d.totalPassesJourMois)}</td><td>${fmtFull(d.totalPassesNuitMois)}</td><td>${fmtFull(d.totalPasses)}</td><td>${fmtFull(d.totalR)}</td></tr></tfoot></table>`;
-  } else {
-    html += `<p>Aucune saisie journalière détaillée pour ce mois — Total recettes : ${fmtFull(d.totalR)} FCFA.</p>`;
-  }
-
-  const catNames = Object.keys(d.catMap).sort();
-  html += `<h2>2 · Détail des dépenses par catégorie</h2>`;
-  if (catNames.length) {
-    html += `<table><thead><tr><th style="text-align:left">Date</th><th style="text-align:left">Catégorie</th><th style="text-align:left">Détail</th><th>Montant (FCFA)</th></tr></thead><tbody>`;
-    catNames.forEach(cat => {
-      const g = d.catMap[cat];
-      g.items.slice().sort((a, b) => parseFrDate(a.date) - parseFrDate(b.date)).forEach(it => {
-        const detail = (cat === 'Salaire du personnel') ? [it.fonction, it.nomPersonnel].filter(Boolean).join(' — ') : (it.sousCategorie || '—');
-        html += `<tr><td style="text-align:left">${it.date}</td><td style="text-align:left">${cat}</td><td style="text-align:left">${detail}</td><td>${fmtFull(it.montant)}</td></tr>`;
-      });
-      html += `<tr><td></td><td style="text-align:left">Sous-total — ${cat}</td><td></td><td>${fmtFull(g.total)}</td></tr>`;
-    });
-    html += `</tbody><tfoot><tr><td colspan="3">TOTAL DÉPENSES</td><td>${fmtFull(d.totalD)}</td></tr></tfoot></table>`;
-
-    html += `<h2>3 · Synthèse des dépenses par catégorie</h2>
-      <table><thead><tr><th style="text-align:left">Catégorie</th><th>Nb. opérations</th><th>Montant (FCFA)</th><th>% du total</th></tr></thead><tbody>`;
-    catNames.slice().sort((a, b) => d.catMap[b].total - d.catMap[a].total).forEach(cat => {
-      const g = d.catMap[cat];
-      const pct = d.totalD > 0 ? (g.total / d.totalD * 100) : 0;
-      html += `<tr><td style="text-align:left">${cat}</td><td>${g.items.length}</td><td>${fmtFull(g.total)}</td><td>${pct.toFixed(1)}%</td></tr>`;
-    });
-    html += `</tbody><tfoot><tr><td style="text-align:left">TOTAL</td><td>${d.depensesEntries.length}</td><td>${fmtFull(d.totalD)}</td><td>100%</td></tr></tfoot></table>`;
-  } else {
-    html += `<p>Aucune dépense détaillée pour ce mois.</p>`;
-  }
-
-  if (d.recettesEntries.length + d.depensesEntries.length > 0) {
-    html += `<h2>4 · Journal des transactions du mois</h2>
-      <table><thead><tr><th style="text-align:left">Date</th><th style="text-align:left">Type</th><th style="text-align:left">Détail</th><th>Montant (FCFA)</th></tr></thead><tbody>`;
-    const journal = [
-      ...d.recettesEntries.map(e => ({ ...e, __label: 'Recette' })),
-      ...d.depensesEntries.map(e => ({ ...e, __label: 'Dépense' }))
-    ].sort((a, b) => parseFrDate(a.date) - parseFrDate(b.date));
-    journal.forEach(e => {
-      const detail = e.type === 'depenses' ? (txDetail(e) || '—') : 'Encaissement';
-      const sign = e.type === 'recettes' ? '+' : '-';
-      html += `<tr><td style="text-align:left">${e.date}</td><td style="text-align:left">${e.__label}</td><td style="text-align:left">${detail}</td><td>${sign}${fmtFull(e.montant)}</td></tr>`;
-    });
-    html += `</tbody></table>`;
-  }
-
-  html += `<div class="print-footer">Auberge Tamar · AubergeGest · Édité le ${now}</div>`;
-  return html;
-}
-
-// Construit et télécharge un .docx à partir d'un contenu HTML (h1/h2/p/table), en réutilisant le
-// même moteur générique que l'export Word du menu Impression/Export (docxLetterhead/docxTableFromEl —
-// voir exportWord()). Partagé par le Bilan Mensuel et le Bilan Annuel.
-function buildBilanWordDoc(html, filename) {
-  const D = window.docx;
-  const A4_W = 11906, A4_H = 16838; // twips (1/20 pt), format A4
-  const margin = 800;
-  const pageContentWidth = A4_W - margin * 2;
-  const domDoc = new DOMParser().parseFromString(html, 'text/html');
-  const nodes = Array.from(domDoc.body.children);
-  const bodyChildren = [docxLetterhead(false, pageContentWidth), new D.Paragraph({ text: '', spacing: { after: 120 } })];
-  nodes.forEach(el => {
-    const tag = el.tagName.toLowerCase();
-    if (tag === 'h1') bodyChildren.push(docxParagraphFromEl(el, 'h1', false));
-    else if (tag === 'h2') bodyChildren.push(docxParagraphFromEl(el, 'h2', false));
-    else if (tag === 'p') bodyChildren.push(docxParagraphFromEl(el, 'p', false));
-    else if (tag === 'table') {
-      const t = docxTableFromEl(el, false, pageContentWidth);
-      if (t) { bodyChildren.push(t); bodyChildren.push(new D.Paragraph({ text: '', spacing: { after: 80 } })); }
-    } else if (tag === 'div' && el.className === 'print-footer') {
-      bodyChildren.push(docxParagraphFromEl(el, 'footer', false));
-    }
-  });
-  const wordDoc = new D.Document({
-    creator: 'AubergeGest',
-    title: filename,
-    sections: [{
-      properties: { page: { size: { orientation: D.PageOrientation.PORTRAIT, width: A4_W, height: A4_H }, margin: { top: margin, bottom: margin, left: margin, right: margin } } },
-      children: bodyChildren
-    }]
-  });
-  D.Packer.toBlob(wordDoc).then(blob => {
-    if (!blob || blob.size < 1000) { showToast('⚠️ Le fichier Word généré semble incomplet — réessayez'); return; }
-    downloadBlob(blob, filename + '.docx');
-    showToast('📝 Fichier Word téléchargé');
-  }).catch(e => { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Word'); });
-}
-
-function genererBilanMensuelWord() {
-  const year = parseInt(document.getElementById('bilanAnnee').value);
-  const monthIdx = MOIS_FULL.indexOf(document.getElementById('bilanMois').value);
-  closeModal('modalBilan');
-  showToast('⏳ Génération du bilan (Word) en cours...');
-  loadDocxJS(() => {
-    try {
-      const slug = MOIS_FULL[monthIdx].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      buildBilanWordDoc(buildBilanMensuelHTML(year, monthIdx), `Bilan_Mensuel_${slug}_${year}_AubergeTamar`);
-    } catch (e) { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Word'); }
-  });
-}
-
-function genererBilanMensuelExcel() {
-  const year = parseInt(document.getElementById('bilanAnnee').value);
-  const monthIdx = MOIS_FULL.indexOf(document.getElementById('bilanMois').value);
-  closeModal('modalBilan');
-  showToast('⏳ Génération du bilan (Excel) en cours...');
-  loadExcelJS(() => {
-    try { buildBilanMensuelExcel(year, monthIdx); }
-    catch (e) { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Excel'); }
-  });
-}
-
-// Construit le classeur Excel "expert" du bilan mensuel (mêmes sections que le PDF)
-function buildBilanMensuelExcel(year, monthIdx) {
-  const d = getBilanMensuelData(year, monthIdx);
-  const wb = new ExcelJS.Workbook();
-  wb.creator = 'AubergeGest'; wb.created = new Date();
-  const sheet = wb.addWorksheet('Bilan Mensuel');
-  sheet.columns = Array(6).fill(0).map(() => ({ width: 17, style: { font: { size: 11 } } }));
-  sheet.properties.defaultRowHeight = 18;
-  let r = xlAddLetterhead(sheet, `BILAN FINANCIER MENSUEL — ${d.monthLabel.toUpperCase()} ${year}`,
-    [`Recettes : ${fmtFull(d.totalR)} F · Dépenses : ${fmtFull(d.totalD)} F · Net : ${fmtFull(d.net)} F · Marge : ${d.margeVal.toFixed(1)}%`], 6);
-
-  // 1. Recettes journalières
-  sheet.mergeCells(r, 1, r, 6);
-  sheet.getCell(r, 1).value = '1 · RECETTES JOURNALIÈRES — NUITÉES & PASSES';
-  sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
-  r++;
-  if (d.dailyRows.length) {
-    sheet.getRow(r).values = ['Date', 'Nuitées (FCFA)', 'Passes Jour (FCFA)', 'Passes Nuit (FCFA)', 'Total Passes (FCFA)', 'Total Général (FCFA)'];
-    xlStyleHeaderRow(sheet, r); const h1 = r; r++;
-    d.dailyRows.forEach(row => { sheet.getRow(r).values = [row.dateLabel, row.nuitees, row.passesJour, row.passesNuit, row.totalPassesJournee, row.total]; r++; });
-    sheet.getRow(r).values = ['TOTAL', d.totalChambres, d.totalPassesJourMois, d.totalPassesNuitMois, d.totalPasses, d.totalR];
-    xlHighlightTotalRow(sheet, r, 6);
-    xlBorderRange(sheet, h1, r, 1, 6); xlZebraStripe(sheet, h1 + 1, r - 1, 1, 6);
-    r += 2;
-  } else {
-    sheet.getRow(r).values = [`Aucune saisie journalière détaillée — Total recettes : ${fmtFull(d.totalR)} F`];
-    r += 2;
-  }
-
-  // 2. Détail des dépenses par catégorie + 3. Synthèse par catégorie
-  const catNames = Object.keys(d.catMap).sort();
-  sheet.mergeCells(r, 1, r, 6);
-  sheet.getCell(r, 1).value = '2 · DÉTAIL DES DÉPENSES PAR CATÉGORIE';
-  sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
-  r++;
-  if (catNames.length) {
-    sheet.getRow(r).values = ['Date', 'Catégorie', 'Détail', 'Montant (FCFA)'];
-    xlStyleHeaderRow(sheet, r); const h2 = r; r++;
-    catNames.forEach(cat => {
-      const g = d.catMap[cat];
-      g.items.slice().sort((a, b) => parseFrDate(a.date) - parseFrDate(b.date)).forEach(it => {
-        const detail = (cat === 'Salaire du personnel') ? [it.fonction, it.nomPersonnel].filter(Boolean).join(' — ') : (it.sousCategorie || '—');
-        sheet.getRow(r).values = [it.date, cat, detail, it.montant]; r++;
-      });
-      sheet.getRow(r).values = ['', `Sous-total — ${cat}`, '', g.total];
-      sheet.getRow(r).font = { bold: true }; r++;
-    });
-    sheet.getRow(r).values = ['', 'TOTAL DÉPENSES', '', d.totalD];
-    xlHighlightTotalRow(sheet, r, 4);
-    xlBorderRange(sheet, h2, r, 1, 4); xlZebraStripe(sheet, h2 + 1, r - 1, 1, 4);
-    r += 2;
-
-    sheet.mergeCells(r, 1, r, 6);
-    sheet.getCell(r, 1).value = '3 · SYNTHÈSE DES DÉPENSES PAR CATÉGORIE';
-    sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
-    r++;
-    sheet.getRow(r).values = ['Catégorie', 'Nb. opérations', 'Montant (FCFA)', '% du total'];
-    xlStyleHeaderRow(sheet, r); const h3 = r; r++;
-    catNames.slice().sort((a, b) => d.catMap[b].total - d.catMap[a].total).forEach(cat => {
-      const g = d.catMap[cat]; const pct = d.totalD > 0 ? (g.total / d.totalD * 100) : 0;
-      sheet.getRow(r).values = [cat, g.items.length, g.total, pct.toFixed(1) + '%']; r++;
-    });
-    sheet.getRow(r).values = ['TOTAL', d.depensesEntries.length, d.totalD, '100%'];
-    xlHighlightTotalRow(sheet, r, 4);
-    xlBorderRange(sheet, h3, r, 1, 4); xlZebraStripe(sheet, h3 + 1, r - 1, 1, 4);
-    r += 2;
-  } else {
-    sheet.getRow(r).values = ['Aucune dépense détaillée pour ce mois.']; r += 2;
-  }
-
-  // 4. Journal des transactions
-  if (d.recettesEntries.length + d.depensesEntries.length > 0) {
-    sheet.mergeCells(r, 1, r, 6);
-    sheet.getCell(r, 1).value = '4 · JOURNAL DES TRANSACTIONS DU MOIS';
-    sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
-    r++;
-    sheet.getRow(r).values = ['Date', 'Type', 'Détail', 'Montant (FCFA)'];
-    xlStyleHeaderRow(sheet, r); const h4 = r; r++;
-    const journal = [
-      ...d.recettesEntries.map(e => ({ ...e, __label: 'Recette' })),
-      ...d.depensesEntries.map(e => ({ ...e, __label: 'Dépense' }))
-    ].sort((a, b) => parseFrDate(a.date) - parseFrDate(b.date));
-    journal.forEach(e => {
-      const detail = e.type === 'depenses' ? (txDetail(e) || '—') : 'Encaissement';
-      const sign = e.type === 'recettes' ? 1 : -1;
-      sheet.getRow(r).values = [e.date, e.__label, detail, sign * e.montant]; r++;
-    });
-    xlBorderRange(sheet, h4, r - 1, 1, 4); xlZebraStripe(sheet, h4 + 1, r - 1, 1, 4);
-  }
-
-  sheet.views = [{ state: 'frozen', ySplit: 6 }];
-  xlSetPageSetup(sheet, 'portrait');
-  const slug = d.monthLabel.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  xlDownload(wb, `Bilan_Mensuel_${slug}_${year}_AubergeTamar.xlsx`);
-  showToast('📊 Fichier Excel téléchargé');
-}
-
 // ===== BILAN ANNUEL EXPERT (PDF) =====
 
 // Rassemble toutes les données nécessaires au bilan d'une année complète
@@ -16733,137 +16375,6 @@ function buildBilanAnnuelPDF(year) {
   // ===== TÉLÉCHARGEMENT =====
   doc.save(`Bilan_Annuel_${year}_AubergeTamar.pdf`);
   showToast(`📄 Bilan annuel ${year} généré`);
-}
-
-// ===== BILAN ANNUEL EXPERT — EXCEL & WORD =====
-// Construit le contenu HTML du bilan annuel (mêmes sections que le PDF : synthèse, détail mois
-// par mois, dépenses par catégorie sur l'année, temps forts). Source commune à l'export Word.
-function buildBilanAnnuelHTML(year) {
-  const d = getBilanAnnuelData(year);
-  const now = new Date().toLocaleDateString('fr-FR');
-  let html = `<h1>BILAN FINANCIER ANNUEL</h1>
-    <p style="text-align:center;font-size:11px;color:#666;margin:-8px 0 16px">Exercice ${year} — Édité le ${now}</p>`;
-
-  html += `<h2>Synthèse de l'année</h2>
-    <table><thead><tr><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead>
-    <tbody><tr><td>${fmtFull(d.totalR)}</td><td>${fmtFull(d.totalD)}</td><td>${fmtFull(d.net)}</td><td>${d.margeVal.toFixed(1)}%</td></tr></tbody></table>`;
-
-  html += `<h2>1 · Détail mois par mois — Chambres &amp; Passes</h2>
-    <table><thead><tr><th style="text-align:left">Mois</th><th>Chambres (FCFA)</th><th>Passes (FCFA)</th><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead><tbody>`;
-  d.monthsFull.forEach(m => {
-    const margeM = m.total === 0 ? 0 : ((m.net / m.total) * 100);
-    html += `<tr><td style="text-align:left">${m.label}</td><td>${fmtFull(m.r)}</td><td>${fmtFull(m.p)}</td><td>${fmtFull(m.total)}</td><td>${fmtFull(m.d)}</td><td>${fmtFull(m.net)}</td><td>${margeM.toFixed(1)}%</td></tr>`;
-  });
-  html += `</tbody><tfoot><tr><td style="text-align:left">TOTAL</td><td>${fmtFull(d.totalChambres)}</td><td>${fmtFull(d.totalPasses)}</td><td>${fmtFull(d.totalR)}</td><td>${fmtFull(d.totalD)}</td><td>${fmtFull(d.net)}</td><td>${d.margeVal.toFixed(1)}%</td></tr></tfoot></table>`;
-
-  const catNames = Object.keys(d.catMap).sort();
-  html += `<h2>2 · Dépenses par catégorie — Vue annuelle</h2>`;
-  if (catNames.length) {
-    html += `<table><thead><tr><th style="text-align:left">Catégorie</th><th>Nb. opérations</th><th>Montant (FCFA)</th><th>% du total</th></tr></thead><tbody>`;
-    catNames.slice().sort((a, b) => d.catMap[b].total - d.catMap[a].total).forEach(cat => {
-      const g = d.catMap[cat];
-      const pct = d.totalD > 0 ? (g.total / d.totalD * 100) : 0;
-      html += `<tr><td style="text-align:left">${cat}</td><td>${g.items.length}</td><td>${fmtFull(g.total)}</td><td>${pct.toFixed(1)}%</td></tr>`;
-    });
-    html += `</tbody><tfoot><tr><td style="text-align:left">TOTAL</td><td>${d.depensesEntries.length}</td><td>${fmtFull(d.totalD)}</td><td>100%</td></tr></tfoot></table>`;
-  } else {
-    html += `<p>Aucune dépense détaillée pour cette année.</p>`;
-  }
-
-  if (d.bestMonth || d.worstMonth) {
-    html += `<h2>3 · Temps forts de l'année</h2>
-      <table><thead><tr><th style="text-align:left">Repère</th><th style="text-align:left">Mois</th><th>Net (FCFA)</th></tr></thead><tbody>`;
-    if (d.bestMonth) html += `<tr><td style="text-align:left">Meilleur mois</td><td style="text-align:left">${d.bestMonth.label}</td><td>${fmtFull(d.bestMonth.net)}</td></tr>`;
-    if (d.worstMonth) html += `<tr><td style="text-align:left">Mois le plus faible</td><td style="text-align:left">${d.worstMonth.label}</td><td>${fmtFull(d.worstMonth.net)}</td></tr>`;
-    html += `</tbody></table>`;
-  }
-
-  html += `<div class="print-footer">Auberge Tamar · AubergeGest · Édité le ${now}</div>`;
-  return html;
-}
-
-function genererBilanAnnuelWord() {
-  const year = parseInt(document.getElementById('bilanAnneeAnnuel').value);
-  closeModal('modalBilanAnnuel');
-  showToast('⏳ Génération du bilan annuel (Word) en cours...');
-  loadDocxJS(() => {
-    try { buildBilanWordDoc(buildBilanAnnuelHTML(year), `Bilan_Annuel_${year}_AubergeTamar`); }
-    catch (e) { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Word'); }
-  });
-}
-
-function genererBilanAnnuelExcel() {
-  const year = parseInt(document.getElementById('bilanAnneeAnnuel').value);
-  closeModal('modalBilanAnnuel');
-  showToast('⏳ Génération du bilan annuel (Excel) en cours...');
-  loadExcelJS(() => {
-    try { buildBilanAnnuelExcel(year); }
-    catch (e) { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Excel'); }
-  });
-}
-
-// Construit le classeur Excel "expert" du bilan annuel (mêmes sections que le PDF)
-function buildBilanAnnuelExcel(year) {
-  const d = getBilanAnnuelData(year);
-  const wb = new ExcelJS.Workbook();
-  wb.creator = 'AubergeGest'; wb.created = new Date();
-  const sheet = wb.addWorksheet('Bilan Annuel');
-  sheet.columns = Array(7).fill(0).map(() => ({ width: 15, style: { font: { size: 11 } } }));
-  sheet.properties.defaultRowHeight = 18;
-  let r = xlAddLetterhead(sheet, `BILAN FINANCIER ANNUEL — ${year}`,
-    [`Recettes : ${fmtFull(d.totalR)} F · Dépenses : ${fmtFull(d.totalD)} F · Net : ${fmtFull(d.net)} F · Marge : ${d.margeVal.toFixed(1)}%`], 7);
-
-  sheet.mergeCells(r, 1, r, 7);
-  sheet.getCell(r, 1).value = '1 · DÉTAIL MOIS PAR MOIS — CHAMBRES & PASSES';
-  sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
-  r++;
-  sheet.getRow(r).values = ['Mois', 'Chambres (FCFA)', 'Passes (FCFA)', 'Recettes (FCFA)', 'Dépenses (FCFA)', 'Net (FCFA)', 'Marge'];
-  xlStyleHeaderRow(sheet, r); const h1 = r; r++;
-  d.monthsFull.forEach(m => {
-    const margeM = m.total === 0 ? 0 : ((m.net / m.total) * 100);
-    sheet.getRow(r).values = [m.label, m.r, m.p, m.total, m.d, m.net, margeM.toFixed(1) + '%']; r++;
-  });
-  sheet.getRow(r).values = ['TOTAL', d.totalChambres, d.totalPasses, d.totalR, d.totalD, d.net, d.margeVal.toFixed(1) + '%'];
-  xlHighlightTotalRow(sheet, r, 7);
-  xlBorderRange(sheet, h1, r, 1, 7); xlZebraStripe(sheet, h1 + 1, r - 1, 1, 7);
-  r += 2;
-
-  const catNames = Object.keys(d.catMap).sort();
-  sheet.mergeCells(r, 1, r, 7);
-  sheet.getCell(r, 1).value = '2 · DÉPENSES PAR CATÉGORIE — VUE ANNUELLE';
-  sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
-  r++;
-  if (catNames.length) {
-    sheet.getRow(r).values = ['Catégorie', 'Nb. opérations', 'Montant (FCFA)', '% du total'];
-    xlStyleHeaderRow(sheet, r); const h2 = r; r++;
-    catNames.slice().sort((a, b) => d.catMap[b].total - d.catMap[a].total).forEach(cat => {
-      const g = d.catMap[cat]; const pct = d.totalD > 0 ? (g.total / d.totalD * 100) : 0;
-      sheet.getRow(r).values = [cat, g.items.length, g.total, pct.toFixed(1) + '%']; r++;
-    });
-    sheet.getRow(r).values = ['TOTAL', d.depensesEntries.length, d.totalD, '100%'];
-    xlHighlightTotalRow(sheet, r, 4);
-    xlBorderRange(sheet, h2, r, 1, 4); xlZebraStripe(sheet, h2 + 1, r - 1, 1, 4);
-    r += 2;
-  } else {
-    sheet.getRow(r).values = ['Aucune dépense détaillée pour cette année.']; r += 2;
-  }
-
-  if (d.bestMonth || d.worstMonth) {
-    sheet.mergeCells(r, 1, r, 7);
-    sheet.getCell(r, 1).value = "3 · TEMPS FORTS DE L'ANNÉE";
-    sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
-    r++;
-    sheet.getRow(r).values = ['Repère', 'Mois', 'Net (FCFA)'];
-    xlStyleHeaderRow(sheet, r); const h3 = r; r++;
-    if (d.bestMonth) { sheet.getRow(r).values = ['Meilleur mois', d.bestMonth.label, d.bestMonth.net]; r++; }
-    if (d.worstMonth) { sheet.getRow(r).values = ['Mois le plus faible', d.worstMonth.label, d.worstMonth.net]; r++; }
-    xlBorderRange(sheet, h3, r - 1, 1, 3); xlZebraStripe(sheet, h3 + 1, r - 1, 1, 3);
-  }
-
-  sheet.views = [{ state: 'frozen', ySplit: 6 }];
-  xlSetPageSetup(sheet, 'landscape');
-  xlDownload(wb, `Bilan_Annuel_${year}_AubergeTamar.xlsx`);
-  showToast('📊 Fichier Excel téléchargé');
 }
 
 // Impression Canon
