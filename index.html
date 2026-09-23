@@ -434,6 +434,12 @@ window.dispatchEvent(new Event('firebaseReady'));
   .pay-btn.reset:active{background:rgba(26,58,92,.2)}
   .pay-btn.delete{background:rgba(220,53,69,.12);color:#dc3545}
   .pay-btn.delete:active{background:rgba(220,53,69,.28)}
+  .porc-subnav{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+  .porc-subnav::-webkit-scrollbar{display:none}
+  .porc-subtab-btn{flex:0 0 auto;background:var(--card);border:2px solid var(--border);border-radius:20px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:800;color:var(--text-muted);cursor:pointer;white-space:nowrap}
+  .porc-subtab-btn.active{background:linear-gradient(135deg,var(--navy),var(--navy-light));color:#fff;border-color:transparent}
+  .porc-subsection{display:none}
+  .porc-subsection.active{display:block}
   .pay-badge{font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;display:inline-block;letter-spacing:.2px}
   .pay-badge.solde{background:#39ff14;color:#0b3d00;box-shadow:0 0 8px rgba(57,255,20,.65);text-shadow:none}
   .pay-badge.avance{background:rgba(245,166,35,.18);color:#c97c00}
@@ -747,6 +753,7 @@ window.dispatchEvent(new Event('firebaseReady'));
     <button class="tab-btn" onclick="switchTab('depenses',this)"><span class="tab-ico">💸</span><span class="tab-lbl">Dépenses</span></button>
     <button class="tab-btn" onclick="switchTab('banque',this)"><span class="tab-ico">🏦</span><span class="tab-lbl">Banque</span></button>
     <button class="tab-btn" onclick="switchTab('personnel',this)"><span class="tab-ico">👥</span><span class="tab-lbl">Personnel</span></button>
+    <button class="tab-btn" onclick="switchTab('porc',this)"><span class="tab-ico">🐖</span><span class="tab-lbl">Porc au Four</span></button>
   </div>
   </div>
 </div>
@@ -1500,7 +1507,220 @@ window.dispatchEvent(new Event('firebaseReady'));
   <div id="personnelListContainer"></div>
 </div>
 
+<!-- PORC AU FOUR — module autonome, totalement indépendant des données de l'hôtel -->
+<div id="tab-porc" class="section">
+  <div style="text-align:center;margin-bottom:8px">
+    <svg width="112" height="94" viewBox="0 0 200 160" style="filter:drop-shadow(0 4px 10px rgba(0,0,0,.18))">
+      <ellipse cx="55" cy="35" rx="18" ry="22" fill="#e8899d" transform="rotate(-25 55 35)"/>
+      <ellipse cx="145" cy="35" rx="18" ry="22" fill="#e8899d" transform="rotate(25 145 35)"/>
+      <ellipse cx="100" cy="95" rx="75" ry="58" fill="#f4a6b8"/>
+      <circle cx="50" cy="100" r="11" fill="#f8c7d3" opacity=".85"/>
+      <circle cx="150" cy="100" r="11" fill="#f8c7d3" opacity=".85"/>
+      <circle cx="65" cy="80" r="6" fill="#3a2430"/>
+      <circle cx="135" cy="80" r="6" fill="#3a2430"/>
+      <ellipse cx="100" cy="112" rx="32" ry="24" fill="#f191a8"/>
+      <ellipse cx="88" cy="114" rx="6" ry="8" fill="#c9536c"/>
+      <ellipse cx="112" cy="114" rx="6" ry="8" fill="#c9536c"/>
+      <circle cx="100" cy="130" r="13" fill="#c0392b"/>
+      <rect x="97" y="115" width="6" height="12" rx="2" fill="#5a3a20"/>
+      <path d="M92 118 q6 -6 12 0" stroke="#2f7a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div style="font-size:12px;color:var(--text-muted);font-weight:800;margin-top:2px">🐖 Porc au Four</div>
+  </div>
+  <div style="text-align:center;margin-bottom:14px">
+    <button onclick="openChangePorcPinModal()" style="background:var(--bg);border:1px solid var(--border);color:var(--navy);font-family:inherit;font-size:11px;font-weight:700;border-radius:8px;padding:7px 12px;cursor:pointer">🔑 Modifier le code PIN Porc au Four</button>
+  </div>
+  <div class="porc-subnav">
+    <button class="porc-subtab-btn active" onclick="switchPorcSub('resume',this)">📊 Résumé</button>
+    <button class="porc-subtab-btn" onclick="switchPorcSub('achats',this)">🐖 Achats</button>
+    <button class="porc-subtab-btn" onclick="switchPorcSub('ingredients',this)">🧂 Ingrédients</button>
+    <button class="porc-subtab-btn" onclick="switchPorcSub('salaires',this)">👷 Salaires</button>
+    <button class="porc-subtab-btn" onclick="switchPorcSub('recettes',this)">💰 Recettes</button>
+    <button class="porc-subtab-btn" onclick="switchPorcSub('fournisseurs',this)">🏦 Fournisseurs</button>
+    <button class="porc-subtab-btn" onclick="switchPorcSub('rapports',this)">📈 Rapports</button>
+  </div>
+
+  <!-- RÉSUMÉ -->
+  <div id="porc-sub-resume" class="porc-subsection active">
+    <div class="year-selector" style="gap:10px">
+      <label>Mois</label>
+      <select class="year-select" id="porcResumeMonth" onchange="renderPorcResume()"></select>
+      <label>Année</label>
+      <select class="year-select" id="porcResumeYear" onchange="renderPorcResume()"></select>
+    </div>
+    <div class="summary-row">
+      <div class="summary-card recettes" style="grid-column:1/-1;text-align:center">
+        <div class="sc-label">💰 Recettes (vente porc au four)</div>
+        <div class="sc-value green" id="porcResR">—</div>
+        <div class="sc-sub">FCFA</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-card depenses"><div class="sc-label">🐖 Achat de porcs</div><div class="sc-value red" id="porcResAchat">—</div><div class="sc-sub" id="porcResAchatSub">FCFA</div></div>
+      <div class="summary-card depenses"><div class="sc-label">🧂 Ingrédients</div><div class="sc-value red" id="porcResIng">—</div><div class="sc-sub">FCFA</div></div>
+      <div class="summary-card depenses"><div class="sc-label">👷 Salaires</div><div class="sc-value red" id="porcResSal">—</div><div class="sc-sub">FCFA</div></div>
+      <div class="summary-card depenses"><div class="sc-label">💸 Total Dépenses</div><div class="sc-value red" id="porcResD">—</div><div class="sc-sub">FCFA</div></div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-card net" style="grid-column:1/-1;text-align:center">
+        <div class="sc-label">📊 Résultat Net</div>
+        <div class="sc-value navy" id="porcResNet">—</div>
+        <div class="sc-sub">Marge : <span id="porcResMarge">—</span></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span id="porcDonutTitle">—</span></div>
+      <div class="big-donut-wrap">
+        <svg id="porcDonutSvg"></svg>
+        <div class="big-donut-center">
+          <div class="bdc-label">Résultat Net</div>
+          <div class="bdc-value" id="porcDonutCenterNet">—</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:16px;font-size:11px;color:var(--text-muted);margin-top:6px">
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#2e8b57;margin-right:4px;vertical-align:middle"></i>Recettes</span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#c0392b;margin-right:4px;vertical-align:middle"></i>Dépenses</span>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header"><span>🐖 Lots d'approvisionnement (période sélectionnée)</span></div>
+      <table class="table-fixed" id="porcResumeAchatsTable"></table>
+    </div>
+  </div>
+
+  <!-- ACHATS -->
+  <div id="porc-sub-achats" class="porc-subsection">
+    <button class="action-btn" onclick="openPorcAchatModal()">➕ Nouvel achat de porc(s)</button>
+    <div class="table-card">
+      <div class="table-card-header"><span>Historique des achats</span><span id="porcAchatsTotal"></span></div>
+      <table class="table-fixed" id="porcAchatsTable"></table>
+    </div>
+  </div>
+
+  <!-- INGRÉDIENTS -->
+  <div id="porc-sub-ingredients" class="porc-subsection">
+    <button class="action-btn orange" onclick="openPorcIngredientModal()">➕ Nouvelle dépense (ingrédient)</button>
+    <div class="table-card">
+      <div class="table-card-header"><span>Ingrédients (huile, piments, épices...)</span><span id="porcIngredientsTotal"></span></div>
+      <table class="table-fixed" id="porcIngredientsTable"></table>
+    </div>
+  </div>
+
+  <!-- SALAIRES -->
+  <div id="porc-sub-salaires" class="porc-subsection">
+    <div class="table-card" style="padding:14px">
+      <div style="font-size:12px;font-weight:800;color:var(--text-muted);margin-bottom:10px">👷 Noms du personnel (P1 à P4)</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">P1</label><input class="form-input" type="text" id="porcNomP1" oninput="savePorcNoms()"></div>
+        <div class="form-group"><label class="form-label">P2</label><input class="form-input" type="text" id="porcNomP2" oninput="savePorcNoms()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">P3</label><input class="form-input" type="text" id="porcNomP3" oninput="savePorcNoms()"></div>
+        <div class="form-group"><label class="form-label">P4</label><input class="form-input" type="text" id="porcNomP4" oninput="savePorcNoms()"></div>
+      </div>
+    </div>
+    <button class="action-btn orange" onclick="openPorcSalaireModal()">➕ Nouveau paiement de salaire</button>
+    <div class="table-card">
+      <div class="table-card-header"><span>Historique des salaires</span><span id="porcSalairesTotal"></span></div>
+      <table class="table-fixed" id="porcSalairesTable"></table>
+    </div>
+  </div>
+
+  <!-- RECETTES -->
+  <div id="porc-sub-recettes" class="porc-subsection">
+    <button class="action-btn" onclick="openPorcRecetteModal()">➕ Nouvelle recette (vente)</button>
+    <div class="table-card">
+      <div class="table-card-header"><span>Ventes en détail (porc au four)</span><span id="porcRecettesTotal"></span></div>
+      <table class="table-fixed" id="porcRecettesTable"></table>
+    </div>
+  </div>
+
+  <!-- FOURNISSEURS -->
+  <div id="porc-sub-fournisseurs" class="porc-subsection">
+    <div class="table-card" style="padding:14px">
+      <div style="font-size:12px;font-weight:800;color:var(--text-muted);margin-bottom:10px">🏦 Noms des fournisseurs (F1 à F4)</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">F1</label><input class="form-input" type="text" id="porcFournNomF1" oninput="savePorcFournNoms()"></div>
+        <div class="form-group"><label class="form-label">F2</label><input class="form-input" type="text" id="porcFournNomF2" oninput="savePorcFournNoms()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">F3</label><input class="form-input" type="text" id="porcFournNomF3" oninput="savePorcFournNoms()"></div>
+        <div class="form-group"><label class="form-label">F4</label><input class="form-input" type="text" id="porcFournNomF4" oninput="savePorcFournNoms()"></div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-card depenses"><div class="sc-label">💳 Total dû</div><div class="sc-value red" id="porcFournTotalDu">—</div><div class="sc-sub">FCFA</div></div>
+      <div class="summary-card recettes"><div class="sc-label">✅ Total remboursé</div><div class="sc-value green" id="porcFournTotalRemb">—</div><div class="sc-sub">FCFA</div></div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-card net" style="grid-column:1/-1;text-align:center">
+        <div class="sc-label">📌 Reste à rembourser (tous fournisseurs)</div>
+        <div class="sc-value navy" id="porcFournReste">—</div>
+        <div class="sc-sub">FCFA</div>
+      </div>
+    </div>
+    <button class="action-btn" onclick="openPorcFournisseurModal()">➕ Nouveau fournisseur / nouvelle dette</button>
+    <button class="action-btn orange" onclick="openPorcRemboursementModal()">💵 Nouveau remboursement</button>
+    <div id="porcFournisseursList"></div>
+  </div>
+
+  <!-- RAPPORTS -->
+  <div id="porc-sub-rapports" class="porc-subsection">
+    <div class="table-card" style="padding:14px">
+      <label class="form-label">Type de rapport</label>
+      <select class="form-select" id="porcRapportType" onchange="renderPorcRapportFilters()">
+        <option value="periode">📆 Par période (dates libres)</option>
+        <option value="lot">🐖 Par approvisionnement (lot de porcs)</option>
+        <option value="mois">📅 Par mois</option>
+        <option value="annee">📈 Par année</option>
+      </select>
+      <div id="porcRapportFilters" style="margin-top:12px"></div>
+      <button class="action-btn" style="margin-top:12px" onclick="renderPorcRapport()">🔍 Générer le rapport</button>
+    </div>
+    <div id="porcRapportResult"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+      <button class="print-export-btn" onclick="exportPorcRapportPDF()">
+        <span style="font-size:28px">📄</span>
+        <span class="peb-label">Exporter PDF</span>
+        <span class="peb-sub">Fichier imprimable</span>
+      </button>
+      <button class="print-export-btn" onclick="exportPorcRapportExcel()">
+        <span style="font-size:28px">📊</span>
+        <span class="peb-label">Exporter Excel</span>
+        <span class="peb-sub">Fichier .xlsx</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /main -->
+
+<!-- MODALES "PORC AU FOUR" — FOURNISSEURS -->
+<div class="modal-overlay" id="modalPorcFournisseur" onclick="closeModalOutside(event,'modalPorcFournisseur')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalPorcFournisseurTitle">🏦 Nouveau fournisseur / nouvelle dette</div>
+    <div class="form-group"><label class="form-label">Fournisseur</label><select class="form-select" id="pfFournisseurIdx"></select></div>
+    <div class="form-group"><label class="form-label">Montant dû (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="pfMontantDu" placeholder="Ex: 150 000" oninput="formatMontant(this)"></div>
+    <div class="form-group"><label class="form-label">Date de la dette</label><input class="form-input" type="date" id="pfDate"></div>
+    <div class="form-group"><label class="form-label">Note</label><input class="form-input" type="text" id="pfNote" placeholder="Optionnel"></div>
+    <button class="action-btn" onclick="savePorcFournisseur()">✅ Enregistrer</button>
+    <button class="action-btn" onclick="closeModal('modalPorcFournisseur')" style="background:var(--border);color:var(--text);box-shadow:none">Annuler</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPorcRemboursement" onclick="closeModalOutside(event,'modalPorcRemboursement')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalPorcRemboursementTitle">💵 Nouveau remboursement</div>
+    <div class="form-group"><label class="form-label">Fournisseur</label><select class="form-select" id="prbFournisseur"></select></div>
+    <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="prbDate"></div>
+    <div class="form-group"><label class="form-label">Montant remboursé (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="prbMontant" placeholder="Ex: 50 000" oninput="formatMontant(this)"></div>
+    <div class="form-group"><label class="form-label">Note</label><input class="form-input" type="text" id="prbNote" placeholder="Optionnel"></div>
+    <button class="action-btn orange" onclick="savePorcRemboursement()">✅ Enregistrer</button>
+    <button class="action-btn" onclick="closeModal('modalPorcRemboursement')" style="background:var(--border);color:var(--text);box-shadow:none">Annuler</button>
+  </div>
+</div>
 
 </div><!-- /appContent -->
 
@@ -1739,6 +1959,35 @@ window.dispatchEvent(new Event('firebaseReady'));
       <button onclick="bankPinChangeBackspace()">⌫</button>
     </div>
     <button class="action-btn" onclick="cancelChangeBankPin()" style="background:var(--border);color:var(--text);box-shadow:none;margin-top:18px;margin-bottom:0">Annuler</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalChangePorcPin">
+  <div class="modal-sheet" style="text-align:center">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🐖 Modifier le code Porc au Four</div>
+    <div style="font-size:12px;color:var(--text-muted);margin:-8px 0 14px;line-height:1.5" id="porcPinChangeSubtitle">
+      Entrez le nouveau code à 4 chiffres pour l'onglet Porc au Four.
+    </div>
+    <div class="gpin-dots" id="porcPinChangeDots">
+      <span class="gpin-dot"></span><span class="gpin-dot"></span><span class="gpin-dot"></span><span class="gpin-dot"></span>
+    </div>
+    <div class="gpin-error" id="porcPinChangeError">Les deux codes ne correspondent pas, recommencez</div>
+    <div class="gpin-pad">
+      <button onclick="porcPinChangePress('1')">1</button>
+      <button onclick="porcPinChangePress('2')">2</button>
+      <button onclick="porcPinChangePress('3')">3</button>
+      <button onclick="porcPinChangePress('4')">4</button>
+      <button onclick="porcPinChangePress('5')">5</button>
+      <button onclick="porcPinChangePress('6')">6</button>
+      <button onclick="porcPinChangePress('7')">7</button>
+      <button onclick="porcPinChangePress('8')">8</button>
+      <button onclick="porcPinChangePress('9')">9</button>
+      <button class="pin-empty" tabindex="-1" style="visibility:hidden"></button>
+      <button onclick="porcPinChangePress('0')">0</button>
+      <button onclick="porcPinChangeBackspace()">⌫</button>
+    </div>
+    <button class="action-btn" onclick="cancelChangePorcPin()" style="background:var(--border);color:var(--text);box-shadow:none;margin-top:18px;margin-bottom:0">Annuler</button>
   </div>
 </div>
 
@@ -2167,9 +2416,20 @@ window.dispatchEvent(new Event('firebaseReady'));
       </div>
     </div>
     <div id="bilanApercu" style="background:var(--bg);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:11.5px;color:var(--text)"></div>
-    <button class="action-btn" id="btnGenererBilan" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));box-shadow:0 4px 16px rgba(26,58,92,.35)" onclick="genererBilanMensuelPDF()">
-      ✅ Générer le PDF
-    </button>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+      <button class="print-export-btn" onclick="genererBilanMensuelPDF()">
+        <span style="font-size:28px">📄</span>
+        <span class="peb-label">PDF</span>
+      </button>
+      <button class="print-export-btn" onclick="genererBilanMensuelExcel()">
+        <span style="font-size:28px">📊</span>
+        <span class="peb-label">Excel</span>
+      </button>
+      <button class="print-export-btn" onclick="genererBilanMensuelWord()">
+        <span style="font-size:28px">📝</span>
+        <span class="peb-label">Word</span>
+      </button>
+    </div>
     <button class="action-btn" onclick="closeModal('modalBilan')" style="background:var(--border);color:var(--text);box-shadow:none;margin-bottom:0">Annuler</button>
   </div>
 </div>
@@ -2187,10 +2447,82 @@ window.dispatchEvent(new Event('firebaseReady'));
       <select class="form-select" id="bilanAnneeAnnuel"></select>
     </div>
     <div id="bilanAnnuelApercu" style="background:var(--bg);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:11.5px;color:var(--text)"></div>
-    <button class="action-btn" id="btnGenererBilanAnnuel" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));box-shadow:0 4px 16px rgba(26,58,92,.35)" onclick="genererBilanAnnuelPDF()">
-      ✅ Générer le PDF
-    </button>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+      <button class="print-export-btn" onclick="genererBilanAnnuelPDF()">
+        <span style="font-size:28px">📄</span>
+        <span class="peb-label">PDF</span>
+      </button>
+      <button class="print-export-btn" onclick="genererBilanAnnuelExcel()">
+        <span style="font-size:28px">📊</span>
+        <span class="peb-label">Excel</span>
+      </button>
+      <button class="print-export-btn" onclick="genererBilanAnnuelWord()">
+        <span style="font-size:28px">📝</span>
+        <span class="peb-label">Word</span>
+      </button>
+    </div>
     <button class="action-btn" onclick="closeModal('modalBilanAnnuel')" style="background:var(--border);color:var(--text);box-shadow:none;margin-bottom:0">Annuler</button>
+  </div>
+</div>
+
+<!-- ===== MODALES "PORC AU FOUR" ===== -->
+<div class="modal-overlay" id="modalPorcAchat" onclick="closeModalOutside(event,'modalPorcAchat')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalPorcAchatTitle">🐖 Nouvel achat de porc(s)</div>
+    <div class="form-group"><label class="form-label">Date d'achat</label><input class="form-input" type="date" id="paDate"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nombre de porcs</label><input class="form-input" type="number" min="1" id="paNombre" placeholder="Ex: 3"></div>
+      <div class="form-group"><label class="form-label">Poids total (kg)</label><input class="form-input" type="number" step="0.1" min="0" id="paPoids" placeholder="Ex: 180"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Montant total (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="paMontant" placeholder="Ex: 450 000" oninput="formatMontant(this)"></div>
+    <div class="form-group"><label class="form-label">Notes (fournisseur, marché...)</label><input class="form-input" type="text" id="paNotes" placeholder="Optionnel"></div>
+    <button class="action-btn" onclick="savePorcAchat()">✅ Enregistrer</button>
+    <button class="action-btn" onclick="closeModal('modalPorcAchat')" style="background:var(--border);color:var(--text);box-shadow:none">Annuler</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPorcIngredient" onclick="closeModalOutside(event,'modalPorcIngredient')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalPorcIngredientTitle">🧂 Nouvelle dépense (ingrédient)</div>
+    <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="piDate"></div>
+    <div class="form-group"><label class="form-label">Désignation</label><input class="form-input" type="text" id="piDesignation" placeholder="Ex: Huile, Piments, Charbon, Emballage..." list="piDesignationList"></div>
+    <datalist id="piDesignationList">
+      <option value="Huile">
+      <option value="Piments">
+      <option value="Épices">
+      <option value="Charbon">
+      <option value="Sel">
+      <option value="Emballage">
+    </datalist>
+    <div class="form-group"><label class="form-label">Montant (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="piMontant" placeholder="Ex: 5 000" oninput="formatMontant(this)"></div>
+    <button class="action-btn orange" onclick="savePorcIngredient()">✅ Enregistrer</button>
+    <button class="action-btn" onclick="closeModal('modalPorcIngredient')" style="background:var(--border);color:var(--text);box-shadow:none">Annuler</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPorcSalaire" onclick="closeModalOutside(event,'modalPorcSalaire')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalPorcSalaireTitle">👷 Nouveau paiement de salaire</div>
+    <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="psalDate"></div>
+    <div class="form-group"><label class="form-label">Personnel</label><select class="form-select" id="psalPersonne"></select></div>
+    <div class="form-group"><label class="form-label">Montant (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="psalMontant" placeholder="Ex: 25 000" oninput="formatMontant(this)"></div>
+    <button class="action-btn orange" onclick="savePorcSalaire()">✅ Enregistrer</button>
+    <button class="action-btn" onclick="closeModal('modalPorcSalaire')" style="background:var(--border);color:var(--text);box-shadow:none">Annuler</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPorcRecette" onclick="closeModalOutside(event,'modalPorcRecette')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalPorcRecetteTitle">💰 Nouvelle recette</div>
+    <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="prDate"></div>
+    <div class="form-group"><label class="form-label">Montant (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="prMontant" placeholder="Ex: 35 000" oninput="formatMontant(this)"></div>
+    <div class="form-group"><label class="form-label">Description</label><input class="form-input" type="text" id="prDescription" placeholder="Optionnel — Ex: Vente midi"></div>
+    <button class="action-btn" onclick="savePorcRecette()">✅ Enregistrer</button>
+    <button class="action-btn" onclick="closeModal('modalPorcRecette')" style="background:var(--border);color:var(--text);box-shadow:none">Annuler</button>
   </div>
 </div>
 
@@ -2506,6 +2838,9 @@ const knownLockedDevices = new Set(); // évite de ré-alerter pour un verrouill
 // Double protection de l'onglet Banque : code PIN dédié, modifiable par Superviseur/Administrateur,
 // synchronisé via Firestore (document 'parametres/banque'). Se redemande à chaque rechargement.
 let bankPin = '0000';
+// Code PIN dédié à l'onglet "Porc au Four" (même mécanisme de double protection que la Banque)
+let porcPin = '0746';
+let porcUnlocked = false;
 let bankUnlocked = false;
 
 // ===== RÔLES =====
@@ -2752,6 +3087,75 @@ function cancelChangeBankPin(){
   document.getElementById('bankPinChangeError').classList.remove('show');
   closeModal('modalChangeBankPin');
 }
+
+// ── Code PIN dédié à l'onglet "Porc au Four" (double protection, même principe que Banque) ──
+function openPorcPinModal(onGranted){
+  openSecureCodeModal(porcPin, () => {
+    porcUnlocked = true;
+    if (onGranted) onGranted();
+  }, '🐖 Onglet Porc au Four', 'Entrez le code PIN dédié à l\'onglet Porc au Four.');
+}
+let porcPinChangeInput = '';
+let porcPinChangeStep = 1;
+let porcPinChangeFirstValue = '';
+function openChangePorcPinModal(){
+  if (currentRole !== 'superviseur' && currentRole !== 'administrateur') { showToast('⛔ Réservé au Superviseur ou à l\'Administrateur'); return; }
+  porcPinChangeStep = 1;
+  porcPinChangeFirstValue = '';
+  porcPinChangeInput = '';
+  updatePorcPinChangeDots();
+  document.getElementById('porcPinChangeSubtitle').textContent = 'Entrez le nouveau code à 4 chiffres pour l\'onglet Porc au Four.';
+  document.getElementById('porcPinChangeError').classList.remove('show');
+  openModal('modalChangePorcPin');
+}
+function updatePorcPinChangeDots(){
+  document.querySelectorAll('#porcPinChangeDots .gpin-dot').forEach((d,i)=>{
+    d.classList.toggle('filled', i < porcPinChangeInput.length);
+  });
+}
+function porcPinChangePress(digit){
+  if (porcPinChangeInput.length >= 4) return;
+  porcPinChangeInput += digit;
+  updatePorcPinChangeDots();
+  if (porcPinChangeInput.length === 4) setTimeout(processPorcPinChangeStep, 150);
+}
+function porcPinChangeBackspace(){
+  porcPinChangeInput = porcPinChangeInput.slice(0, -1);
+  updatePorcPinChangeDots();
+  document.getElementById('porcPinChangeError').classList.remove('show');
+}
+function processPorcPinChangeStep(){
+  if (porcPinChangeStep === 1) {
+    porcPinChangeFirstValue = porcPinChangeInput;
+    porcPinChangeInput = '';
+    porcPinChangeStep = 2;
+    updatePorcPinChangeDots();
+    document.getElementById('porcPinChangeSubtitle').textContent = 'Confirmez le nouveau code en le saisissant une seconde fois.';
+    return;
+  }
+  if (porcPinChangeInput === porcPinChangeFirstValue) {
+    const newPin = porcPinChangeInput;
+    if (fbReady) {
+      window._setDoc(window._doc(window._db, 'parametres', 'porc'), { pin: newPin, modifiePar: currentRole, dateModif: Date.now() }, { merge: true });
+    }
+    porcPin = newPin;
+    closeModal('modalChangePorcPin');
+    showToast('✅ Code PIN Porc au Four mis à jour');
+  } else {
+    document.getElementById('porcPinChangeError').classList.add('show');
+    porcPinChangeStep = 1;
+    porcPinChangeFirstValue = '';
+    porcPinChangeInput = '';
+    updatePorcPinChangeDots();
+    document.getElementById('porcPinChangeSubtitle').textContent = 'Entrez le nouveau code à 4 chiffres pour l\'onglet Porc au Four.';
+  }
+}
+function cancelChangePorcPin(){
+  porcPinChangeInput = ''; porcPinChangeStep = 1; porcPinChangeFirstValue = '';
+  updatePorcPinChangeDots();
+  document.getElementById('porcPinChangeError').classList.remove('show');
+  closeModal('modalChangePorcPin');
+}
 function openRoleLoginModal(){
   if (isMyDeviceLocked()) { openModal('modalCodeLocked'); return; }
   openSecureCodeModal(ROLE_CODES, (role) => {
@@ -2783,6 +3187,7 @@ function switchTab(name,btn){
 function switchSection(name){
   if (isRestrictedTab(name) && !restrictedUnlocked) { showToast("🔒 Réservé à la direction — connectez-vous depuis l'écran d'accueil"); return; }
   if (name === 'banque' && !bankUnlocked) { openBankPinModal(() => doSwitchSection(name)); return; }
+  if (name === 'porc' && !porcUnlocked) { openPorcPinModal(() => doSwitchSection(name)); return; }
   doSwitchSection(name);
 }
 function doSwitchSection(name){
@@ -2805,6 +3210,7 @@ function doSwitchSection(name){
   if(name==='banque')renderBanque();
   if(name==='personnel')renderPersonnelTab();
   if(name==='documents')renderDocuments();
+  if(name==='porc')renderPorcAll();
 }
 // Grise visuellement les onglets réservés à la direction tant que le Gestionnaire n'a pas
 // donné le code Superviseur/Administrateur depuis l'écran d'accueil (plus de pavé de code
@@ -12192,6 +12598,1010 @@ loadPersonnelFromStorage();
   if (modifie) { persistFonctions(); persistPersonnel(); }
 })();
 
+// ===================================================================
+// ===== MODULE "PORC AU FOUR" — autonome, indépendant des données =====
+// ===== de l'hôtel : achat de porcs, ingrédients, salaires, ventes ====
+// ===================================================================
+const PORC_ACHATS_KEY = 'porc_achats_v1';
+const PORC_ING_KEY    = 'porc_ingredients_v1';
+const PORC_SAL_KEY    = 'porc_salaires_v1';
+const PORC_REC_KEY    = 'porc_recettes_v1';
+const PORC_NOMS_KEY   = 'porc_personnel_noms_v1';
+
+let porcAchats = [];
+let porcIngredients = [];
+let porcSalaires = [];
+let porcRecettes = [];
+let porcPersonnelNoms = ['Personnel 1','Personnel 2','Personnel 3','Personnel 4'];
+
+let editingPorcAchatRef = null;
+let editingPorcIngredientRef = null;
+let editingPorcSalaireRef = null;
+let editingPorcRecetteRef = null;
+
+function persistPorcAchats(){ try{ localStorage.setItem(PORC_ACHATS_KEY, JSON.stringify(porcAchats)); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur enregistrement achats porc'); } }
+function loadPorcAchats(){ try{ const raw=localStorage.getItem(PORC_ACHATS_KEY); porcAchats = raw?JSON.parse(raw):[]; }catch(e){ porcAchats=[]; } }
+loadPorcAchats();
+
+function persistPorcIngredients(){ try{ localStorage.setItem(PORC_ING_KEY, JSON.stringify(porcIngredients)); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur enregistrement ingrédients'); } }
+function loadPorcIngredients(){ try{ const raw=localStorage.getItem(PORC_ING_KEY); porcIngredients = raw?JSON.parse(raw):[]; }catch(e){ porcIngredients=[]; } }
+loadPorcIngredients();
+
+function persistPorcSalaires(){ try{ localStorage.setItem(PORC_SAL_KEY, JSON.stringify(porcSalaires)); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur enregistrement salaires'); } }
+function loadPorcSalaires(){ try{ const raw=localStorage.getItem(PORC_SAL_KEY); porcSalaires = raw?JSON.parse(raw):[]; }catch(e){ porcSalaires=[]; } }
+loadPorcSalaires();
+
+function persistPorcRecettes(){ try{ localStorage.setItem(PORC_REC_KEY, JSON.stringify(porcRecettes)); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur enregistrement recettes'); } }
+function loadPorcRecettes(){ try{ const raw=localStorage.getItem(PORC_REC_KEY); porcRecettes = raw?JSON.parse(raw):[]; }catch(e){ porcRecettes=[]; } }
+loadPorcRecettes();
+
+function persistPorcNoms(){ try{ localStorage.setItem(PORC_NOMS_KEY, JSON.stringify(porcPersonnelNoms)); }catch(e){} }
+function loadPorcNoms(){ try{ const raw=localStorage.getItem(PORC_NOMS_KEY); if(raw) porcPersonnelNoms = JSON.parse(raw); }catch(e){} }
+loadPorcNoms();
+
+function porcLocalId(){ return 'loc_'+Date.now()+'_'+Math.random().toString(36).slice(2,8); }
+
+// ----- Synchronisation Firestore (collections dédiées, séparées de celles de l'hôtel) -----
+async function fbSavePorcAchat(entry){ if(!fbReady||!window._db) return; try{ const ref=await window._addDoc(window._collection(window._db,'porc_achats'),{...entry,ts:Date.now()}); entry._docId=ref.id; persistPorcAchats(); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur sync achat porc'); } }
+async function fbUpdatePorcAchat(docId, entry){ if(!fbReady||!window._db||!docId) return; try{ const {_docId,_localId,...data}=entry; await window._setDoc(window._doc(window._db,'porc_achats',docId), data, {merge:true}); }catch(e){ showToast('⚠️ Erreur mise à jour achat porc'); } }
+
+async function fbSavePorcIngredient(entry){ if(!fbReady||!window._db) return; try{ const ref=await window._addDoc(window._collection(window._db,'porc_ingredients'),{...entry,ts:Date.now()}); entry._docId=ref.id; persistPorcIngredients(); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur sync ingrédient'); } }
+async function fbUpdatePorcIngredient(docId, entry){ if(!fbReady||!window._db||!docId) return; try{ const {_docId,_localId,...data}=entry; await window._setDoc(window._doc(window._db,'porc_ingredients',docId), data, {merge:true}); }catch(e){ showToast('⚠️ Erreur mise à jour ingrédient'); } }
+
+async function fbSavePorcSalaire(entry){ if(!fbReady||!window._db) return; try{ const ref=await window._addDoc(window._collection(window._db,'porc_salaires'),{...entry,ts:Date.now()}); entry._docId=ref.id; persistPorcSalaires(); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur sync salaire'); } }
+async function fbUpdatePorcSalaire(docId, entry){ if(!fbReady||!window._db||!docId) return; try{ const {_docId,_localId,...data}=entry; await window._setDoc(window._doc(window._db,'porc_salaires',docId), data, {merge:true}); }catch(e){ showToast('⚠️ Erreur mise à jour salaire'); } }
+
+async function fbSavePorcRecette(entry){ if(!fbReady||!window._db) return; try{ const ref=await window._addDoc(window._collection(window._db,'porc_recettes'),{...entry,ts:Date.now()}); entry._docId=ref.id; persistPorcRecettes(); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur sync recette'); } }
+async function fbUpdatePorcRecette(docId, entry){ if(!fbReady||!window._db||!docId) return; try{ const {_docId,_localId,...data}=entry; await window._setDoc(window._doc(window._db,'porc_recettes',docId), data, {merge:true}); }catch(e){ showToast('⚠️ Erreur mise à jour recette'); } }
+
+let _porcListenersStarted = false;
+function listenPorcCollections(){
+  if (!fbReady || !window._db || _porcListenersStarted) return;
+  _porcListenersStarted = true;
+  const qA = window._query(window._collection(window._db,'porc_achats'), window._orderBy('ts','desc'));
+  window._onSnapshot(qA, (snap)=>{ porcAchats = snap.docs.map(d=>({...d.data(),_docId:d.id})); persistPorcAchats(); renderPorcAll(); });
+  const qI = window._query(window._collection(window._db,'porc_ingredients'), window._orderBy('ts','desc'));
+  window._onSnapshot(qI, (snap)=>{ porcIngredients = snap.docs.map(d=>({...d.data(),_docId:d.id})); persistPorcIngredients(); renderPorcAll(); });
+  const qS = window._query(window._collection(window._db,'porc_salaires'), window._orderBy('ts','desc'));
+  window._onSnapshot(qS, (snap)=>{ porcSalaires = snap.docs.map(d=>({...d.data(),_docId:d.id})); persistPorcSalaires(); renderPorcAll(); });
+  const qR = window._query(window._collection(window._db,'porc_recettes'), window._orderBy('ts','desc'));
+  window._onSnapshot(qR, (snap)=>{ porcRecettes = snap.docs.map(d=>({...d.data(),_docId:d.id})); persistPorcRecettes(); renderPorcAll(); });
+  const qF = window._query(window._collection(window._db,'porc_fournisseurs'), window._orderBy('ts','desc'));
+  window._onSnapshot(qF, (snap)=>{ porcFournisseurs = snap.docs.map(d=>({...d.data(),_docId:d.id})); persistPorcFournisseurs(); renderPorcAll(); });
+  const qRb = window._query(window._collection(window._db,'porc_remboursements'), window._orderBy('ts','desc'));
+  window._onSnapshot(qRb, (snap)=>{ porcRemboursements = snap.docs.map(d=>({...d.data(),_docId:d.id})); persistPorcRemboursements(); renderPorcAll(); });
+}
+
+// ----- Navigation interne de l'onglet -----
+function switchPorcSub(name, btn){
+  document.querySelectorAll('.porc-subsection').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.porc-subtab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('porc-sub-'+name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name==='resume') renderPorcResume();
+  if (name==='achats') renderPorcAchats();
+  if (name==='ingredients') renderPorcIngredients();
+  if (name==='salaires') { populatePorcNomsInputs(); renderPorcSalaires(); }
+  if (name==='recettes') renderPorcRecettes();
+  if (name==='fournisseurs') renderPorcFournisseurs();
+  if (name==='rapports') renderPorcRapportFilters();
+}
+
+function renderPorcAll(){
+  renderPorcAchats();
+  renderPorcIngredients();
+  renderPorcSalaires();
+  renderPorcRecettes();
+  renderPorcFournisseurs();
+  renderPorcResume();
+  const rapportsActive = document.getElementById('porc-sub-rapports') && document.getElementById('porc-sub-rapports').classList.contains('active');
+  if (rapportsActive) renderPorcRapport();
+}
+
+// ----- Sélecteurs de période (onglet Résumé) -----
+function populatePorcPeriodSelects(){
+  const my = document.getElementById('porcResumeMonth');
+  if (my && !my.dataset.filled) {
+    my.innerHTML = '<option value="all">Tous les mois</option>' + MOIS_FULL.map((m,i)=>`<option value="${i}">${m}</option>`).join('');
+    my.value = String(new Date().getMonth());
+    my.dataset.filled = '1';
+  }
+  const yy = document.getElementById('porcResumeYear');
+  if (yy && !yy.dataset.filled) {
+    yy.innerHTML = allYearsList(true).map(y=>`<option value="${y}"${y===new Date().getFullYear()?' selected':''}>${y}</option>`).join('');
+    yy.dataset.filled = '1';
+  }
+}
+
+function porcDateInPeriod(dateStr, monthSel, yearSel){
+  if (!dateStr) return false;
+  const d = new Date(dateStr+'T00:00:00');
+  if (isNaN(d)) return false;
+  if (String(d.getFullYear()) !== String(yearSel)) return false;
+  if (monthSel !== 'all' && d.getMonth() !== parseInt(monthSel,10)) return false;
+  return true;
+}
+
+function renderPorcResume(){
+  populatePorcPeriodSelects();
+  const monthSel = document.getElementById('porcResumeMonth') ? document.getElementById('porcResumeMonth').value : 'all';
+  const yearSel = document.getElementById('porcResumeYear') ? document.getElementById('porcResumeYear').value : new Date().getFullYear();
+
+  const achatsP = porcAchats.filter(a=>porcDateInPeriod(a.date,monthSel,yearSel));
+  const ingP    = porcIngredients.filter(i=>porcDateInPeriod(i.date,monthSel,yearSel));
+  const salP    = porcSalaires.filter(s=>porcDateInPeriod(s.date,monthSel,yearSel));
+  const recP    = porcRecettes.filter(r=>porcDateInPeriod(r.date,monthSel,yearSel));
+
+  const totalAchat = achatsP.reduce((s,a)=>s+(a.montant||0),0);
+  const totalIng   = ingP.reduce((s,i)=>s+(i.montant||0),0);
+  const totalSal   = salP.reduce((s,x)=>s+(x.montant||0),0);
+  const totalR     = recP.reduce((s,r)=>s+(r.montant||0),0);
+  const totalD     = totalAchat+totalIng+totalSal;
+  const net        = totalR - totalD;
+  const marge      = totalR>0 ? ((net/totalR)*100).toFixed(1)+' %' : '—';
+  const nbPorcs    = achatsP.reduce((s,a)=>s+(a.nombre||0),0);
+
+  document.getElementById('porcResR').textContent = fmt(totalR)+' F';
+  document.getElementById('porcResAchat').textContent = fmt(totalAchat)+' F';
+  document.getElementById('porcResAchatSub').textContent = nbPorcs+' porc(s) · '+achatsP.length+' lot(s)';
+  document.getElementById('porcResIng').textContent = fmt(totalIng)+' F';
+  document.getElementById('porcResSal').textContent = fmt(totalSal)+' F';
+  document.getElementById('porcResD').textContent = fmt(totalD)+' F';
+  document.getElementById('porcResNet').textContent = fmt(net)+' F';
+  document.getElementById('porcResMarge').textContent = marge;
+
+  const periodeLabel = (monthSel==='all' ? 'Année ' : (MOIS_FULL[parseInt(monthSel,10)]+' ')) + yearSel;
+  document.getElementById('porcDonutTitle').textContent = periodeLabel;
+  document.getElementById('porcDonutCenterNet').textContent = fmt(net)+' F';
+  renderSegmentedDonut({
+    svgId: 'porcDonutSvg',
+    segments: [
+      { label: 'Recettes : '+fmt(totalR)+' F', value: totalR, short: 'Recettes' },
+      { label: 'Dépenses : '+fmt(totalD)+' F', value: totalD, short: 'Dépenses' }
+    ],
+    colors: ['#2e8b57', '#c0392b'],
+    selectedIdx: -1,
+    onSelectFnName: 'porcDonutNoop'
+  });
+
+  const sorted = achatsP.slice().sort((a,b)=> (a.date||'') < (b.date||'') ? 1 : -1);
+  document.getElementById('porcResumeAchatsTable').innerHTML = sorted.length
+    ? `<thead><tr><th>Date</th><th>Nombre</th><th>Poids total</th><th>Montant</th></tr></thead><tbody>${sorted.map(a=>`
+      <tr><td>${formatDateFRLong(a.date)}</td><td>${a.nombre||0}</td><td>${a.poidsKg||0} kg</td><td style="font-weight:800">${fmt(a.montant||0)} F</td></tr>`).join('')}</tbody>`
+    : `<tbody><tr><td style="text-align:center;padding:16px;color:var(--text-muted)">Aucun achat sur cette période</td></tr></tbody>`;
+}
+
+// ----- Achats -----
+function renderPorcAchats(){
+  const sorted = porcAchats.slice().sort((a,b)=> (a.date||'') < (b.date||'') ? 1 : -1);
+  const total = porcAchats.reduce((s,a)=>s+(a.montant||0),0);
+  document.getElementById('porcAchatsTotal').textContent = fmt(total)+' F au total';
+  document.getElementById('porcAchatsTable').innerHTML = sorted.length ? `
+    <thead><tr><th>Date</th><th>Nombre</th><th>Poids</th><th>Montant</th><th>Notes</th><th></th></tr></thead>
+    <tbody>${sorted.map(a=>`
+      <tr>
+        <td>${formatDateFRLong(a.date)}</td>
+        <td>${a.nombre||0}</td>
+        <td>${a.poidsKg||0} kg</td>
+        <td style="font-weight:800">${fmt(a.montant||0)} F</td>
+        <td>${a.notes||''}</td>
+        <td style="white-space:nowrap">
+          <button class="pay-btn reset" onclick="editPorcAchat('${a._localId||''}','${a._docId||''}')">✏️</button>
+          <button class="pay-btn delete" onclick="deletePorcAchat('${a._localId||''}','${a._docId||''}')">🗑️</button>
+        </td>
+      </tr>`).join('')}</tbody>`
+    : `<tbody><tr><td style="text-align:center;padding:16px;color:var(--text-muted)">Aucun achat enregistré</td></tr></tbody>`;
+}
+function openPorcAchatModal(){
+  editingPorcAchatRef = null;
+  document.getElementById('modalPorcAchatTitle').textContent = '🐖 Nouvel achat de porc(s)';
+  document.getElementById('paDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('paNombre').value = '';
+  document.getElementById('paPoids').value = '';
+  document.getElementById('paMontant').value = '';
+  document.getElementById('paNotes').value = '';
+  openModal('modalPorcAchat');
+}
+function editPorcAchat(localId, docId){
+  const a = porcAchats.find(x=>(localId && x._localId===localId)||(docId && x._docId===docId));
+  if (!a) { showToast('⚠️ Achat introuvable'); return; }
+  editingPorcAchatRef = { localId: a._localId||'', docId: a._docId||'' };
+  document.getElementById('modalPorcAchatTitle').textContent = "✎ Modifier l'achat";
+  document.getElementById('paDate').value = a.date||'';
+  document.getElementById('paNombre').value = a.nombre||'';
+  document.getElementById('paPoids').value = a.poidsKg||'';
+  document.getElementById('paMontant').value = a.montant?a.montant.toLocaleString('fr-FR'):'';
+  document.getElementById('paNotes').value = a.notes||'';
+  openModal('modalPorcAchat');
+}
+function savePorcAchat(){
+  const date = document.getElementById('paDate').value;
+  const nombre = parseInt(document.getElementById('paNombre').value,10)||0;
+  const poidsKg = parseFloat(document.getElementById('paPoids').value)||0;
+  const montant = parseMontant('paMontant');
+  const notes = document.getElementById('paNotes').value.trim();
+  if (!date) { showToast('⚠️ Date requise'); return; }
+  if (!nombre) { showToast('⚠️ Nombre de porcs requis'); return; }
+  if (!montant) { showToast('⚠️ Montant requis'); return; }
+  if (editingPorcAchatRef) {
+    const a = porcAchats.find(x=>(editingPorcAchatRef.localId && x._localId===editingPorcAchatRef.localId)||(editingPorcAchatRef.docId && x._docId===editingPorcAchatRef.docId));
+    if (a) { Object.assign(a,{date,nombre,poidsKg,montant,notes}); if (a._docId && fbReady) fbUpdatePorcAchat(a._docId,a); else persistPorcAchats(); }
+    editingPorcAchatRef = null;
+  } else {
+    const entry = { _localId: porcLocalId(), date, nombre, poidsKg, montant, notes };
+    porcAchats.unshift(entry);
+    persistPorcAchats();
+    if (fbReady) fbSavePorcAchat(entry);
+  }
+  closeModal('modalPorcAchat');
+  renderPorcAchats();
+  renderPorcResume();
+  showToast('✅ Achat enregistré');
+}
+function deletePorcAchat(localId, docId){
+  if (!confirm('Supprimer cet achat ? Action irréversible.')) return;
+  if (docId && fbReady) {
+    window._deleteDoc(window._doc(window._db,'porc_achats',docId)).then(()=>showToast('🗑️ Achat supprimé')).catch(()=>showToast('⚠️ Erreur suppression'));
+  } else {
+    const idx = porcAchats.findIndex(x=>x._localId===localId);
+    if (idx>-1) { porcAchats.splice(idx,1); persistPorcAchats(); renderPorcAchats(); renderPorcResume(); showToast('🗑️ Achat supprimé'); }
+  }
+}
+
+// ----- Ingrédients -----
+function renderPorcIngredients(){
+  const sorted = porcIngredients.slice().sort((a,b)=> (a.date||'') < (b.date||'') ? 1 : -1);
+  const total = porcIngredients.reduce((s,i)=>s+(i.montant||0),0);
+  document.getElementById('porcIngredientsTotal').textContent = fmt(total)+' F au total';
+  document.getElementById('porcIngredientsTable').innerHTML = sorted.length ? `
+    <thead><tr><th>Date</th><th>Désignation</th><th>Montant</th><th></th></tr></thead>
+    <tbody>${sorted.map(i=>`
+      <tr>
+        <td>${formatDateFRLong(i.date)}</td>
+        <td>${i.designation||''}</td>
+        <td style="font-weight:800">${fmt(i.montant||0)} F</td>
+        <td style="white-space:nowrap">
+          <button class="pay-btn reset" onclick="editPorcIngredient('${i._localId||''}','${i._docId||''}')">✏️</button>
+          <button class="pay-btn delete" onclick="deletePorcIngredient('${i._localId||''}','${i._docId||''}')">🗑️</button>
+        </td>
+      </tr>`).join('')}</tbody>`
+    : `<tbody><tr><td style="text-align:center;padding:16px;color:var(--text-muted)">Aucune dépense enregistrée</td></tr></tbody>`;
+}
+function openPorcIngredientModal(){
+  editingPorcIngredientRef = null;
+  document.getElementById('modalPorcIngredientTitle').textContent = '🧂 Nouvelle dépense (ingrédient)';
+  document.getElementById('piDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('piDesignation').value = '';
+  document.getElementById('piMontant').value = '';
+  openModal('modalPorcIngredient');
+}
+function editPorcIngredient(localId, docId){
+  const i = porcIngredients.find(x=>(localId && x._localId===localId)||(docId && x._docId===docId));
+  if (!i) { showToast('⚠️ Dépense introuvable'); return; }
+  editingPorcIngredientRef = { localId: i._localId||'', docId: i._docId||'' };
+  document.getElementById('modalPorcIngredientTitle').textContent = '✎ Modifier la dépense';
+  document.getElementById('piDate').value = i.date||'';
+  document.getElementById('piDesignation').value = i.designation||'';
+  document.getElementById('piMontant').value = i.montant?i.montant.toLocaleString('fr-FR'):'';
+  openModal('modalPorcIngredient');
+}
+function savePorcIngredient(){
+  const date = document.getElementById('piDate').value;
+  const designation = document.getElementById('piDesignation').value.trim();
+  const montant = parseMontant('piMontant');
+  if (!date) { showToast('⚠️ Date requise'); return; }
+  if (!designation) { showToast('⚠️ Désignation requise'); return; }
+  if (!montant) { showToast('⚠️ Montant requis'); return; }
+  if (editingPorcIngredientRef) {
+    const i = porcIngredients.find(x=>(editingPorcIngredientRef.localId && x._localId===editingPorcIngredientRef.localId)||(editingPorcIngredientRef.docId && x._docId===editingPorcIngredientRef.docId));
+    if (i) { Object.assign(i,{date,designation,montant}); if (i._docId && fbReady) fbUpdatePorcIngredient(i._docId,i); else persistPorcIngredients(); }
+    editingPorcIngredientRef = null;
+  } else {
+    const entry = { _localId: porcLocalId(), date, designation, montant };
+    porcIngredients.unshift(entry);
+    persistPorcIngredients();
+    if (fbReady) fbSavePorcIngredient(entry);
+  }
+  closeModal('modalPorcIngredient');
+  renderPorcIngredients();
+  renderPorcResume();
+  showToast('✅ Dépense enregistrée');
+}
+function deletePorcIngredient(localId, docId){
+  if (!confirm('Supprimer cette dépense ? Action irréversible.')) return;
+  if (docId && fbReady) {
+    window._deleteDoc(window._doc(window._db,'porc_ingredients',docId)).then(()=>showToast('🗑️ Dépense supprimée')).catch(()=>showToast('⚠️ Erreur suppression'));
+  } else {
+    const idx = porcIngredients.findIndex(x=>x._localId===localId);
+    if (idx>-1) { porcIngredients.splice(idx,1); persistPorcIngredients(); renderPorcIngredients(); renderPorcResume(); showToast('🗑️ Dépense supprimée'); }
+  }
+}
+
+// ----- Salaires -----
+function populatePorcNomsInputs(){
+  document.getElementById('porcNomP1').value = porcPersonnelNoms[0]||'Personnel 1';
+  document.getElementById('porcNomP2').value = porcPersonnelNoms[1]||'Personnel 2';
+  document.getElementById('porcNomP3').value = porcPersonnelNoms[2]||'Personnel 3';
+  document.getElementById('porcNomP4').value = porcPersonnelNoms[3]||'Personnel 4';
+}
+function savePorcNoms(){
+  porcPersonnelNoms = [
+    document.getElementById('porcNomP1').value.trim() || 'Personnel 1',
+    document.getElementById('porcNomP2').value.trim() || 'Personnel 2',
+    document.getElementById('porcNomP3').value.trim() || 'Personnel 3',
+    document.getElementById('porcNomP4').value.trim() || 'Personnel 4'
+  ];
+  persistPorcNoms();
+  renderPorcSalaires();
+}
+function populatePorcSalairePersonneSelect(){
+  const sel = document.getElementById('psalPersonne');
+  if (!sel) return;
+  sel.innerHTML = porcPersonnelNoms.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
+}
+function renderPorcSalaires(){
+  const sorted = porcSalaires.slice().sort((a,b)=> (a.date||'') < (b.date||'') ? 1 : -1);
+  const total = porcSalaires.reduce((s,x)=>s+(x.montant||0),0);
+  document.getElementById('porcSalairesTotal').textContent = fmt(total)+' F au total';
+  document.getElementById('porcSalairesTable').innerHTML = sorted.length ? `
+    <thead><tr><th>Date</th><th>Personnel</th><th>Montant</th><th></th></tr></thead>
+    <tbody>${sorted.map(s=>`
+      <tr>
+        <td>${formatDateFRLong(s.date)}</td>
+        <td>${porcPersonnelNoms[s.personneIdx]||('Personnel '+((s.personneIdx||0)+1))}</td>
+        <td style="font-weight:800">${fmt(s.montant||0)} F</td>
+        <td style="white-space:nowrap">
+          <button class="pay-btn reset" onclick="editPorcSalaire('${s._localId||''}','${s._docId||''}')">✏️</button>
+          <button class="pay-btn delete" onclick="deletePorcSalaire('${s._localId||''}','${s._docId||''}')">🗑️</button>
+        </td>
+      </tr>`).join('')}</tbody>`
+    : `<tbody><tr><td style="text-align:center;padding:16px;color:var(--text-muted)">Aucun salaire enregistré</td></tr></tbody>`;
+}
+function openPorcSalaireModal(){
+  editingPorcSalaireRef = null;
+  populatePorcSalairePersonneSelect();
+  document.getElementById('modalPorcSalaireTitle').textContent = '👷 Nouveau paiement de salaire';
+  document.getElementById('psalDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('psalPersonne').value = '0';
+  document.getElementById('psalMontant').value = '';
+  openModal('modalPorcSalaire');
+}
+function editPorcSalaire(localId, docId){
+  const s = porcSalaires.find(x=>(localId && x._localId===localId)||(docId && x._docId===docId));
+  if (!s) { showToast('⚠️ Paiement introuvable'); return; }
+  editingPorcSalaireRef = { localId: s._localId||'', docId: s._docId||'' };
+  populatePorcSalairePersonneSelect();
+  document.getElementById('modalPorcSalaireTitle').textContent = '✎ Modifier le paiement';
+  document.getElementById('psalDate').value = s.date||'';
+  document.getElementById('psalPersonne').value = String(s.personneIdx||0);
+  document.getElementById('psalMontant').value = s.montant?s.montant.toLocaleString('fr-FR'):'';
+  openModal('modalPorcSalaire');
+}
+function savePorcSalaire(){
+  const date = document.getElementById('psalDate').value;
+  const personneIdx = parseInt(document.getElementById('psalPersonne').value,10)||0;
+  const montant = parseMontant('psMontant');
+  if (!date) { showToast('⚠️ Date requise'); return; }
+  if (!montant) { showToast('⚠️ Montant requis'); return; }
+  if (editingPorcSalaireRef) {
+    const s = porcSalaires.find(x=>(editingPorcSalaireRef.localId && x._localId===editingPorcSalaireRef.localId)||(editingPorcSalaireRef.docId && x._docId===editingPorcSalaireRef.docId));
+    if (s) { Object.assign(s,{date,personneIdx,montant}); if (s._docId && fbReady) fbUpdatePorcSalaire(s._docId,s); else persistPorcSalaires(); }
+    editingPorcSalaireRef = null;
+  } else {
+    const entry = { _localId: porcLocalId(), date, personneIdx, montant };
+    porcSalaires.unshift(entry);
+    persistPorcSalaires();
+    if (fbReady) fbSavePorcSalaire(entry);
+  }
+  closeModal('modalPorcSalaire');
+  renderPorcSalaires();
+  renderPorcResume();
+  showToast('✅ Salaire enregistré');
+}
+function deletePorcSalaire(localId, docId){
+  if (!confirm('Supprimer ce paiement ? Action irréversible.')) return;
+  if (docId && fbReady) {
+    window._deleteDoc(window._doc(window._db,'porc_salaires',docId)).then(()=>showToast('🗑️ Paiement supprimé')).catch(()=>showToast('⚠️ Erreur suppression'));
+  } else {
+    const idx = porcSalaires.findIndex(x=>x._localId===localId);
+    if (idx>-1) { porcSalaires.splice(idx,1); persistPorcSalaires(); renderPorcSalaires(); renderPorcResume(); showToast('🗑️ Paiement supprimé'); }
+  }
+}
+
+// ----- Recettes (ventes détail porc au four) -----
+function renderPorcRecettes(){
+  const sorted = porcRecettes.slice().sort((a,b)=> (a.date||'') < (b.date||'') ? 1 : -1);
+  const total = porcRecettes.reduce((s,r)=>s+(r.montant||0),0);
+  document.getElementById('porcRecettesTotal').textContent = fmt(total)+' F au total';
+  document.getElementById('porcRecettesTable').innerHTML = sorted.length ? `
+    <thead><tr><th>Date</th><th>Description</th><th>Montant</th><th></th></tr></thead>
+    <tbody>${sorted.map(r=>`
+      <tr>
+        <td>${formatDateFRLong(r.date)}</td>
+        <td>${r.description||''}</td>
+        <td style="font-weight:800">${fmt(r.montant||0)} F</td>
+        <td style="white-space:nowrap">
+          <button class="pay-btn reset" onclick="editPorcRecette('${r._localId||''}','${r._docId||''}')">✏️</button>
+          <button class="pay-btn delete" onclick="deletePorcRecette('${r._localId||''}','${r._docId||''}')">🗑️</button>
+        </td>
+      </tr>`).join('')}</tbody>`
+    : `<tbody><tr><td style="text-align:center;padding:16px;color:var(--text-muted)">Aucune recette enregistrée</td></tr></tbody>`;
+}
+function openPorcRecetteModal(){
+  editingPorcRecetteRef = null;
+  document.getElementById('modalPorcRecetteTitle').textContent = '💰 Nouvelle recette';
+  document.getElementById('prDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('prMontant').value = '';
+  document.getElementById('prDescription').value = '';
+  openModal('modalPorcRecette');
+}
+function editPorcRecette(localId, docId){
+  const r = porcRecettes.find(x=>(localId && x._localId===localId)||(docId && x._docId===docId));
+  if (!r) { showToast('⚠️ Recette introuvable'); return; }
+  editingPorcRecetteRef = { localId: r._localId||'', docId: r._docId||'' };
+  document.getElementById('modalPorcRecetteTitle').textContent = '✎ Modifier la recette';
+  document.getElementById('prDate').value = r.date||'';
+  document.getElementById('prMontant').value = r.montant?r.montant.toLocaleString('fr-FR'):'';
+  document.getElementById('prDescription').value = r.description||'';
+  openModal('modalPorcRecette');
+}
+function savePorcRecette(){
+  const date = document.getElementById('prDate').value;
+  const montant = parseMontant('prMontant');
+  const description = document.getElementById('prDescription').value.trim();
+  if (!date) { showToast('⚠️ Date requise'); return; }
+  if (!montant) { showToast('⚠️ Montant requis'); return; }
+  if (editingPorcRecetteRef) {
+    const r = porcRecettes.find(x=>(editingPorcRecetteRef.localId && x._localId===editingPorcRecetteRef.localId)||(editingPorcRecetteRef.docId && x._docId===editingPorcRecetteRef.docId));
+    if (r) { Object.assign(r,{date,montant,description}); if (r._docId && fbReady) fbUpdatePorcRecette(r._docId,r); else persistPorcRecettes(); }
+    editingPorcRecetteRef = null;
+  } else {
+    const entry = { _localId: porcLocalId(), date, montant, description };
+    porcRecettes.unshift(entry);
+    persistPorcRecettes();
+    if (fbReady) fbSavePorcRecette(entry);
+  }
+  closeModal('modalPorcRecette');
+  renderPorcRecettes();
+  renderPorcResume();
+  showToast('✅ Recette enregistrée');
+}
+function deletePorcRecette(localId, docId){
+  if (!confirm('Supprimer cette recette ? Action irréversible.')) return;
+  if (docId && fbReady) {
+    window._deleteDoc(window._doc(window._db,'porc_recettes',docId)).then(()=>showToast('🗑️ Recette supprimée')).catch(()=>showToast('⚠️ Erreur suppression'));
+  } else {
+    const idx = porcRecettes.findIndex(x=>x._localId===localId);
+    if (idx>-1) { porcRecettes.splice(idx,1); persistPorcRecettes(); renderPorcRecettes(); renderPorcResume(); showToast('🗑️ Recette supprimée'); }
+  }
+}
+
+// ----- Rapports experts : par période libre, par lot (approvisionnement), par mois, par année -----
+function renderPorcRapportFilters(){
+  const type = document.getElementById('porcRapportType').value;
+  const box = document.getElementById('porcRapportFilters');
+  if (type === 'periode') {
+    box.innerHTML = `
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Du</label><input class="form-input" type="date" id="prapDebut"></div>
+        <div class="form-group"><label class="form-label">Au</label><input class="form-input" type="date" id="prapFin"></div>
+      </div>`;
+    document.getElementById('prapDebut').value = new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().slice(0,10);
+    document.getElementById('prapFin').value = new Date().toISOString().slice(0,10);
+  } else if (type === 'lot') {
+    const sorted = porcAchats.slice().sort((a,b)=> (a.date||'') < (b.date||'') ? 1 : -1);
+    box.innerHTML = `<div class="form-group"><label class="form-label">Lot (approvisionnement)</label>
+      <select class="form-select" id="prapLot">${sorted.length ? sorted.map(a=>`<option value="${a._localId||a._docId}">${formatDateFRLong(a.date)} — ${a.nombre||0} porc(s), ${fmt(a.montant||0)} F</option>`).join('') : '<option value="">Aucun achat enregistré</option>'}</select></div>`;
+  } else if (type === 'mois') {
+    box.innerHTML = `
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Mois</label>
+          <select class="form-select" id="prapMois">${MOIS_FULL.map((m,i)=>`<option value="${i}">${m}</option>`).join('')}</select></div>
+        <div class="form-group"><label class="form-label">Année</label>
+          <select class="form-select" id="prapAnnee">${allYearsList(true).map(y=>`<option value="${y}"${y===new Date().getFullYear()?' selected':''}>${y}</option>`).join('')}</select></div>
+      </div>`;
+    document.getElementById('prapMois').value = String(new Date().getMonth());
+  } else if (type === 'annee') {
+    box.innerHTML = `<div class="form-group"><label class="form-label">Année</label>
+      <select class="form-select" id="prapAnnee2">${allYearsList(true).map(y=>`<option value="${y}"${y===new Date().getFullYear()?' selected':''}>${y}</option>`).join('')}</select></div>`;
+  }
+  document.getElementById('porcRapportResult').innerHTML = '';
+}
+function porcCalcSummary(dateFilterFn){
+  const achatsP = porcAchats.filter(a=>dateFilterFn(a.date));
+  const ingP    = porcIngredients.filter(i=>dateFilterFn(i.date));
+  const salP    = porcSalaires.filter(s=>dateFilterFn(s.date));
+  const recP    = porcRecettes.filter(r=>dateFilterFn(r.date));
+  const totalAchat = achatsP.reduce((s,a)=>s+(a.montant||0),0);
+  const totalIng   = ingP.reduce((s,i)=>s+(i.montant||0),0);
+  const totalSal   = salP.reduce((s,x)=>s+(x.montant||0),0);
+  const totalR     = recP.reduce((s,r)=>s+(r.montant||0),0);
+  const totalD     = totalAchat+totalIng+totalSal;
+  const net        = totalR - totalD;
+  const nbPorcs    = achatsP.reduce((s,a)=>s+(a.nombre||0),0);
+  return { achatsP, ingP, salP, recP, totalAchat, totalIng, totalSal, totalR, totalD, net, nbPorcs };
+}
+function porcSummaryHTML(sum, titre){
+  const marge = sum.totalR>0 ? ((sum.net/sum.totalR)*100).toFixed(1)+' %' : '—';
+  return `
+    <div class="summary-row">
+      <div class="summary-card recettes" style="grid-column:1/-1;text-align:center">
+        <div class="sc-label">${titre}</div>
+        <div class="sc-value green" style="font-size:20px">${fmt(sum.totalR)} F</div>
+        <div class="sc-sub">Recettes</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-card depenses"><div class="sc-label">🐖 Achat porcs</div><div class="sc-value red">${fmt(sum.totalAchat)} F</div><div class="sc-sub">${sum.nbPorcs} porc(s)</div></div>
+      <div class="summary-card depenses"><div class="sc-label">🧂 Ingrédients</div><div class="sc-value red">${fmt(sum.totalIng)} F</div><div class="sc-sub">FCFA</div></div>
+      <div class="summary-card depenses"><div class="sc-label">👷 Salaires</div><div class="sc-value red">${fmt(sum.totalSal)} F</div><div class="sc-sub">FCFA</div></div>
+      <div class="summary-card net"><div class="sc-label">📊 Résultat Net</div><div class="sc-value navy">${fmt(sum.net)} F</div><div class="sc-sub">Marge : ${marge}</div></div>
+    </div>`;
+}
+function renderPorcRapport(){
+  const type = document.getElementById('porcRapportType').value;
+  const box = document.getElementById('porcRapportResult');
+  if (type === 'periode') {
+    const debut = document.getElementById('prapDebut').value;
+    const fin = document.getElementById('prapFin').value;
+    if (!debut || !fin) { showToast('⚠️ Dates requises'); return; }
+    const sum = porcCalcSummary(d => d && d>=debut && d<=fin);
+    box.innerHTML = porcSummaryHTML(sum, `📆 Du ${formatDateFRLong(debut)} au ${formatDateFRLong(fin)}`);
+  } else if (type === 'lot') {
+    const lotSel = document.getElementById('prapLot');
+    const key = lotSel ? lotSel.value : '';
+    if (!key) { box.innerHTML = '<div class="table-card" style="padding:16px;text-align:center;color:var(--text-muted)">Aucun lot disponible</div>'; return; }
+    const sorted = porcAchats.slice().sort((a,b)=> (a.date||'') < (b.date||'') ? -1 : 1); // ordre chronologique croissant
+    const idx = sorted.findIndex(a => (a._localId===key) || (a._docId===key));
+    if (idx === -1) { box.innerHTML = '<div class="table-card" style="padding:16px;text-align:center;color:var(--text-muted)">Lot introuvable</div>'; return; }
+    const lot = sorted[idx];
+    const nextLot = sorted[idx+1];
+    const debut = lot.date;
+    const fin = nextLot ? nextLot.date : new Date().toISOString().slice(0,10);
+    // Fenêtre [debut, fin) : le jour du lot suivant appartient déjà à ce lot suivant
+    const sum = porcCalcSummary(d => d && d>=debut && (nextLot ? d<fin : d<=fin));
+    box.innerHTML = `
+      <div class="table-card" style="padding:14px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:800;color:var(--text-muted)">🐖 Lot du ${formatDateFRLong(lot.date)}</div>
+        <div style="font-size:12px;margin-top:4px">${lot.nombre||0} porc(s) · ${lot.poidsKg||0} kg · ${fmt(lot.montant||0)} F d'achat${lot.notes?(' · '+lot.notes):''}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Fenêtre de vente : du ${formatDateFRLong(debut)} ${nextLot?('au '+formatDateFRLong(fin)+' (jour du lot suivant exclu)') : "à aujourd'hui"}</div>
+      </div>
+      ${porcSummaryHTML(sum, '🐖 Résultat de ce lot')}`;
+  } else if (type === 'mois') {
+    const mois = parseInt(document.getElementById('prapMois').value,10);
+    const annee = document.getElementById('prapAnnee').value;
+    const sum = porcCalcSummary(d => { if(!d) return false; const dt=new Date(d+'T00:00:00'); return dt.getFullYear()===parseInt(annee,10) && dt.getMonth()===mois; });
+    box.innerHTML = porcSummaryHTML(sum, `📅 ${MOIS_FULL[mois]} ${annee}`);
+  } else if (type === 'annee') {
+    const annee = document.getElementById('prapAnnee2').value;
+    const sum = porcCalcSummary(d => { if(!d) return false; return new Date(d+'T00:00:00').getFullYear()===parseInt(annee,10); });
+    let rowsHTML = '';
+    for (let m=0;m<12;m++){
+      const sM = porcCalcSummary(d=>{ if(!d) return false; const dt=new Date(d+'T00:00:00'); return dt.getFullYear()===parseInt(annee,10) && dt.getMonth()===m; });
+      rowsHTML += `<tr><td>${MOIS_FULL[m]}</td><td>${fmt(sM.totalR)} F</td><td>${fmt(sM.totalD)} F</td><td style="font-weight:800">${fmt(sM.net)} F</td></tr>`;
+    }
+    box.innerHTML = porcSummaryHTML(sum, `📈 Année ${annee}`) + `
+      <div class="table-card">
+        <div class="table-card-header"><span>Détail mois par mois</span></div>
+        <table class="table-fixed"><thead><tr><th>Mois</th><th>Recettes</th><th>Dépenses</th><th>Net</th></tr></thead><tbody>${rowsHTML}</tbody></table>
+      </div>`;
+  }
+}
+
+// ----- Export du rapport "Porc au Four" (PDF / Excel), en couleur, basé sur les filtres actuellement sélectionnés -----
+// Recalcule les mêmes données que renderPorcRapport() à partir des filtres en cours, sans dépendre
+// du HTML déjà affiché à l'écran (fonctionne même si "Générer le rapport" n'a pas encore été cliqué).
+function porcRapportDataForExport(){
+  const type = document.getElementById('porcRapportType').value;
+  if (type === 'periode') {
+    const debut = document.getElementById('prapDebut').value;
+    const fin = document.getElementById('prapFin').value;
+    if (!debut || !fin) { showToast('⚠️ Dates requises'); return null; }
+    const sum = porcCalcSummary(d => d && d>=debut && d<=fin);
+    return { sum, titre: `Période du ${formatDateFRLong(debut)} au ${formatDateFRLong(fin)}`, monthly: null };
+  } else if (type === 'lot') {
+    const lotSel = document.getElementById('prapLot');
+    const key = lotSel ? lotSel.value : '';
+    if (!key) { showToast('⚠️ Aucun lot disponible'); return null; }
+    const sorted = porcAchats.slice().sort((a,b)=> (a.date||'') < (b.date||'') ? -1 : 1);
+    const idx = sorted.findIndex(a => (a._localId===key) || (a._docId===key));
+    if (idx === -1) { showToast('⚠️ Lot introuvable'); return null; }
+    const lot = sorted[idx];
+    const nextLot = sorted[idx+1];
+    const debut = lot.date;
+    const fin = nextLot ? nextLot.date : new Date().toISOString().slice(0,10);
+    const sum = porcCalcSummary(d => d && d>=debut && (nextLot ? d<fin : d<=fin));
+    const titre = `Lot du ${formatDateFRLong(lot.date)} — ${lot.nombre||0} porc(s), ${fmt(lot.montant||0)} F d'achat · vente du ${formatDateFRLong(debut)} ${nextLot?('au '+formatDateFRLong(fin)+' (lot suivant exclu)') : "à aujourd'hui"}`;
+    return { sum, titre, monthly: null };
+  } else if (type === 'mois') {
+    const mois = parseInt(document.getElementById('prapMois').value,10);
+    const annee = document.getElementById('prapAnnee').value;
+    const sum = porcCalcSummary(d => { if(!d) return false; const dt=new Date(d+'T00:00:00'); return dt.getFullYear()===parseInt(annee,10) && dt.getMonth()===mois; });
+    return { sum, titre: `${MOIS_FULL[mois]} ${annee}`, monthly: null };
+  } else if (type === 'annee') {
+    const annee = document.getElementById('prapAnnee2').value;
+    const sum = porcCalcSummary(d => { if(!d) return false; return new Date(d+'T00:00:00').getFullYear()===parseInt(annee,10); });
+    const monthly = [];
+    for (let m=0;m<12;m++){
+      const sM = porcCalcSummary(d=>{ if(!d) return false; const dt=new Date(d+'T00:00:00'); return dt.getFullYear()===parseInt(annee,10) && dt.getMonth()===m; });
+      monthly.push({ mois: MOIS_FULL[m], r: sM.totalR, d: sM.totalD, net: sM.net });
+    }
+    return { sum, titre: `Année ${annee}`, monthly };
+  }
+  return null;
+}
+
+// Export PDF du rapport Porc au Four — en-tête/pied de page communs, tableau de synthèse coloré
+// (jsPDF + autoTable), et détail mois par mois pour un rapport annuel.
+function exportPorcRapportPDF(){
+  const data = porcRapportDataForExport();
+  if (!data) return;
+  loadJsPDF(() => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const margin = 14;
+    let y = pdfAddHeader(doc, 'RAPPORT PORC AU FOUR', [data.titre, `Édité le ${new Date().toLocaleDateString('fr-FR')}`]);
+    const sum = data.sum;
+    const margeTxt = sum.totalR>0 ? (((sum.net/sum.totalR)*100).toFixed(1)+' %') : '—';
+
+    doc.autoTable({
+      startY: y, margin: { left: margin, right: margin },
+      head: [['Indicateur', 'Montant (FCFA)']],
+      body: [
+        ['💰 Recettes (ventes)', fmtPdf(sum.totalR)],
+        [`🐖 Achat de porcs (${sum.nbPorcs} porc(s))`, fmtPdf(sum.totalAchat)],
+        ['🧂 Ingrédients', fmtPdf(sum.totalIng)],
+        ['👷 Salaires', fmtPdf(sum.totalSal)],
+        ['💸 Total dépenses', fmtPdf(sum.totalD)],
+        ['📊 Résultat net', fmtPdf(sum.net)],
+        ['Marge', margeTxt]
+      ],
+      theme: 'grid',
+      styles: { fontSize: 12, cellPadding: 3, minCellHeight: 7 },
+      headStyles: { fillColor: PDF_NAVY, textColor: 255, fontStyle: 'bold' },
+      columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
+      didParseCell: (c) => {
+        if (c.row.section === 'body' && c.column.index === 1) {
+          const label = String(c.row.raw[0]);
+          if (label.includes('Recettes')) c.cell.styles.textColor = PDF_GREEN;
+          else if (label.includes('Achat') || label.includes('Ingrédients') || label.includes('Salaires') || label.includes('Total dépenses')) c.cell.styles.textColor = PDF_RED;
+          else if (label.includes('Résultat net')) { c.cell.styles.textColor = PDF_NAVY; c.cell.styles.fontStyle = 'bold'; c.cell.styles.fillColor = [224,232,240]; }
+        }
+      }
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    if (data.monthly) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(...PDF_NAVY);
+      doc.text('DÉTAIL MOIS PAR MOIS', margin, y);
+      y += 6;
+      const rows = data.monthly.map(m => [m.mois, fmtPdf(m.r), fmtPdf(m.d), fmtPdf(m.net)]);
+      doc.autoTable({
+        startY: y, margin: { left: margin, right: margin },
+        head: [['Mois', 'Recettes (FCFA)', 'Dépenses (FCFA)', 'Net (FCFA)']],
+        body: rows, theme: 'striped',
+        styles: { fontSize: 10.5, cellPadding: 2.2, halign: 'center' },
+        headStyles: { fillColor: PDF_NAVY, textColor: 255, fontStyle: 'bold' }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+    }
+
+    pdfAddFooter(doc);
+    const now = new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
+    doc.save(`Rapport_Porc_au_Four_${now}.pdf`);
+    showToast('📄 Rapport Porc au Four généré (PDF)');
+  });
+}
+
+// Export Excel du rapport Porc au Four — mise en page experte (ExcelJS) : en-tête AUBERGE TAMAR,
+// tableau de synthèse coloré, et détail mois par mois pour un rapport annuel.
+function exportPorcRapportExcel(){
+  const data = porcRapportDataForExport();
+  if (!data) return;
+  loadExcelJS(() => {
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'AubergeGest';
+    wb.created = new Date();
+    const sheet = wb.addWorksheet('Rapport Porc au Four');
+    const numCols = data.monthly ? 4 : 2;
+    let row = xlAddLetterhead(sheet, 'RAPPORT PORC AU FOUR', [data.titre, `Édité le ${new Date().toLocaleDateString('fr-FR')}`], numCols);
+    sheet.getColumn(1).width = 34;
+    sheet.getColumn(2).width = 20;
+    if (data.monthly) { sheet.getColumn(3).width = 20; sheet.getColumn(4).width = 20; }
+
+    sheet.getCell(row,1).value = 'Indicateur';
+    sheet.getCell(row,2).value = 'Montant (FCFA)';
+    xlStyleHeaderRow(sheet, row);
+    row++;
+
+    const sum = data.sum;
+    const margeTxt = sum.totalR>0 ? (((sum.net/sum.totalR)*100).toFixed(1)+' %') : '—';
+    const firstDataRow = row;
+    const lines = [
+      ['Recettes (ventes)', sum.totalR],
+      [`Achat de porcs (${sum.nbPorcs} porc(s))`, sum.totalAchat],
+      ['Ingrédients', sum.totalIng],
+      ['Salaires', sum.totalSal],
+      ['Total dépenses', sum.totalD],
+      ['Résultat net', sum.net]
+    ];
+    lines.forEach(([label, val]) => {
+      sheet.getCell(row,1).value = label;
+      sheet.getCell(row,2).value = val;
+      row++;
+    });
+    const netRow = row - 1; // ligne "Résultat net"
+    sheet.getCell(row,1).value = 'Marge';
+    sheet.getCell(row,2).value = margeTxt;
+    row++;
+
+    xlBorderRange(sheet, firstDataRow, row-1, 1, 2);
+    xlZebraStripe(sheet, firstDataRow, row-1, 1, 2);
+    xlHighlightTotalRow(sheet, netRow, 2);
+    row += 1; // ligne d'espacement
+
+    if (data.monthly) {
+      sheet.getCell(row,1).value = 'Mois';
+      sheet.getCell(row,2).value = 'Recettes (FCFA)';
+      sheet.getCell(row,3).value = 'Dépenses (FCFA)';
+      sheet.getCell(row,4).value = 'Net (FCFA)';
+      xlStyleHeaderRow(sheet, row);
+      row++;
+      const startM = row;
+      data.monthly.forEach(m => {
+        sheet.getCell(row,1).value = m.mois;
+        sheet.getCell(row,2).value = m.r;
+        sheet.getCell(row,3).value = m.d;
+        sheet.getCell(row,4).value = m.net;
+        row++;
+      });
+      xlBorderRange(sheet, startM, row-1, 1, 4);
+      xlZebraStripe(sheet, startM, row-1, 1, 4);
+    }
+
+    xlSetPageSetup(sheet, 'portrait', false);
+    const now = new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
+    xlDownload(wb, `Rapport_Porc_au_Four_${now}.xlsx`);
+    showToast('📊 Rapport Porc au Four généré (Excel)');
+  });
+}
+
+// ----- Fournisseurs (dettes) & Remboursements -----
+const PORC_FOURN_KEY = 'porc_fournisseurs_v1';
+const PORC_REMB_KEY  = 'porc_remboursements_v1';
+const PORC_FOURN_NOMS_KEY = 'porc_fournisseur_noms_v1';
+let porcFournisseurs = [];
+let porcRemboursements = [];
+let porcFournisseurNoms = ['F1','F2','F3','F4'];
+let editingPorcFournisseurRef = null;
+let editingPorcRemboursementRef = null;
+
+function persistPorcFournisseurNoms(){ try{ localStorage.setItem(PORC_FOURN_NOMS_KEY, JSON.stringify(porcFournisseurNoms)); }catch(e){} }
+function loadPorcFournisseurNoms(){ try{ const raw=localStorage.getItem(PORC_FOURN_NOMS_KEY); if(raw) porcFournisseurNoms = JSON.parse(raw); }catch(e){} }
+loadPorcFournisseurNoms();
+function populatePorcFournNomsInputs(){
+  document.getElementById('porcFournNomF1').value = porcFournisseurNoms[0]||'F1';
+  document.getElementById('porcFournNomF2').value = porcFournisseurNoms[1]||'F2';
+  document.getElementById('porcFournNomF3').value = porcFournisseurNoms[2]||'F3';
+  document.getElementById('porcFournNomF4').value = porcFournisseurNoms[3]||'F4';
+}
+function savePorcFournNoms(){
+  porcFournisseurNoms = [
+    document.getElementById('porcFournNomF1').value.trim() || 'F1',
+    document.getElementById('porcFournNomF2').value.trim() || 'F2',
+    document.getElementById('porcFournNomF3').value.trim() || 'F3',
+    document.getElementById('porcFournNomF4').value.trim() || 'F4'
+  ];
+  persistPorcFournisseurNoms();
+  renderPorcFournisseurs();
+}
+// Nom affiché d'une dette fournisseur : priorité au nouvel index F1-F4, repli sur l'ancien champ nom libre (données existantes)
+function porcFournisseurDisplayName(f){
+  if (f.fournisseurIdx !== undefined && f.fournisseurIdx !== null) return porcFournisseurNoms[f.fournisseurIdx] || ('F'+((f.fournisseurIdx||0)+1));
+  return f.nom || 'Fournisseur';
+}
+
+function persistPorcFournisseurs(){ try{ localStorage.setItem(PORC_FOURN_KEY, JSON.stringify(porcFournisseurs)); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur enregistrement fournisseurs'); } }
+function loadPorcFournisseurs(){ try{ const raw=localStorage.getItem(PORC_FOURN_KEY); porcFournisseurs = raw?JSON.parse(raw):[]; }catch(e){ porcFournisseurs=[]; } }
+loadPorcFournisseurs();
+
+function persistPorcRemboursements(){ try{ localStorage.setItem(PORC_REMB_KEY, JSON.stringify(porcRemboursements)); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur enregistrement remboursements'); } }
+function loadPorcRemboursements(){ try{ const raw=localStorage.getItem(PORC_REMB_KEY); porcRemboursements = raw?JSON.parse(raw):[]; }catch(e){ porcRemboursements=[]; } }
+loadPorcRemboursements();
+
+async function fbSavePorcFournisseur(entry){ if(!fbReady||!window._db) return; try{ const ref=await window._addDoc(window._collection(window._db,'porc_fournisseurs'),{...entry,ts:Date.now()}); entry._docId=ref.id; persistPorcFournisseurs(); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur sync fournisseur'); } }
+async function fbUpdatePorcFournisseur(docId, entry){ if(!fbReady||!window._db||!docId) return; try{ const {_docId,_localId,...data}=entry; await window._setDoc(window._doc(window._db,'porc_fournisseurs',docId), data, {merge:true}); }catch(e){ showToast('⚠️ Erreur mise à jour fournisseur'); } }
+
+async function fbSavePorcRemboursement(entry){ if(!fbReady||!window._db) return; try{ const ref=await window._addDoc(window._collection(window._db,'porc_remboursements'),{...entry,ts:Date.now()}); entry._docId=ref.id; persistPorcRemboursements(); }catch(e){ showToast(isStorageFullError(e)?storageFullMessage():'⚠️ Erreur sync remboursement'); } }
+async function fbUpdatePorcRemboursement(docId, entry){ if(!fbReady||!window._db||!docId) return; try{ const {_docId,_localId,...data}=entry; await window._setDoc(window._doc(window._db,'porc_remboursements',docId), data, {merge:true}); }catch(e){ showToast('⚠️ Erreur mise à jour remboursement'); } }
+
+function porcFournisseurKey(f){ return f._localId || f._docId; }
+function porcFournisseurRemboursements(key){ return porcRemboursements.filter(r=>r.fournisseurKey===key); }
+function porcFournisseurReste(f){
+  const key = porcFournisseurKey(f);
+  const rembourse = porcFournisseurRemboursements(key).reduce((s,r)=>s+(r.montant||0),0);
+  return (f.montantDu||0) - rembourse;
+}
+
+function renderPorcFournisseurs(){
+  populatePorcFournNomsInputs();
+  const totalDu = porcFournisseurs.reduce((s,f)=>s+(f.montantDu||0),0);
+  const totalRemb = porcRemboursements.reduce((s,r)=>s+(r.montant||0),0);
+  document.getElementById('porcFournTotalDu').textContent = fmt(totalDu)+' F';
+  document.getElementById('porcFournTotalRemb').textContent = fmt(totalRemb)+' F';
+  document.getElementById('porcFournReste').textContent = fmt(totalDu-totalRemb)+' F';
+
+  const sorted = porcFournisseurs.slice().sort((a,b)=> (a.date||'') < (b.date||'') ? 1 : -1);
+  const list = document.getElementById('porcFournisseursList');
+  if (!sorted.length) { list.innerHTML = `<div class="table-card" style="padding:16px;text-align:center;color:var(--text-muted)">Aucun fournisseur enregistré</div>`; return; }
+  list.innerHTML = sorted.map(f=>{
+    const key = porcFournisseurKey(f);
+    const rembs = porcFournisseurRemboursements(key).slice().sort((a,b)=> (a.date||'') < (b.date||'') ? 1 : -1);
+    const totalR = rembs.reduce((s,r)=>s+(r.montant||0),0);
+    const reste = (f.montantDu||0) - totalR;
+    const soldé = reste <= 0;
+    const rembRows = rembs.map(r=>`
+      <tr>
+        <td>${formatDateFRLong(r.date)}</td>
+        <td style="font-weight:800;color:var(--green)">${fmt(r.montant||0)} F</td>
+        <td>${r.note||''}</td>
+        <td style="white-space:nowrap">
+          <button class="pay-btn reset" onclick="editPorcRemboursement('${r._localId||''}','${r._docId||''}')">✏️</button>
+          <button class="pay-btn delete" onclick="deletePorcRemboursement('${r._localId||''}','${r._docId||''}')">🗑️</button>
+        </td>
+      </tr>`).join('');
+    return `
+    <div class="table-card" style="padding:14px;margin-bottom:14px${soldé?'':';border:1px solid rgba(192,57,43,.25)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div>
+          <div style="font-size:14px;font-weight:800">${porcFournisseurDisplayName(f)}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Dette du ${formatDateFRLong(f.date)}${f.note?(' · '+f.note):''}</div>
+        </div>
+        <div style="white-space:nowrap">
+          <button class="pay-btn reset" onclick="editPorcFournisseur('${f._localId||''}','${f._docId||''}')">✏️</button>
+          <button class="pay-btn delete" onclick="deletePorcFournisseur('${f._localId||''}','${f._docId||''}')">🗑️</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap">
+        <div style="font-size:12px">💳 Dû : <strong>${fmt(f.montantDu||0)} F</strong></div>
+        <div style="font-size:12px">✅ Remboursé : <strong style="color:var(--green)">${fmt(totalR)} F</strong></div>
+        <div style="font-size:12px">📌 Reste : <strong style="color:${soldé?'var(--green)':'var(--red)'}">${soldé?'Soldé':fmt(reste)+' F'}</strong></div>
+      </div>
+      ${rembs.length ? `<table class="table-fixed" style="margin-top:10px"><thead><tr><th>Date</th><th>Montant</th><th>Note</th><th></th></tr></thead><tbody>${rembRows}</tbody></table>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function populatePorcFournisseurIdxSelect(){
+  const sel = document.getElementById('pfFournisseurIdx');
+  if (!sel) return;
+  sel.innerHTML = porcFournisseurNoms.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
+}
+function openPorcFournisseurModal(){
+  editingPorcFournisseurRef = null;
+  populatePorcFournisseurIdxSelect();
+  document.getElementById('modalPorcFournisseurTitle').textContent = '🏦 Nouveau fournisseur / nouvelle dette';
+  document.getElementById('pfFournisseurIdx').value = '0';
+  document.getElementById('pfMontantDu').value = '';
+  document.getElementById('pfDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('pfNote').value = '';
+  openModal('modalPorcFournisseur');
+}
+function editPorcFournisseur(localId, docId){
+  const f = porcFournisseurs.find(x=>(localId && x._localId===localId)||(docId && x._docId===docId));
+  if (!f) { showToast('⚠️ Fournisseur introuvable'); return; }
+  editingPorcFournisseurRef = { localId: f._localId||'', docId: f._docId||'' };
+  populatePorcFournisseurIdxSelect();
+  document.getElementById('modalPorcFournisseurTitle').textContent = '✎ Modifier la dette';
+  document.getElementById('pfFournisseurIdx').value = String(f.fournisseurIdx||0);
+  document.getElementById('pfMontantDu').value = f.montantDu?f.montantDu.toLocaleString('fr-FR'):'';
+  document.getElementById('pfDate').value = f.date||'';
+  document.getElementById('pfNote').value = f.note||'';
+  openModal('modalPorcFournisseur');
+}
+function savePorcFournisseur(){
+  const fournisseurIdx = parseInt(document.getElementById('pfFournisseurIdx').value,10)||0;
+  const montantDu = parseMontant('pfMontantDu');
+  const date = document.getElementById('pfDate').value;
+  const note = document.getElementById('pfNote').value.trim();
+  if (!date) { showToast('⚠️ Date requise'); return; }
+  if (!montantDu) { showToast('⚠️ Montant dû requis'); return; }
+  if (editingPorcFournisseurRef) {
+    const f = porcFournisseurs.find(x=>(editingPorcFournisseurRef.localId && x._localId===editingPorcFournisseurRef.localId)||(editingPorcFournisseurRef.docId && x._docId===editingPorcFournisseurRef.docId));
+    if (f) { Object.assign(f,{fournisseurIdx,montantDu,date,note}); if (f._docId && fbReady) fbUpdatePorcFournisseur(f._docId,f); else persistPorcFournisseurs(); }
+    editingPorcFournisseurRef = null;
+  } else {
+    const entry = { _localId: porcLocalId(), fournisseurIdx, montantDu, date, note };
+    porcFournisseurs.unshift(entry);
+    persistPorcFournisseurs();
+    if (fbReady) fbSavePorcFournisseur(entry);
+  }
+  closeModal('modalPorcFournisseur');
+  renderPorcFournisseurs();
+  showToast('✅ Fournisseur enregistré');
+}
+function deletePorcFournisseur(localId, docId){
+  if (!confirm('Supprimer ce fournisseur et son historique de remboursements ? Action irréversible.')) return;
+  const key = localId || docId;
+  // Supprime aussi les remboursements liés
+  porcFournisseurRemboursements(key).forEach(r=>{
+    if (r._docId && fbReady) window._deleteDoc(window._doc(window._db,'porc_remboursements',r._docId)).catch(()=>{});
+  });
+  porcRemboursements = porcRemboursements.filter(r=>r.fournisseurKey!==key);
+  persistPorcRemboursements();
+  if (docId && fbReady) {
+    window._deleteDoc(window._doc(window._db,'porc_fournisseurs',docId)).then(()=>showToast('🗑️ Fournisseur supprimé')).catch(()=>showToast('⚠️ Erreur suppression'));
+  } else {
+    const idx = porcFournisseurs.findIndex(x=>x._localId===localId);
+    if (idx>-1) { porcFournisseurs.splice(idx,1); persistPorcFournisseurs(); }
+  }
+  renderPorcFournisseurs();
+}
+
+function populatePorcRemboursementFournisseurSelect(){
+  const sel = document.getElementById('prbFournisseur');
+  if (!sel) return;
+  sel.innerHTML = porcFournisseurs.length
+    ? porcFournisseurs.map(f=>`<option value="${porcFournisseurKey(f)}">${porcFournisseurDisplayName(f).replace(/"/g,'&quot;')} — reste ${fmt(porcFournisseurReste(f))} F</option>`).join('')
+    : '<option value="">Aucun fournisseur — créez-en un d\'abord</option>';
+}
+function openPorcRemboursementModal(){
+  if (!porcFournisseurs.length) { showToast('⚠️ Créez d\'abord un fournisseur'); return; }
+  editingPorcRemboursementRef = null;
+  populatePorcRemboursementFournisseurSelect();
+  document.getElementById('modalPorcRemboursementTitle').textContent = '💵 Nouveau remboursement';
+  document.getElementById('prbDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('prbMontant').value = '';
+  document.getElementById('prbNote').value = '';
+  openModal('modalPorcRemboursement');
+}
+function editPorcRemboursement(localId, docId){
+  const r = porcRemboursements.find(x=>(localId && x._localId===localId)||(docId && x._docId===docId));
+  if (!r) { showToast('⚠️ Remboursement introuvable'); return; }
+  editingPorcRemboursementRef = { localId: r._localId||'', docId: r._docId||'' };
+  populatePorcRemboursementFournisseurSelect();
+  document.getElementById('modalPorcRemboursementTitle').textContent = '✎ Modifier le remboursement';
+  document.getElementById('prbFournisseur').value = r.fournisseurKey||'';
+  document.getElementById('prbDate').value = r.date||'';
+  document.getElementById('prbMontant').value = r.montant?r.montant.toLocaleString('fr-FR'):'';
+  document.getElementById('prbNote').value = r.note||'';
+  openModal('modalPorcRemboursement');
+}
+function savePorcRemboursement(){
+  const fournisseurKey = document.getElementById('prbFournisseur').value;
+  const date = document.getElementById('prbDate').value;
+  const montant = parseMontant('prbMontant');
+  const note = document.getElementById('prbNote').value.trim();
+  if (!fournisseurKey) { showToast('⚠️ Fournisseur requis'); return; }
+  if (!date) { showToast('⚠️ Date requise'); return; }
+  if (!montant) { showToast('⚠️ Montant requis'); return; }
+  if (editingPorcRemboursementRef) {
+    const r = porcRemboursements.find(x=>(editingPorcRemboursementRef.localId && x._localId===editingPorcRemboursementRef.localId)||(editingPorcRemboursementRef.docId && x._docId===editingPorcRemboursementRef.docId));
+    if (r) { Object.assign(r,{fournisseurKey,date,montant,note}); if (r._docId && fbReady) fbUpdatePorcRemboursement(r._docId,r); else persistPorcRemboursements(); }
+    editingPorcRemboursementRef = null;
+  } else {
+    const entry = { _localId: porcLocalId(), fournisseurKey, date, montant, note };
+    porcRemboursements.unshift(entry);
+    persistPorcRemboursements();
+    if (fbReady) fbSavePorcRemboursement(entry);
+  }
+  closeModal('modalPorcRemboursement');
+  renderPorcFournisseurs();
+  showToast('✅ Remboursement enregistré');
+}
+function deletePorcRemboursement(localId, docId){
+  if (!confirm('Supprimer ce remboursement ? Action irréversible.')) return;
+  if (docId && fbReady) {
+    window._deleteDoc(window._doc(window._db,'porc_remboursements',docId)).then(()=>showToast('🗑️ Remboursement supprimé')).catch(()=>showToast('⚠️ Erreur suppression'));
+  } else {
+    const idx = porcRemboursements.findIndex(x=>x._localId===localId);
+    if (idx>-1) { porcRemboursements.splice(idx,1); persistPorcRemboursements(); renderPorcFournisseurs(); showToast('🗑️ Remboursement supprimé'); }
+  }
+}
+
+// ----- Fonction utilitaire : diagramme circulaire neutre (pas de sélection possible) -----
+function porcDonutNoop(){}
+
 // ===== GESTION RH : dates de recrutement / fin de contrat =====
 // Formate une date ISO (yyyy-mm-dd) en format français lisible (jj/mm/aaaa)
 function formatDateFRLong(iso){
@@ -12641,7 +14051,6 @@ function saveReservation(){
   const depart = document.getElementById('rDepart').value;
   const heureDepart = document.getElementById('rHeureDepart').value || '12:00';
   const prix = parseMontant('rPrix');
-  if (!nom) { showToast('⚠️ Nom client requis'); return; }
   if (!arrivee || !depart) { showToast('⚠️ Dates requises'); return; }
 
   // Chambre non précisée : la réservation est archivée directement dans l'historique, sans occuper de chambre
@@ -12721,7 +14130,6 @@ function saveChambre(){
   const depart = document.getElementById('cDepart').value;
   const heureDepart = document.getElementById('cHeureDepart').value || '12:00';
   const prix = parseMontant('cPrix');
-  if(!nom){showToast('⚠️ Nom client requis');return}
   if(!depart){showToast('⚠️ Date de départ requise');return}
   const room = ROOMS.find(r => r.num === num);
   // Empêche un séjour qui chevaucherait une réservation déjà en attente sur cette chambre
@@ -12865,6 +14273,7 @@ function startFirebaseSync() {
   if (!window._db) { setConnStatus(false); return; }
   setConnStatus(true);
   fbReady = true;
+  listenPorcCollections(); // module autonome "Porc au Four" (collections dédiées)
 
   // ── 1. Écoute saisies ──
   const q = window._query(
@@ -12951,32 +14360,109 @@ function startFirebaseSync() {
     // catégorie/fonction/montant) parmi les dépenses Firestore et on la supprime. Cela annule
     // exactement l'ajout en double, sans jamais toucher aux saisies réelles de l'utilisateur (si un
     // doublon strict existe, l'une des deux copies identiques est supprimée et l'autre reste).
-    if (AUBERGE_TAMAR_DEPENSES_REELLES_JANV_SUR_FEV_AOUT2026.length && !localStorage.getItem('aubergeTamar_depensesReellesJanvFevAout2026_DEDUP_v1')) {
-      try { localStorage.setItem('aubergeTamar_depensesReellesJanvFevAout2026_DEDUP_v1', '1'); } catch(e) {}
-      const docsByMonth = {};
+    // REMPLACEMENT CANONIQUE UNIQUE des dépenses de Janvier à Août 2026 (13/09/2026, sur demande de
+    // l'utilisateur) : supprime TOUTES les dépenses actuellement enregistrées pour ces 8 mois — quel
+    // qu'en soit le contenu (saisies réelles, lignes injectées par erreur, doublons...) — et les
+    // remplace par UNE SEULE série fixe de 12 lignes par mois, totalisant 1 450 500 F/mois : Salaires
+    // (Sécurité 40 000 F, Buanderie 35 000 F, Réceptionniste 35 000 F, Gérant 40 000 F), Impôt
+    // synthétique (37 500 F), Fournitures (Serviette 5 000 F, Literie-Draps 10 000 F, Omo 10 000 F,
+    // Papier Hygiénique 40 000 F, Déodorant 6 000 F), Remboursement dettes (Baobab San Pedro 517 000 F,
+    // Coopec San Pedro 675 000 F). Les dépenses des AUTRES mois (Septembre 2026 et au-delà) ne sont
+    // pas touchées. Remplace l'ancien nettoyage "lignes injectées" (v4, obsolète après ce remplacement
+    // complet). Protégé par un flag localStorage pour ne s'exécuter qu'UNE SEULE fois par appareil.
+    // v2 (13/09/2026) : le Remboursement dettes Coopec San Pedro n'est PAS un montant fixe de
+    // 675 000 F — c'est 25 000 F par jour du mois, SAUF le dimanche (non compté). Calculé ici plutôt
+    // que codé en dur, pour que le total corresponde exactement au nombre réel de jours non-dimanche
+    // de chaque mois (ex. 675 000 F en Janvier et Juillet, 600 000 F en Février, 650 000 F les autres
+    // mois de cette période — cohérent avec les montants réels déjà constatés par l'utilisateur).
+    // Nouveau nom de flag (_v2) : force la ré-exécution du remplacement même sur un appareil où la
+    // v1 (qui utilisait à tort un montant fixe de 675 000 F pour Coopec) a déjà tourné — la v2
+    // supprime d'abord TOUTES les lignes existantes de Coopec (et des autres catégories) pour
+    // Janvier→Août avant de réinsérer la bonne valeur, donc aucune ligne en double n'est créée.
+    if (!localStorage.getItem('aubergeTamar_depensesCanoniquesJanvAout2026_v2')) {
+      try { localStorage.setItem('aubergeTamar_depensesCanoniquesJanvAout2026_v2', '1'); } catch(e) {}
+      function joursNonDimancheDuMois(annee, moisIdx) {
+        const nbJours = new Date(annee, moisIdx + 1, 0).getDate();
+        let n = 0;
+        for (let j = 1; j <= nbJours; j++) { if (new Date(annee, moisIdx, j).getDay() !== 0) n++; }
+        return n;
+      }
+      const moisCanon = [
+        { mois: 'Janvier',  moisIdx: 0, date: '31/01/2026' },
+        { mois: 'Février',  moisIdx: 1, date: '28/02/2026' },
+        { mois: 'Mars',     moisIdx: 2, date: '31/03/2026' },
+        { mois: 'Avril',    moisIdx: 3, date: '30/04/2026' },
+        { mois: 'Mai',      moisIdx: 4, date: '31/05/2026' },
+        { mois: 'Juin',     moisIdx: 5, date: '30/06/2026' },
+        { mois: 'Juillet',  moisIdx: 6, date: '31/07/2026' },
+        { mois: 'Août',     moisIdx: 7, date: '31/08/2026' }
+      ];
+      const lignesFixes = [
+        { categorie: 'Salaire du personnel', sousCategorie: '', fonction: 'Sécurité',       montant: 40000 },
+        { categorie: 'Salaire du personnel', sousCategorie: '', fonction: 'Buanderie',      montant: 35000 },
+        { categorie: 'Salaire du personnel', sousCategorie: '', fonction: 'RÉCEPTIONNISTE', montant: 35000 },
+        { categorie: 'Salaire du personnel', sousCategorie: '', fonction: 'Gérant',         montant: 40000 },
+        { categorie: 'Impôts',      sousCategorie: 'Impôt synthétique',  fonction: '', montant: 37500 },
+        { categorie: 'Fournitures', sousCategorie: 'Serviette',         fonction: '', montant: 5000 },
+        { categorie: 'Fournitures', sousCategorie: 'Literie - Draps',   fonction: '', montant: 10000 },
+        { categorie: 'Fournitures', sousCategorie: 'Omo',               fonction: '', montant: 10000 },
+        { categorie: 'Fournitures', sousCategorie: 'Papier Hygiénique', fonction: '', montant: 40000 },
+        { categorie: 'Fournitures', sousCategorie: 'Déodorant',         fonction: '', montant: 6000 },
+        { categorie: 'Remboursement dettes', sousCategorie: 'Baobab San Pedro', fonction: '', montant: 517000 }
+      ];
+      const idsADeleter = [];
+      snap.forEach(d => {
+        const data = d.data();
+        if (data.type === 'depenses' && /\/(0[1-8])\/2026$/.test(data.date || '')) idsADeleter.push(d.id);
+      });
+      const nouvellesEntrees = [];
+      let tsBase = Date.now();
+      moisCanon.forEach(m => {
+        lignesFixes.forEach(l => {
+          nouvellesEntrees.push({
+            type: 'depenses', mois: m.mois, moisIdx: m.moisIdx, annee: 2026, montant: l.montant,
+            date: m.date, categorie: l.categorie, sousCategorie: l.sousCategorie, fonction: l.fonction,
+            nomPersonnel: '', contact: '', ts: tsBase++
+          });
+        });
+        const montantCoopec = joursNonDimancheDuMois(2026, m.moisIdx) * 25000;
+        nouvellesEntrees.push({
+          type: 'depenses', mois: m.mois, moisIdx: m.moisIdx, annee: 2026, montant: montantCoopec,
+          date: m.date, categorie: 'Remboursement dettes', sousCategorie: 'Coopec San Pedro', fonction: '',
+          nomPersonnel: '', contact: '', ts: tsBase++
+        });
+      });
+      replaceCollectionEntriesBatched('saisies', idsADeleter, nouvellesEntrees)
+        .then(() => showToast('✅ Dépenses Janvier→Août 2026 réinitialisées (Coopec calculé à 25 000 F/jour hors dimanche) — Auberge Tamar'))
+        .catch(() => {});
+    }
+    // Nettoyage GÉNÉRIQUE PERMANENT (v3) : contrairement au v1/v2 ci-dessus qui ne s'exécutaient
+    // qu'UNE SEULE fois (via un flag localStorage) et se limitaient à Juin/Juillet 2026, ce bloc
+    // s'exécute à CHAQUE mise à jour Firestore (pas de flag "une seule fois"), sur TOUTES les
+    // dépenses, tous mois et toutes années confondus — passés, présents et à venir. Il regroupe les
+    // dépenses par (catégorie + sous-catégorie + fonction + montant + date) et, dès qu'un groupe
+    // contient plus d'une écriture identique, supprime automatiquement les copies en trop en ne
+    // conservant que la première. Un verrou en mémoire (dedupDepensesEnCours) évite les exécutions
+    // concurrentes pendant qu'une suppression est déjà en cours (chaque suppression redéclenche ce
+    // même listener onSnapshot).
+    if (!window._dedupDepensesEnCours) {
+      const groups = {};
       snap.forEach(d => {
         const data = d.data();
         if (data.type !== 'depenses' || !data.date) return;
-        const mm = data.date.slice(3); // "MM/AAAA"
-        (docsByMonth[mm] = docsByMonth[mm] || []).push({ id: d.id, data });
+        const key = [data.categorie||'', data.sousCategorie||'', data.fonction||'', data.montant, data.date].join('|');
+        (groups[key] = groups[key] || []).push(d.id);
       });
       const idsToDelete = [];
-      AUBERGE_TAMAR_DEPENSES_REELLES_JANV_SUR_FEV_AOUT2026.forEach(entry => {
-        const mm = entry.date.slice(3);
-        const pool = docsByMonth[mm] || [];
-        const idx = pool.findIndex(x =>
-          !idsToDelete.includes(x.id) &&
-          x.data.montant === entry.montant &&
-          x.data.categorie === entry.categorie &&
-          (x.data.sousCategorie || '') === (entry.sousCategorie || '') &&
-          (x.data.fonction || '') === (entry.fonction || '')
-        );
-        if (idx !== -1) idsToDelete.push(pool[idx].id);
+      Object.values(groups).forEach(ids => {
+        if (ids.length > 1) idsToDelete.push(...ids.slice(1)); // garde la 1ère occurrence, supprime le reste
       });
       if (idsToDelete.length) {
+        window._dedupDepensesEnCours = true;
         Promise.all(idsToDelete.map(id => window._deleteDoc(window._doc(window._db, 'saisies', id)).catch(() => {})))
-          .then(() => showToast('✅ Doublons de dépenses (Février→Août) supprimés — Auberge Tamar'))
-          .catch(() => {});
+          .then(() => showToast(`✅ ${idsToDelete.length} doublon(s) de dépenses supprimé(s) automatiquement — Auberge Tamar`))
+          .catch(() => {})
+          .finally(() => { window._dedupDepensesEnCours = false; });
       }
     }
   }, () => setConnStatus(false));
@@ -13433,6 +14919,14 @@ function startFirebaseSync() {
     if (snap.exists()) {
       const data = snap.data();
       if (data.pin) bankPin = data.pin;
+    }
+  }, () => {});
+
+  // ── 6b-bis. Écoute du code PIN de l'onglet Porc au Four (double protection) ──
+  window._onSnapshot(window._doc(window._db, 'parametres', 'porc'), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.pin) porcPin = data.pin;
     }
   }, () => {});
 
@@ -16062,6 +17556,236 @@ function buildBilanMensuelPDF(year, monthIdx) {
   showToast(`📄 Bilan de ${d.monthLabel} ${year} généré`);
 }
 
+// ===== BILAN MENSUEL EXPERT — EXCEL & WORD =====
+// Construit le contenu HTML du bilan mensuel (mêmes sections que le PDF : synthèse, recettes
+// journalières, dépenses détaillées par catégorie, synthèse par catégorie, journal des
+// transactions). Ce HTML sert de source commune à l'export Word (converti génériquement en
+// tableaux docx.js, comme buildPrintContent()) et reprend le format des autres rapports.
+function buildBilanMensuelHTML(year, monthIdx) {
+  const d = getBilanMensuelData(year, monthIdx);
+  const now = new Date().toLocaleDateString('fr-FR');
+  let html = `<h1>BILAN FINANCIER MENSUEL</h1>
+    <p style="text-align:center;font-size:11px;color:#666;margin:-8px 0 16px">${d.monthLabel} ${year} — Édité le ${now}</p>`;
+
+  html += `<h2>Synthèse du mois</h2>
+    <table><thead><tr><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead>
+    <tbody><tr><td>${fmtFull(d.totalR)}</td><td>${fmtFull(d.totalD)}</td><td>${fmtFull(d.net)}</td><td>${d.margeVal.toFixed(1)}%</td></tr></tbody></table>`;
+
+  html += `<h2>1 · Recettes journalières — Nuitées &amp; Passes</h2>`;
+  if (d.dailyRows.length) {
+    html += `<table><thead><tr><th style="text-align:left">Date</th><th>Nuitées (FCFA)</th><th>Passes Jour (FCFA)</th><th>Passes Nuit (FCFA)</th><th>Total Passes (FCFA)</th><th>Total Général (FCFA)</th></tr></thead><tbody>`;
+    d.dailyRows.forEach(r => {
+      html += `<tr><td style="text-align:left">${r.dateLabel}</td><td>${fmtFull(r.nuitees)}</td><td>${fmtFull(r.passesJour)}</td><td>${fmtFull(r.passesNuit)}</td><td>${fmtFull(r.totalPassesJournee)}</td><td>${fmtFull(r.total)}</td></tr>`;
+    });
+    html += `</tbody><tfoot><tr><td style="text-align:left">TOTAL</td><td>${fmtFull(d.totalChambres)}</td><td>${fmtFull(d.totalPassesJourMois)}</td><td>${fmtFull(d.totalPassesNuitMois)}</td><td>${fmtFull(d.totalPasses)}</td><td>${fmtFull(d.totalR)}</td></tr></tfoot></table>`;
+  } else {
+    html += `<p>Aucune saisie journalière détaillée pour ce mois — Total recettes : ${fmtFull(d.totalR)} FCFA.</p>`;
+  }
+
+  const catNames = Object.keys(d.catMap).sort();
+  html += `<h2>2 · Détail des dépenses par catégorie</h2>`;
+  if (catNames.length) {
+    html += `<table><thead><tr><th style="text-align:left">Date</th><th style="text-align:left">Catégorie</th><th style="text-align:left">Détail</th><th>Montant (FCFA)</th></tr></thead><tbody>`;
+    catNames.forEach(cat => {
+      const g = d.catMap[cat];
+      g.items.slice().sort((a, b) => parseFrDate(a.date) - parseFrDate(b.date)).forEach(it => {
+        const detail = (cat === 'Salaire du personnel') ? [it.fonction, it.nomPersonnel].filter(Boolean).join(' — ') : (it.sousCategorie || '—');
+        html += `<tr><td style="text-align:left">${it.date}</td><td style="text-align:left">${cat}</td><td style="text-align:left">${detail}</td><td>${fmtFull(it.montant)}</td></tr>`;
+      });
+      html += `<tr><td></td><td style="text-align:left">Sous-total — ${cat}</td><td></td><td>${fmtFull(g.total)}</td></tr>`;
+    });
+    html += `</tbody><tfoot><tr><td colspan="3">TOTAL DÉPENSES</td><td>${fmtFull(d.totalD)}</td></tr></tfoot></table>`;
+
+    html += `<h2>3 · Synthèse des dépenses par catégorie</h2>
+      <table><thead><tr><th style="text-align:left">Catégorie</th><th>Nb. opérations</th><th>Montant (FCFA)</th><th>% du total</th></tr></thead><tbody>`;
+    catNames.slice().sort((a, b) => d.catMap[b].total - d.catMap[a].total).forEach(cat => {
+      const g = d.catMap[cat];
+      const pct = d.totalD > 0 ? (g.total / d.totalD * 100) : 0;
+      html += `<tr><td style="text-align:left">${cat}</td><td>${g.items.length}</td><td>${fmtFull(g.total)}</td><td>${pct.toFixed(1)}%</td></tr>`;
+    });
+    html += `</tbody><tfoot><tr><td style="text-align:left">TOTAL</td><td>${d.depensesEntries.length}</td><td>${fmtFull(d.totalD)}</td><td>100%</td></tr></tfoot></table>`;
+  } else {
+    html += `<p>Aucune dépense détaillée pour ce mois.</p>`;
+  }
+
+  if (d.recettesEntries.length + d.depensesEntries.length > 0) {
+    html += `<h2>4 · Journal des transactions du mois</h2>
+      <table><thead><tr><th style="text-align:left">Date</th><th style="text-align:left">Type</th><th style="text-align:left">Détail</th><th>Montant (FCFA)</th></tr></thead><tbody>`;
+    const journal = [
+      ...d.recettesEntries.map(e => ({ ...e, __label: 'Recette' })),
+      ...d.depensesEntries.map(e => ({ ...e, __label: 'Dépense' }))
+    ].sort((a, b) => parseFrDate(a.date) - parseFrDate(b.date));
+    journal.forEach(e => {
+      const detail = e.type === 'depenses' ? (txDetail(e) || '—') : 'Encaissement';
+      const sign = e.type === 'recettes' ? '+' : '-';
+      html += `<tr><td style="text-align:left">${e.date}</td><td style="text-align:left">${e.__label}</td><td style="text-align:left">${detail}</td><td>${sign}${fmtFull(e.montant)}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+
+  html += `<div class="print-footer">Auberge Tamar · AubergeGest · Édité le ${now}</div>`;
+  return html;
+}
+
+// Construit et télécharge un .docx à partir d'un contenu HTML (h1/h2/p/table), en réutilisant le
+// même moteur générique que l'export Word du menu Impression/Export (docxLetterhead/docxTableFromEl —
+// voir exportWord()). Partagé par le Bilan Mensuel et le Bilan Annuel.
+function buildBilanWordDoc(html, filename) {
+  const D = window.docx;
+  const A4_W = 11906, A4_H = 16838; // twips (1/20 pt), format A4
+  const margin = 800;
+  const pageContentWidth = A4_W - margin * 2;
+  const domDoc = new DOMParser().parseFromString(html, 'text/html');
+  const nodes = Array.from(domDoc.body.children);
+  const bodyChildren = [docxLetterhead(false, pageContentWidth), new D.Paragraph({ text: '', spacing: { after: 120 } })];
+  nodes.forEach(el => {
+    const tag = el.tagName.toLowerCase();
+    if (tag === 'h1') bodyChildren.push(docxParagraphFromEl(el, 'h1', false));
+    else if (tag === 'h2') bodyChildren.push(docxParagraphFromEl(el, 'h2', false));
+    else if (tag === 'p') bodyChildren.push(docxParagraphFromEl(el, 'p', false));
+    else if (tag === 'table') {
+      const t = docxTableFromEl(el, false, pageContentWidth);
+      if (t) { bodyChildren.push(t); bodyChildren.push(new D.Paragraph({ text: '', spacing: { after: 80 } })); }
+    } else if (tag === 'div' && el.className === 'print-footer') {
+      bodyChildren.push(docxParagraphFromEl(el, 'footer', false));
+    }
+  });
+  const wordDoc = new D.Document({
+    creator: 'AubergeGest',
+    title: filename,
+    sections: [{
+      properties: { page: { size: { orientation: D.PageOrientation.PORTRAIT, width: A4_W, height: A4_H }, margin: { top: margin, bottom: margin, left: margin, right: margin } } },
+      children: bodyChildren
+    }]
+  });
+  D.Packer.toBlob(wordDoc).then(blob => {
+    if (!blob || blob.size < 1000) { showToast('⚠️ Le fichier Word généré semble incomplet — réessayez'); return; }
+    downloadBlob(blob, filename + '.docx');
+    showToast('📝 Fichier Word téléchargé');
+  }).catch(e => { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Word'); });
+}
+
+function genererBilanMensuelWord() {
+  const year = parseInt(document.getElementById('bilanAnnee').value);
+  const monthIdx = MOIS_FULL.indexOf(document.getElementById('bilanMois').value);
+  closeModal('modalBilan');
+  showToast('⏳ Génération du bilan (Word) en cours...');
+  loadDocxJS(() => {
+    try {
+      const slug = MOIS_FULL[monthIdx].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      buildBilanWordDoc(buildBilanMensuelHTML(year, monthIdx), `Bilan_Mensuel_${slug}_${year}_AubergeTamar`);
+    } catch (e) { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Word'); }
+  });
+}
+
+function genererBilanMensuelExcel() {
+  const year = parseInt(document.getElementById('bilanAnnee').value);
+  const monthIdx = MOIS_FULL.indexOf(document.getElementById('bilanMois').value);
+  closeModal('modalBilan');
+  showToast('⏳ Génération du bilan (Excel) en cours...');
+  loadExcelJS(() => {
+    try { buildBilanMensuelExcel(year, monthIdx); }
+    catch (e) { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Excel'); }
+  });
+}
+
+// Construit le classeur Excel "expert" du bilan mensuel (mêmes sections que le PDF)
+function buildBilanMensuelExcel(year, monthIdx) {
+  const d = getBilanMensuelData(year, monthIdx);
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'AubergeGest'; wb.created = new Date();
+  const sheet = wb.addWorksheet('Bilan Mensuel');
+  sheet.columns = Array(6).fill(0).map(() => ({ width: 17, style: { font: { size: 11 } } }));
+  sheet.properties.defaultRowHeight = 18;
+  let r = xlAddLetterhead(sheet, `BILAN FINANCIER MENSUEL — ${d.monthLabel.toUpperCase()} ${year}`,
+    [`Recettes : ${fmtFull(d.totalR)} F · Dépenses : ${fmtFull(d.totalD)} F · Net : ${fmtFull(d.net)} F · Marge : ${d.margeVal.toFixed(1)}%`], 6);
+
+  // 1. Recettes journalières
+  sheet.mergeCells(r, 1, r, 6);
+  sheet.getCell(r, 1).value = '1 · RECETTES JOURNALIÈRES — NUITÉES & PASSES';
+  sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
+  r++;
+  if (d.dailyRows.length) {
+    sheet.getRow(r).values = ['Date', 'Nuitées (FCFA)', 'Passes Jour (FCFA)', 'Passes Nuit (FCFA)', 'Total Passes (FCFA)', 'Total Général (FCFA)'];
+    xlStyleHeaderRow(sheet, r); const h1 = r; r++;
+    d.dailyRows.forEach(row => { sheet.getRow(r).values = [row.dateLabel, row.nuitees, row.passesJour, row.passesNuit, row.totalPassesJournee, row.total]; r++; });
+    sheet.getRow(r).values = ['TOTAL', d.totalChambres, d.totalPassesJourMois, d.totalPassesNuitMois, d.totalPasses, d.totalR];
+    xlHighlightTotalRow(sheet, r, 6);
+    xlBorderRange(sheet, h1, r, 1, 6); xlZebraStripe(sheet, h1 + 1, r - 1, 1, 6);
+    r += 2;
+  } else {
+    sheet.getRow(r).values = [`Aucune saisie journalière détaillée — Total recettes : ${fmtFull(d.totalR)} F`];
+    r += 2;
+  }
+
+  // 2. Détail des dépenses par catégorie + 3. Synthèse par catégorie
+  const catNames = Object.keys(d.catMap).sort();
+  sheet.mergeCells(r, 1, r, 6);
+  sheet.getCell(r, 1).value = '2 · DÉTAIL DES DÉPENSES PAR CATÉGORIE';
+  sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
+  r++;
+  if (catNames.length) {
+    sheet.getRow(r).values = ['Date', 'Catégorie', 'Détail', 'Montant (FCFA)'];
+    xlStyleHeaderRow(sheet, r); const h2 = r; r++;
+    catNames.forEach(cat => {
+      const g = d.catMap[cat];
+      g.items.slice().sort((a, b) => parseFrDate(a.date) - parseFrDate(b.date)).forEach(it => {
+        const detail = (cat === 'Salaire du personnel') ? [it.fonction, it.nomPersonnel].filter(Boolean).join(' — ') : (it.sousCategorie || '—');
+        sheet.getRow(r).values = [it.date, cat, detail, it.montant]; r++;
+      });
+      sheet.getRow(r).values = ['', `Sous-total — ${cat}`, '', g.total];
+      sheet.getRow(r).font = { bold: true }; r++;
+    });
+    sheet.getRow(r).values = ['', 'TOTAL DÉPENSES', '', d.totalD];
+    xlHighlightTotalRow(sheet, r, 4);
+    xlBorderRange(sheet, h2, r, 1, 4); xlZebraStripe(sheet, h2 + 1, r - 1, 1, 4);
+    r += 2;
+
+    sheet.mergeCells(r, 1, r, 6);
+    sheet.getCell(r, 1).value = '3 · SYNTHÈSE DES DÉPENSES PAR CATÉGORIE';
+    sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
+    r++;
+    sheet.getRow(r).values = ['Catégorie', 'Nb. opérations', 'Montant (FCFA)', '% du total'];
+    xlStyleHeaderRow(sheet, r); const h3 = r; r++;
+    catNames.slice().sort((a, b) => d.catMap[b].total - d.catMap[a].total).forEach(cat => {
+      const g = d.catMap[cat]; const pct = d.totalD > 0 ? (g.total / d.totalD * 100) : 0;
+      sheet.getRow(r).values = [cat, g.items.length, g.total, pct.toFixed(1) + '%']; r++;
+    });
+    sheet.getRow(r).values = ['TOTAL', d.depensesEntries.length, d.totalD, '100%'];
+    xlHighlightTotalRow(sheet, r, 4);
+    xlBorderRange(sheet, h3, r, 1, 4); xlZebraStripe(sheet, h3 + 1, r - 1, 1, 4);
+    r += 2;
+  } else {
+    sheet.getRow(r).values = ['Aucune dépense détaillée pour ce mois.']; r += 2;
+  }
+
+  // 4. Journal des transactions
+  if (d.recettesEntries.length + d.depensesEntries.length > 0) {
+    sheet.mergeCells(r, 1, r, 6);
+    sheet.getCell(r, 1).value = '4 · JOURNAL DES TRANSACTIONS DU MOIS';
+    sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
+    r++;
+    sheet.getRow(r).values = ['Date', 'Type', 'Détail', 'Montant (FCFA)'];
+    xlStyleHeaderRow(sheet, r); const h4 = r; r++;
+    const journal = [
+      ...d.recettesEntries.map(e => ({ ...e, __label: 'Recette' })),
+      ...d.depensesEntries.map(e => ({ ...e, __label: 'Dépense' }))
+    ].sort((a, b) => parseFrDate(a.date) - parseFrDate(b.date));
+    journal.forEach(e => {
+      const detail = e.type === 'depenses' ? (txDetail(e) || '—') : 'Encaissement';
+      const sign = e.type === 'recettes' ? 1 : -1;
+      sheet.getRow(r).values = [e.date, e.__label, detail, sign * e.montant]; r++;
+    });
+    xlBorderRange(sheet, h4, r - 1, 1, 4); xlZebraStripe(sheet, h4 + 1, r - 1, 1, 4);
+  }
+
+  sheet.views = [{ state: 'frozen', ySplit: 6 }];
+  xlSetPageSetup(sheet, 'portrait');
+  const slug = d.monthLabel.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  xlDownload(wb, `Bilan_Mensuel_${slug}_${year}_AubergeTamar.xlsx`);
+  showToast('📊 Fichier Excel téléchargé');
+}
+
 // ===== BILAN ANNUEL EXPERT (PDF) =====
 
 // Rassemble toutes les données nécessaires au bilan d'une année complète
@@ -16375,6 +18099,137 @@ function buildBilanAnnuelPDF(year) {
   // ===== TÉLÉCHARGEMENT =====
   doc.save(`Bilan_Annuel_${year}_AubergeTamar.pdf`);
   showToast(`📄 Bilan annuel ${year} généré`);
+}
+
+// ===== BILAN ANNUEL EXPERT — EXCEL & WORD =====
+// Construit le contenu HTML du bilan annuel (mêmes sections que le PDF : synthèse, détail mois
+// par mois, dépenses par catégorie sur l'année, temps forts). Source commune à l'export Word.
+function buildBilanAnnuelHTML(year) {
+  const d = getBilanAnnuelData(year);
+  const now = new Date().toLocaleDateString('fr-FR');
+  let html = `<h1>BILAN FINANCIER ANNUEL</h1>
+    <p style="text-align:center;font-size:11px;color:#666;margin:-8px 0 16px">Exercice ${year} — Édité le ${now}</p>`;
+
+  html += `<h2>Synthèse de l'année</h2>
+    <table><thead><tr><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead>
+    <tbody><tr><td>${fmtFull(d.totalR)}</td><td>${fmtFull(d.totalD)}</td><td>${fmtFull(d.net)}</td><td>${d.margeVal.toFixed(1)}%</td></tr></tbody></table>`;
+
+  html += `<h2>1 · Détail mois par mois — Chambres &amp; Passes</h2>
+    <table><thead><tr><th style="text-align:left">Mois</th><th>Chambres (FCFA)</th><th>Passes (FCFA)</th><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead><tbody>`;
+  d.monthsFull.forEach(m => {
+    const margeM = m.total === 0 ? 0 : ((m.net / m.total) * 100);
+    html += `<tr><td style="text-align:left">${m.label}</td><td>${fmtFull(m.r)}</td><td>${fmtFull(m.p)}</td><td>${fmtFull(m.total)}</td><td>${fmtFull(m.d)}</td><td>${fmtFull(m.net)}</td><td>${margeM.toFixed(1)}%</td></tr>`;
+  });
+  html += `</tbody><tfoot><tr><td style="text-align:left">TOTAL</td><td>${fmtFull(d.totalChambres)}</td><td>${fmtFull(d.totalPasses)}</td><td>${fmtFull(d.totalR)}</td><td>${fmtFull(d.totalD)}</td><td>${fmtFull(d.net)}</td><td>${d.margeVal.toFixed(1)}%</td></tr></tfoot></table>`;
+
+  const catNames = Object.keys(d.catMap).sort();
+  html += `<h2>2 · Dépenses par catégorie — Vue annuelle</h2>`;
+  if (catNames.length) {
+    html += `<table><thead><tr><th style="text-align:left">Catégorie</th><th>Nb. opérations</th><th>Montant (FCFA)</th><th>% du total</th></tr></thead><tbody>`;
+    catNames.slice().sort((a, b) => d.catMap[b].total - d.catMap[a].total).forEach(cat => {
+      const g = d.catMap[cat];
+      const pct = d.totalD > 0 ? (g.total / d.totalD * 100) : 0;
+      html += `<tr><td style="text-align:left">${cat}</td><td>${g.items.length}</td><td>${fmtFull(g.total)}</td><td>${pct.toFixed(1)}%</td></tr>`;
+    });
+    html += `</tbody><tfoot><tr><td style="text-align:left">TOTAL</td><td>${d.depensesEntries.length}</td><td>${fmtFull(d.totalD)}</td><td>100%</td></tr></tfoot></table>`;
+  } else {
+    html += `<p>Aucune dépense détaillée pour cette année.</p>`;
+  }
+
+  if (d.bestMonth || d.worstMonth) {
+    html += `<h2>3 · Temps forts de l'année</h2>
+      <table><thead><tr><th style="text-align:left">Repère</th><th style="text-align:left">Mois</th><th>Net (FCFA)</th></tr></thead><tbody>`;
+    if (d.bestMonth) html += `<tr><td style="text-align:left">Meilleur mois</td><td style="text-align:left">${d.bestMonth.label}</td><td>${fmtFull(d.bestMonth.net)}</td></tr>`;
+    if (d.worstMonth) html += `<tr><td style="text-align:left">Mois le plus faible</td><td style="text-align:left">${d.worstMonth.label}</td><td>${fmtFull(d.worstMonth.net)}</td></tr>`;
+    html += `</tbody></table>`;
+  }
+
+  html += `<div class="print-footer">Auberge Tamar · AubergeGest · Édité le ${now}</div>`;
+  return html;
+}
+
+function genererBilanAnnuelWord() {
+  const year = parseInt(document.getElementById('bilanAnneeAnnuel').value);
+  closeModal('modalBilanAnnuel');
+  showToast('⏳ Génération du bilan annuel (Word) en cours...');
+  loadDocxJS(() => {
+    try { buildBilanWordDoc(buildBilanAnnuelHTML(year), `Bilan_Annuel_${year}_AubergeTamar`); }
+    catch (e) { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Word'); }
+  });
+}
+
+function genererBilanAnnuelExcel() {
+  const year = parseInt(document.getElementById('bilanAnneeAnnuel').value);
+  closeModal('modalBilanAnnuel');
+  showToast('⏳ Génération du bilan annuel (Excel) en cours...');
+  loadExcelJS(() => {
+    try { buildBilanAnnuelExcel(year); }
+    catch (e) { console.error(e); showToast('⚠️ Erreur lors de la génération du fichier Excel'); }
+  });
+}
+
+// Construit le classeur Excel "expert" du bilan annuel (mêmes sections que le PDF)
+function buildBilanAnnuelExcel(year) {
+  const d = getBilanAnnuelData(year);
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'AubergeGest'; wb.created = new Date();
+  const sheet = wb.addWorksheet('Bilan Annuel');
+  sheet.columns = Array(7).fill(0).map(() => ({ width: 15, style: { font: { size: 11 } } }));
+  sheet.properties.defaultRowHeight = 18;
+  let r = xlAddLetterhead(sheet, `BILAN FINANCIER ANNUEL — ${year}`,
+    [`Recettes : ${fmtFull(d.totalR)} F · Dépenses : ${fmtFull(d.totalD)} F · Net : ${fmtFull(d.net)} F · Marge : ${d.margeVal.toFixed(1)}%`], 7);
+
+  sheet.mergeCells(r, 1, r, 7);
+  sheet.getCell(r, 1).value = '1 · DÉTAIL MOIS PAR MOIS — CHAMBRES & PASSES';
+  sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
+  r++;
+  sheet.getRow(r).values = ['Mois', 'Chambres (FCFA)', 'Passes (FCFA)', 'Recettes (FCFA)', 'Dépenses (FCFA)', 'Net (FCFA)', 'Marge'];
+  xlStyleHeaderRow(sheet, r); const h1 = r; r++;
+  d.monthsFull.forEach(m => {
+    const margeM = m.total === 0 ? 0 : ((m.net / m.total) * 100);
+    sheet.getRow(r).values = [m.label, m.r, m.p, m.total, m.d, m.net, margeM.toFixed(1) + '%']; r++;
+  });
+  sheet.getRow(r).values = ['TOTAL', d.totalChambres, d.totalPasses, d.totalR, d.totalD, d.net, d.margeVal.toFixed(1) + '%'];
+  xlHighlightTotalRow(sheet, r, 7);
+  xlBorderRange(sheet, h1, r, 1, 7); xlZebraStripe(sheet, h1 + 1, r - 1, 1, 7);
+  r += 2;
+
+  const catNames = Object.keys(d.catMap).sort();
+  sheet.mergeCells(r, 1, r, 7);
+  sheet.getCell(r, 1).value = '2 · DÉPENSES PAR CATÉGORIE — VUE ANNUELLE';
+  sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
+  r++;
+  if (catNames.length) {
+    sheet.getRow(r).values = ['Catégorie', 'Nb. opérations', 'Montant (FCFA)', '% du total'];
+    xlStyleHeaderRow(sheet, r); const h2 = r; r++;
+    catNames.slice().sort((a, b) => d.catMap[b].total - d.catMap[a].total).forEach(cat => {
+      const g = d.catMap[cat]; const pct = d.totalD > 0 ? (g.total / d.totalD * 100) : 0;
+      sheet.getRow(r).values = [cat, g.items.length, g.total, pct.toFixed(1) + '%']; r++;
+    });
+    sheet.getRow(r).values = ['TOTAL', d.depensesEntries.length, d.totalD, '100%'];
+    xlHighlightTotalRow(sheet, r, 4);
+    xlBorderRange(sheet, h2, r, 1, 4); xlZebraStripe(sheet, h2 + 1, r - 1, 1, 4);
+    r += 2;
+  } else {
+    sheet.getRow(r).values = ['Aucune dépense détaillée pour cette année.']; r += 2;
+  }
+
+  if (d.bestMonth || d.worstMonth) {
+    sheet.mergeCells(r, 1, r, 7);
+    sheet.getCell(r, 1).value = "3 · TEMPS FORTS DE L'ANNÉE";
+    sheet.getCell(r, 1).font = { bold: true, size: 11, color: { argb: 'FF1A3A5C' } };
+    r++;
+    sheet.getRow(r).values = ['Repère', 'Mois', 'Net (FCFA)'];
+    xlStyleHeaderRow(sheet, r); const h3 = r; r++;
+    if (d.bestMonth) { sheet.getRow(r).values = ['Meilleur mois', d.bestMonth.label, d.bestMonth.net]; r++; }
+    if (d.worstMonth) { sheet.getRow(r).values = ['Mois le plus faible', d.worstMonth.label, d.worstMonth.net]; r++; }
+    xlBorderRange(sheet, h3, r - 1, 1, 3); xlZebraStripe(sheet, h3 + 1, r - 1, 1, 3);
+  }
+
+  sheet.views = [{ state: 'frozen', ySplit: 6 }];
+  xlSetPageSetup(sheet, 'landscape');
+  xlDownload(wb, `Bilan_Annuel_${year}_AubergeTamar.xlsx`);
+  showToast('📊 Fichier Excel téléchargé');
 }
 
 // Impression Canon
