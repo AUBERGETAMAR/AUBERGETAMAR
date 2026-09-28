@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14549,83 +14548,13 @@ function startFirebaseSync() {
     snap.forEach(d => { const data = d.data(); data._docId = d.id; roomHistory.push(data); idsActuels.push(d.id); });
     roomHistory.sort((a,b) => (b.ts||0) - (a.ts||0));
     scheduleRoomHistoryRenderAndPersist();
-    // Correctif UNIQUE : écrase uniquement les nuitées de Janvier 2026 déjà présentes par la
-    // retranscription fusionnée et complète fournie par l'utilisateur, sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_JANV2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histJanv2026Correctif_v1')) {
-      try { localStorage.setItem('aubergeTamar_histJanv2026Correctif_v1', '1'); } catch(e) {}
-      const idsJanv2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-01')).map(h => h._docId);
-      replaceCollectionEntriesBatched('historique_chambres', idsJanv2026Correctif, AUBERGE_TAMAR_HISTORIQUE_JANV2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Janvier 2026 chargé — Auberge Tamar'))
-        .catch(() => {});
-    }
-    // Correctif UNIQUE : écrase uniquement les nuitées de Février 2026 déjà présentes par la
-    // retranscription mise à jour fournie par l'utilisateur, sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_FEV2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histFev2026Correctif_v1')) {
-      try { localStorage.setItem('aubergeTamar_histFev2026Correctif_v1', '1'); } catch(e) {}
-      const idsFev2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-02')).map(h => h._docId);
-      replaceCollectionEntriesBatched('historique_chambres', idsFev2026Correctif, AUBERGE_TAMAR_HISTORIQUE_FEV2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Février 2026 chargé — Auberge Tamar'))
-        .catch(() => {});
-    }
-    // Correctif UNIQUE : écrase uniquement les nuitées de Mars 2026 déjà présentes par la
-    // retranscription du cahier papier fournie par l'utilisateur, sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_MARS2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histMars2026Correctif_v1')) {
-      try { localStorage.setItem('aubergeTamar_histMars2026Correctif_v1', '1'); } catch(e) {}
-      const idsMars2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-03')).map(h => h._docId);
-      replaceCollectionEntriesBatched('historique_chambres', idsMars2026Correctif, AUBERGE_TAMAR_HISTORIQUE_MARS2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Mars 2026 chargé — Auberge Tamar'))
-        .catch(() => {});
-    }
-    // Correctif UNIQUE : écrase uniquement les nuitées d'Avril 2026 déjà présentes par la
-    // retranscription fidèle du cahier papier fournie par l'utilisateur (y compris la fusion du 27
-    // avril dans le 26 avril), sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_AVRIL2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histAvril2026Correctif_v1')) {
-      try { localStorage.setItem('aubergeTamar_histAvril2026Correctif_v1', '1'); } catch(e) {}
-      const idsAvril2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-04')).map(h => h._docId);
-      replaceCollectionEntriesBatched('historique_chambres', idsAvril2026Correctif, AUBERGE_TAMAR_HISTORIQUE_AVRIL2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Avril 2026 chargé — Auberge Tamar'))
-        .catch(() => {});
-    }
-    // Correctif UNIQUE : écrase uniquement les nuitées de Mai 2026 déjà présentes par la
-    // retranscription fidèle du cahier papier fournie par l'utilisateur, sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_MAI2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histMai2026Correctif_v1')) {
-      try { localStorage.setItem('aubergeTamar_histMai2026Correctif_v1', '1'); } catch(e) {}
-      const idsMai2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-05')).map(h => h._docId);
-      replaceCollectionEntriesBatched('historique_chambres', idsMai2026Correctif, AUBERGE_TAMAR_HISTORIQUE_MAI2026_CORRECTIF).then(() => showToast('✅ Correctif nuitées Mai 2026 chargé — Auberge Tamar'))
-        .catch(() => {});
-    }
-    // Correctif UNIQUE : écrase les nuitées de Juin 2026 déjà présentes (y compris celles chargées par
-    // lors d'une version antérieure de l'app) par la retranscription complète et mise à jour du
-    // registre papier fournie par l'utilisateur le 11/09/2026, intégrant les "passes" journalières
-    // et la correction du 30 juin (v6 — remplace la précédente v5), sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_JUIN2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histJuin2026Correctif_v6')) {
-      const idsJuin2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-06')).map(h => h._docId);
-      replaceCollectionEntriesBatched('historique_chambres', idsJuin2026Correctif, AUBERGE_TAMAR_HISTORIQUE_JUIN2026_CORRECTIF).then(() => {
-        try { localStorage.setItem('aubergeTamar_histJuin2026Correctif_v6', '1'); } catch(e) {}
-        showToast('✅ Correctif nuitées Juin 2026 chargé — Auberge Tamar');
-      }).catch(() => {});
-    }
-    // Correctif UNIQUE : écrase les nuitées de Juillet 2026 déjà présentes (y compris celles chargées
-    // lors d'une version antérieure de l'app) par la retranscription complète et révisée du
-    // registre papier fournie par l'utilisateur le 11/09/2026 (v3 — remplace la précédente v2),
-    // sans toucher aux autres mois.
-    if (AUBERGE_TAMAR_HISTORIQUE_JUILLET2026_CORRECTIF.length && !localStorage.getItem('aubergeTamar_histJuillet2026Correctif_v4')) {
-      const idsJuillet2026Correctif = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-07')).map(h => h._docId);
-      replaceCollectionEntriesBatched('historique_chambres', idsJuillet2026Correctif, AUBERGE_TAMAR_HISTORIQUE_JUILLET2026_CORRECTIF).then(() => {
-        try { localStorage.setItem('aubergeTamar_histJuillet2026Correctif_v4', '1'); } catch(e) {}
-        showToast('✅ Correctif nuitées Juillet 2026 chargé — Auberge Tamar');
-      }).catch(() => {});
-    }
-    // Remplacement UNIQUE : idem pour Août 2026 (chambres 1,2,3,6,7,8, 01→31 août 2026).
-    if (AUBERGE_TAMAR_HISTORIQUE_AOUT2026.length && !localStorage.getItem('aubergeTamar_histAout2026Loaded_v2')) {
-      try { localStorage.setItem('aubergeTamar_histAout2026Loaded_v2', '1'); } catch(e) {}
-      const idsAout2026 = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-08')).map(h => h._docId);
-      replaceCollectionEntriesBatched('historique_chambres', idsAout2026, AUBERGE_TAMAR_HISTORIQUE_AOUT2026).then(() => showToast('✅ Historique Août 2026 chargé — Auberge Tamar'))
-        .catch(() => {});
-    }
-    // Remplacement UNIQUE : idem pour Septembre 2026 (01→08 septembre 2026).
-    if (AUBERGE_TAMAR_HISTORIQUE_SEPTEMBRE2026.length && !localStorage.getItem('aubergeTamar_histSept2026Loaded_v3')) {
-      try { localStorage.setItem('aubergeTamar_histSept2026Loaded_v3', '1'); } catch(e) {}
-      const idsSept2026 = roomHistory.filter(h => typeof h.arrivee === 'string' && h.arrivee.startsWith('2026-09')).map(h => h._docId);
-      replaceCollectionEntriesBatched('historique_chambres', idsSept2026, AUBERGE_TAMAR_HISTORIQUE_SEPTEMBRE2026).then(() => showToast('✅ Historique Septembre 2026 chargé — Auberge Tamar'))
-        .catch(() => {});
-    }
+    // Les correctifs historiques ponctuels (janvier → septembre 2026) ont été retirés : ils avaient
+    // déjà rempli leur rôle, et le fait qu'ils se relancent sur tout appareil n'ayant pas encore le
+    // repère localStorage (nouvel appareil, cache vidé...) écrasait les vraies données Firestore du
+    // mois par le jeu de données figé fourni à l'époque — par exemple le correctif Septembre ne
+    // couvrait que le 01→08 septembre, donc son redéclenchement supprimait les nuitées réelles du
+    // 09 au 26 septembre pour tout le monde. C'est aussi ce qui saturait l'appareil au chargement
+    // (des centaines d'opérations Firestore d'un coup), d'où la lenteur au démarrage.
   });
 
   // ── 4. Écoute opérations bancaires (versements / retraits) ──
