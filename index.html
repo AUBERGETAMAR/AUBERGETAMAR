@@ -670,6 +670,180 @@ window.dispatchEvent(new Event('firebaseReady'));
 .pass-split .ps-l{display:block;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}
 .pass-split .ps-v{display:block;font-size:12px;font-weight:800}
 .pass-split .ps-c{display:block;font-size:9px;font-weight:600;opacity:.75}
+
+  /* ===== Saisie des passes : onglets de mode + lignes Recettes passes ===== */
+  .pp-tabs{display:flex;gap:6px;background:var(--bg);padding:4px;border-radius:12px;margin-bottom:12px}
+  .pp-tab{flex:1;border:none;border-radius:9px;padding:9px 6px;font-size:11.5px;font-weight:800;color:var(--text-muted);background:transparent;cursor:pointer;font-family:inherit}
+  .pp-tab.active{background:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(26,58,92,.3)}
+  .pp-rec-card{border:1.5px solid var(--border);border-radius:14px;padding:10px 12px 2px;margin-bottom:10px;background:var(--card)}
+  .pp-rec-card.clim{border-left:5px solid #2e8b57}
+  .pp-rec-card.vent{border-left:5px solid #e8621a}
+  .pp-rec-title{font-size:12px;font-weight:800;color:var(--navy);margin-bottom:8px}
+  .sj-row{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;background:var(--card)}
+  .sj-row input{margin-top:3px;width:18px;height:18px;flex:none}
+  .sj-main{font-size:12.5px;font-weight:800;color:var(--navy)}
+  .sj-sub{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.4}
+
+  /* ============================================================
+     🧊 STYLE INFOGRAPHIE 3D — onglets, titres, sous-titres, champs de saisie
+     (couche d'habillage uniquement : aucune logique modifiée)
+     ============================================================ */
+  :root{
+    --i3d-edge-navy:#0d2540; --i3d-edge-gold:#b86e0a; --i3d-edge-purple:#4a2a72; --i3d-edge-red:#8f2418;
+  }
+  /* ----- ONGLETS : touches épaisses, face brillante + tranche sombre ----- */
+  .tabs{padding:4px 8px 6px}
+  .tab-btn{
+    margin:3px 4px 6px;padding:8px 13px 8px 10px;border-radius:14px;
+    border:1px solid rgba(255,255,255,.35);border-bottom-color:rgba(0,0,0,.35);
+    background:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.10) 48%,rgba(0,0,0,.14) 52%,rgba(255,255,255,.06) 100%);
+    box-shadow:0 4px 0 #0b1f36, 0 7px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 4px rgba(0,0,0,.25);
+    transform:translateY(0);
+    transition:transform .12s ease, box-shadow .12s ease, background .2s;
+  }
+  .tab-btn .tab-ico{
+    width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+    background:radial-gradient(circle at 32% 28%,#fff 0%,#dfe9f4 45%,#9db4cc 100%);
+    box-shadow:0 2px 3px rgba(0,0,0,.4), inset 0 -2px 3px rgba(20,50,80,.35);
+    filter:none;font-size:12px;
+  }
+  .tab-btn:active:not(.tab-disabled){transform:translateY(3px);box-shadow:0 1px 0 #0b1f36, 0 2px 4px rgba(0,0,0,.4), inset 0 2px 5px rgba(0,0,0,.35)}
+  .tab-btn.active{
+    color:#3a2100;
+    background:linear-gradient(180deg,#fff3c9 0%,#ffd15c 42%,#f5a623 50%,#ec7a1c 100%);
+    border-color:#fff1c2;border-bottom-color:#b86e0a;
+    box-shadow:0 4px 0 var(--i3d-edge-gold), 0 8px 14px rgba(245,166,35,.55), inset 0 2px 0 rgba(255,255,255,.9), inset 0 -3px 5px rgba(150,70,0,.35);
+    transform:translateY(-2px) scale(1.04);
+  }
+  .tab-btn.active .tab-ico{background:radial-gradient(circle at 32% 28%,#fff 0%,#ffe9b0 50%,#e8a030 100%)}
+
+  /* ----- TITRES DE SECTION : bandeau épais + ruban doré + tranche 3D ----- */
+  .section-title{
+    border:2px solid #ffd270;border-bottom-width:3px;border-radius:16px;padding:10px 14px 10px 10px;
+    background:linear-gradient(180deg,#3b78ad 0%,var(--navy-light) 38%,var(--navy) 100%);
+    text-shadow:0 2px 0 rgba(0,0,0,.45), 0 0 8px rgba(255,255,255,.12);
+    box-shadow:0 5px 0 var(--i3d-edge-navy), 0 10px 16px rgba(13,37,64,.38), inset 0 2px 0 rgba(255,255,255,.35), inset 0 -3px 6px rgba(0,0,0,.28);
+    margin-bottom:16px;
+  }
+  .section-title::after{ /* reflet vitré */
+    content:'';position:absolute;left:0;right:0;top:0;height:46%;pointer-events:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0));
+  }
+  .section-title .sec-icon{
+    width:30px;height:30px;flex:0 0 30px;font-size:15px;
+    background:radial-gradient(circle at 32% 28%,#fff6d6 0%,#ffc94d 45%,#e8621a 100%);
+    border:2px solid #fff;box-shadow:0 3px 0 #a5540e, 0 5px 8px rgba(0,0,0,.35), inset 0 -2px 3px rgba(120,50,0,.35);
+    position:relative;z-index:1;
+  }
+  .section-title .sec-text{position:relative;z-index:1}
+  .section-title.expert{
+    background:linear-gradient(180deg,#a67fd0 0%,var(--purple-light) 35%,var(--purple) 100%);
+    box-shadow:0 4px 0 var(--i3d-edge-purple), 0 8px 13px rgba(74,42,114,.4), inset 0 2px 0 rgba(255,255,255,.35), inset 0 -3px 5px rgba(0,0,0,.25);
+    border-radius:14px;
+  }
+  .section-title.expert .sec-icon{width:26px;height:26px;flex:0 0 26px;background:radial-gradient(circle at 32% 28%,#fff 0%,#f0e3ff 50%,#b592dc 100%);box-shadow:0 3px 0 #5d3b8a, 0 4px 6px rgba(0,0,0,.3)}
+  .section-title.danger{
+    background:linear-gradient(180deg,#e2695a 0%,var(--red) 40%,#a32d21 100%);
+    box-shadow:0 5px 0 var(--i3d-edge-red), 0 10px 16px rgba(143,36,24,.4), inset 0 2px 0 rgba(255,255,255,.35), inset 0 -3px 6px rgba(0,0,0,.25);
+  }
+
+  /* ----- SOUS-TITRES : en-têtes de tableaux + libellés (pastilles gonflées) ----- */
+  .table-card{box-shadow:0 5px 0 rgba(26,58,92,.16), 0 10px 18px rgba(26,58,92,.16)}
+  .table-card-header{
+    position:relative;text-shadow:0 2px 0 rgba(0,0,0,.4);
+    background:linear-gradient(180deg,#3b78ad 0%,var(--navy-light) 42%,var(--navy) 100%);
+    border-bottom:3px solid var(--gold);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.3), inset 0 -3px 5px rgba(0,0,0,.25);
+  }
+  .table-card-header.proj-header{background:linear-gradient(180deg,#a67fd0 0%,var(--purple-light) 40%,var(--purple) 100%)}
+  .sc-label{
+    padding:5px 12px;border-radius:12px;font-size:10px;
+    border-bottom-width:2px;
+    box-shadow:0 3px 0 rgba(20,40,60,.22), 0 5px 7px rgba(20,40,60,.14), inset 0 1px 0 rgba(255,255,255,1), inset 0 -2px 3px rgba(20,40,60,.10);
+  }
+  .summary-card.recettes .sc-label{box-shadow:0 3px 0 rgba(30,122,76,.4), 0 5px 7px rgba(46,139,87,.2), inset 0 1px 0 #fff, inset 0 -2px 3px rgba(46,139,87,.16)}
+  .summary-card.depenses .sc-label{box-shadow:0 3px 0 rgba(163,41,27,.4), 0 5px 7px rgba(192,57,43,.2), inset 0 1px 0 #fff, inset 0 -2px 3px rgba(192,57,43,.16)}
+  .summary-card.net .sc-label{box-shadow:0 3px 0 rgba(26,58,92,.4), 0 5px 7px rgba(26,58,92,.2), inset 0 1px 0 #fff, inset 0 -2px 3px rgba(26,58,92,.14)}
+  .summary-card.marge .sc-label{box-shadow:0 3px 0 rgba(184,110,10,.4), 0 5px 7px rgba(245,166,35,.25), inset 0 1px 0 #fff, inset 0 -2px 3px rgba(245,166,35,.2)}
+  .summary-card.prevision .sc-label{box-shadow:0 3px 0 rgba(90,58,128,.4), 0 5px 7px rgba(123,79,166,.22), inset 0 1px 0 #fff, inset 0 -2px 3px rgba(123,79,166,.18)}
+  .summary-card{box-shadow:0 4px 0 rgba(26,58,92,.10), 0 8px 16px rgba(26,58,92,.12)}
+  .form-label{
+    display:inline-block;padding:4px 11px;margin-bottom:8px;border-radius:10px;color:var(--navy);
+    background:linear-gradient(180deg,#ffffff 0%,#dfe8f2 100%);
+    border:1px solid rgba(26,58,92,.14);
+    box-shadow:0 3px 0 rgba(26,58,92,.18), 0 4px 6px rgba(26,58,92,.10), inset 0 1px 0 #fff;
+    text-shadow:0 1px 0 rgba(255,255,255,.8);
+  }
+  .sj-main{text-shadow:0 1px 0 rgba(255,255,255,.8)}
+
+  /* ----- RECTANGLES DE SAISIE : cuvette en creux (inset) + halo 3D au focus ----- */
+  .form-input,.form-select{
+    border:2px solid #b9c9da;border-top-color:#8fa5bd;border-bottom-color:#e8f0f8;border-radius:14px;
+    background:linear-gradient(180deg,#e6edf5 0%,#f8fbfe 22%,#ffffff 100%);
+    box-shadow:inset 0 3px 6px rgba(26,58,92,.22), inset 0 1px 2px rgba(26,58,92,.18), 0 2px 0 #fff, 0 4px 8px rgba(26,58,92,.10);
+    transition:border-color .2s, box-shadow .2s, transform .15s;
+  }
+  .form-input::placeholder{color:#93a4b6;font-weight:600}
+  .form-input:focus,.form-select:focus{
+    border-color:var(--orange);border-top-color:#c4500f;border-bottom-color:#ffc58f;
+    background:#fff;
+    box-shadow:inset 0 3px 6px rgba(26,58,92,.18), 0 0 0 4px rgba(245,166,35,.28), 0 5px 0 rgba(232,98,26,.35), 0 9px 14px rgba(232,98,26,.22);
+    transform:translateY(-1px);
+  }
+  .form-select{
+    background-image:linear-gradient(180deg,#e6edf5 0%,#f8fbfe 22%,#ffffff 100%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9'><path d='M1 1l6 6 6-6' fill='none' stroke='%231a3a5c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;background-position:0 0, right 12px center;background-size:auto, 14px 9px;padding-right:34px;
+  }
+  .year-select{
+    border:1px solid rgba(255,255,255,.4);border-radius:12px;
+    background:linear-gradient(180deg,#3b78ad 0%,var(--navy) 100%);
+    box-shadow:0 4px 0 var(--i3d-edge-navy), 0 7px 10px rgba(13,37,64,.35), inset 0 2px 0 rgba(255,255,255,.35);
+  }
+  .year-select.projected{background:linear-gradient(180deg,#a67fd0 0%,var(--purple) 100%);box-shadow:0 4px 0 var(--i3d-edge-purple), 0 7px 10px rgba(74,42,114,.35), inset 0 2px 0 rgba(255,255,255,.35)}
+  .bank-period-field{box-shadow:inset 0 3px 6px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.12)}
+  @media (prefers-reduced-motion:reduce){.tab-btn,.form-input,.form-select{transition:none}}
+
+  /* ============================================================
+     ✨ ÉCRITURES CLAIRES SUR FOND FONCÉ : plus de blanc.
+     Titres = doré · Sous-titres = vert fluo · Onglets/étiquettes = jaune poussin
+     ============================================================ */
+  :root{ --t-gold:#ffd23f; --t-neon:#39ff14; --t-chick:#fff36b; }
+  /* En-tête de l'application */
+  .status-bar{color:var(--t-chick)}
+  .brand-text h1{color:var(--t-gold);text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 10px rgba(255,210,63,.35)}
+  .brand-text p{color:var(--t-neon);text-shadow:0 0 6px rgba(57,255,20,.45)}
+  /* Onglets non sélectionnés */
+  .tab-btn:not(.active){color:var(--t-chick);text-shadow:0 2px 0 rgba(0,0,0,.5),0 0 6px rgba(255,243,107,.35)}
+  /* Titres de section (bandeaux) */
+  .section-title,.section-title.expert,.section-title.danger{color:var(--t-gold);text-shadow:0 2px 0 rgba(0,0,0,.55),0 0 10px rgba(255,210,63,.4)}
+  .section-title.expert{color:var(--t-chick)}
+  .section-title.danger{color:var(--t-chick)}
+  /* En-têtes de tableaux (titre + sous-titre à droite) */
+  .table-card-header{color:var(--t-gold);text-shadow:0 2px 0 rgba(0,0,0,.5),0 0 8px rgba(255,210,63,.35)}
+  .table-card-header span{color:var(--t-neon);opacity:1;text-shadow:0 0 6px rgba(57,255,20,.5),0 1px 0 rgba(0,0,0,.5)}
+  /* Cartes sombres (Total Général, etc.) : libellé lisible + sous-titres */
+  .sc-label[style*="255,255,255"]{
+    color:var(--t-neon)!important;
+    background:linear-gradient(180deg,#2f6a9c 0%,#173a5e 55%,#0f2942 100%)!important;
+    border-color:rgba(255,255,255,.25)!important;
+    box-shadow:0 3px 0 #08182b, 0 6px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35), inset 0 -2px 3px rgba(0,0,0,.3)!important;
+    text-shadow:0 0 6px rgba(57,255,20,.6),0 1px 0 rgba(0,0,0,.6)!important;
+  }
+  .summary-card[style*="color:white"] .sc-sub{color:var(--t-chick)!important;opacity:1}
+  .summary-card[style*="color:white"] .sc-value{color:var(--t-gold)}
+  /* Sélecteur de période (relevé bancaire) */
+  .bank-period-eyebrow{color:var(--t-neon)}
+  .bank-period-field label,.bank-period-label{color:var(--t-chick)}
+  .bank-period-select{color:var(--t-gold)}
+  /* Sélecteurs d'année, puces actives, onglets secondaires actifs */
+  .year-select,.year-select.projected{color:var(--t-gold);text-shadow:0 1px 0 rgba(0,0,0,.5)}
+  .month-chip.active,.pp-tab.active{color:var(--t-chick);text-shadow:0 1px 0 rgba(0,0,0,.5)}
+  /* Écran d'accueil (couverture) */
+  .cover-page{color:var(--t-gold)}
+  .cover-title{color:var(--t-gold)}
+  .cover-sub{color:var(--t-neon)}
+  .cover-date{color:var(--t-chick)}
 </style>
 </head>
 <body>
@@ -1325,37 +1499,69 @@ window.dispatchEvent(new Event('firebaseReady'));
   <div class="section-title" id="recentRecettesTitle">🕐 Recettes des 12 dernières heures</div>
   <div class="recent-list" id="recentRecettes"></div>
 
+  <div class="section-title">🛏️ Point des Chambres — Recettes</div>
+  <div style="font-size:10.5px;color:var(--text-muted);font-weight:600;margin:-6px 0 10px 2px">💡 Saisie des recettes des chambres à date commune : ❄️ Climatisées à 8 000 F et 🌀 Ventilées à 6 000 F par chambre. Le montant se calcule au tarif mais reste modifiable.</div>
+
+  <div class="table-card" style="padding:14px">
+    <div class="form-row">
+      <div class="form-group" style="grid-column:1/3"><label class="form-label">Date commune</label>
+        <input class="form-input" type="date" id="chmDate"></div>
+    </div>
+    <div style="font-size:10.5px;color:var(--text-muted);margin:-6px 0 12px 2px">💡 La date commune s'applique aux chambres climatisées et ventilées (saisie rétroactive possible).</div>
+    <div class="pp-rec-card clim"><div class="pp-rec-title">❄️ Chambres climatisées — 8 000 F / chambre</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="number" inputmode="numeric" min="0" id="chmNbClim" placeholder="0" oninput="onChmChange('clim')"></div>
+        <div class="form-group"><label class="form-label">Montant (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="chmMtClim" placeholder="0" oninput="formatMontant(this);onChmTotal()"></div>
+      </div></div>
+    <div class="pp-rec-card vent"><div class="pp-rec-title">🌀 Chambres ventilées — 6 000 F / chambre</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="number" inputmode="numeric" min="0" id="chmNbVent" placeholder="0" oninput="onChmChange('vent')"></div>
+        <div class="form-group"><label class="form-label">Montant (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="chmMtVent" placeholder="0" oninput="formatMontant(this);onChmTotal()"></div>
+      </div></div>
+    <div class="form-row">
+      <div class="form-group" style="grid-column:1/3"><label class="form-label">🛏️ Total chambres (FCFA)</label><input class="form-input" type="text" id="chmTotal" readonly placeholder="0"></div>
+    </div>
+    <div style="font-size:10.5px;color:var(--text-muted);margin:-4px 0 12px 2px">🛏️ Ce total est enregistré dans les Recettes chambres (Mensuel, Annuel, Tableau de bord).</div>
+    <button class="action-btn orange" style="margin:0" onclick="saveChambresRecettes()">💾 Enregistrer les recettes chambres</button>
+  </div>
+
   <div class="section-title">🎫 Point des Passes — Jour &amp; Nuit</div>
   <div style="font-size:10.5px;color:var(--text-muted);font-weight:600;margin:-6px 0 10px 2px">💡 Passes scindés en deux passes distincts : ☀️ Jour (6h-17h) et 🌙 Nuit (17h01-00h). Chaque jour calendaire peut porter un point Jour et un point Nuit.</div>
 
   <div class="table-card" style="padding:14px">
-    <div style="font-weight:700;font-size:13px;margin-bottom:8px">☀️ Point des Passes de Jour (6h-17h)</div>
-    <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:10px" id="ppAutoSub">☀️ Jour · Total des passes détaillées du jour : 0 F</div>
-    <div class="form-row">
-      <div class="form-group" style="grid-column:1/3"><label class="form-label">Date concernée</label>
-        <input class="form-input" type="date" id="ppDateConcernee" onchange="onPpDateConcerneeChange()"></div>
-    </div>
-    <div style="font-size:10.5px;color:var(--text-muted);margin:-6px 0 12px 2px">💡 La date concernée peut être modifiée pour une saisie rétroactive.</div>
-    <div class="form-group"><label class="form-label">Point de Jour (FCFA)</label>
-      <input class="form-input" type="text" inputmode="numeric" id="ppMontant" placeholder="Ex: 15 000" oninput="formatMontant(this)"></div>
-    <div style="font-size:10.5px;color:var(--text-muted);margin:-4px 0 12px 2px">🎫 Ce point est intégré au Total Passes du mois et de l'année.</div>
-    <button class="action-btn orange" style="margin:0" onclick="savePointPasse('jour')">💾 Enregistrer le point de Jour</button>
-  </div>
-  <div id="ppHistoryList" style="margin-top:8px"></div>
-
-  <div class="table-card" style="padding:14px;margin-top:12px">
-    <div style="font-weight:700;font-size:13px;margin-bottom:8px">🌙 Point des Passes de Nuit (17h01-00h)</div>
+    <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:4px" id="ppAutoSub">☀️ Jour · Total des passes détaillées du jour : 0 F</div>
     <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:10px" id="ppNuitAutoSub">🌙 Nuit · Total des passes détaillées du jour : 0 F</div>
     <div class="form-row">
       <div class="form-group" style="grid-column:1/3"><label class="form-label">Date concernée</label>
-        <input class="form-input" type="date" id="ppNuitDateConcernee" onchange="onPpNuitDateConcerneeChange()"></div>
+        <input class="form-input" type="date" id="ppDateConcernee" onchange="onPpDateConcerneeChange()">
+        <input type="hidden" id="ppNuitDateConcernee"></div>
     </div>
-    <div style="font-size:10.5px;color:var(--text-muted);margin:-6px 0 12px 2px">💡 La date concernée peut être modifiée pour une saisie rétroactive.</div>
-    <div class="form-group"><label class="form-label">Point de Nuit (FCFA)</label>
-      <input class="form-input" type="text" inputmode="numeric" id="ppNuitMontant" placeholder="Ex: 15 000" oninput="formatMontant(this)"></div>
-    <div style="font-size:10.5px;color:var(--text-muted);margin:-4px 0 12px 2px">🎫 Ce point est intégré au Total Passes du mois et de l'année.</div>
-    <button class="action-btn orange" style="margin:0" onclick="savePointPasse('nuit')">💾 Enregistrer le point de Nuit</button>
+    <div style="font-size:10.5px;color:var(--text-muted);margin:-6px 0 12px 2px">💡 La date concernée peut être modifiée pour une saisie rétroactive (valable pour Jour et Nuit).</div>
+    <div id="ppPanelRec_jour">
+      <div class="pp-rec-card clim"><div class="pp-rec-title">❄️ Chambres climatisées — 3 000 F / passe</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">☀️ Jour — Nombre</label><input class="form-input" type="number" inputmode="numeric" min="0" id="ppRNbClim" placeholder="0" oninput="onPpRecChange('jour','clim')">
+            <label class="form-label" style="margin-top:8px">Montant (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="ppRMtClim" placeholder="0" oninput="formatMontant(this);onPpRecTotal('jour')"></div>
+          <div class="form-group"><label class="form-label">🌙 Nuit — Nombre</label><input class="form-input" type="number" inputmode="numeric" min="0" id="ppRNuitNbClim" placeholder="0" oninput="onPpRecChange('nuit','clim')">
+            <label class="form-label" style="margin-top:8px">Montant (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="ppRNuitMtClim" placeholder="0" oninput="formatMontant(this);onPpRecTotal('nuit')"></div>
+        </div></div>
+      <div class="pp-rec-card vent"><div class="pp-rec-title">🌀 Chambres ventilées — 2 000 F / passe</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">☀️ Jour — Nombre</label><input class="form-input" type="number" inputmode="numeric" min="0" id="ppRNbVent" placeholder="0" oninput="onPpRecChange('jour','vent')">
+            <label class="form-label" style="margin-top:8px">Montant (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="ppRMtVent" placeholder="0" oninput="formatMontant(this);onPpRecTotal('jour')"></div>
+          <div class="form-group"><label class="form-label">🌙 Nuit — Nombre</label><input class="form-input" type="number" inputmode="numeric" min="0" id="ppRNuitNbVent" placeholder="0" oninput="onPpRecChange('nuit','vent')">
+            <label class="form-label" style="margin-top:8px">Montant (FCFA)</label><input class="form-input" type="text" inputmode="numeric" id="ppRNuitMtVent" placeholder="0" oninput="formatMontant(this);onPpRecTotal('nuit')"></div>
+        </div></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">☀️ Total Jour (FCFA)</label><input class="form-input" type="text" id="ppRTotal" readonly placeholder="0"></div>
+        <div class="form-group"><label class="form-label">🌙 Total Nuit (FCFA)</label><input class="form-input" type="text" id="ppRNuitTotal" readonly placeholder="0"></div>
+      </div>
+      <div style="font-size:10.5px;color:var(--text-muted);margin:-4px 0 10px 2px">💡 Le montant se calcule au tarif, mais reste modifiable (tarif particulier). Laissez vide la période sans passes.</div>
+    </div>
+    <div style="font-size:10.5px;color:var(--text-muted);margin:-4px 0 12px 2px">🎫 Ces points sont intégrés au Total Passes du mois et de l'année.</div>
+    <button class="action-btn orange" style="margin:0" onclick="saveBothPasses()">💾 Enregistrer Jour &amp; Nuit</button>
   </div>
+  <div id="ppHistoryList" style="margin-top:8px"></div>
   <div id="ppNuitHistoryList" style="margin-top:8px"></div>
 </div>
 
@@ -2009,6 +2215,20 @@ window.dispatchEvent(new Event('firebaseReady'));
 </div>
 
 
+
+<!-- ===== MODAL CONTRÔLE DES SÉJOURS D'UNE DATE ===== -->
+<div class="modal-overlay" id="modalSejoursDate" onclick="closeModalOutside(event,'modalSejoursDate')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🧹 Séjours de la date</div>
+    <div id="sjIntro" style="font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:12px"></div>
+    <div id="sjList"></div>
+    <div style="font-size:10.5px;color:var(--text-muted);margin:2px 2px 12px;line-height:1.5">⚠️ Supprimer un séjour le retire de <strong>toutes</strong> ses dates (arrivée → sortie) et de l'historique, sur tous les appareils. Les recettes déjà saisies dans l'onglet Recettes ne sont pas modifiées.</div>
+    <button class="action-btn orange" id="sjDeleteBtn" onclick="supprimerSejoursSelectionnes()">🗑️ Supprimer la sélection</button>
+    <button class="action-btn" onclick="closeModal('modalSejoursDate')" style="background:var(--border);color:var(--text);box-shadow:none;margin-bottom:0">Fermer</button>
+  </div>
+</div>
+
 <!-- ===== MODAL IMPRESSION / EXPORT ===== -->
 <div class="modal-overlay" id="modalPrint" onclick="closeModalOutside(event,'modalPrint')">
   <div class="modal-sheet">
@@ -2021,6 +2241,7 @@ window.dispatchEvent(new Event('firebaseReady'));
       <select class="form-select" id="printContent" onchange="onPrintContentChange()">
         <option value="mensuel">Synthèse Annuelle</option>
         <option value="complet">Rapport Complet</option>
+        <option value="mensuel_complet">Rapport Mensuel Complet (tous les jours du mois)</option>
         <option value="fiche">Fiche de Rapport Journalier</option>
         <option value="fiche_mensuel">Synthèse Mensuelle Fiche Journalière</option>
         <option value="fiche_annuel">Synthèse Annuelle Fiche Journalière</option>
@@ -2031,6 +2252,7 @@ window.dispatchEvent(new Event('firebaseReady'));
     <div class="form-group" id="ficheDateGroup" style="display:none">
       <label class="form-label">Date de la fiche</label>
       <input type="date" class="form-input" id="ficheDate">
+      <button type="button" class="action-btn" style="margin:10px 0 0;background:var(--card);color:var(--navy);border:1.5px solid var(--navy);box-shadow:none;font-size:12.5px" onclick="openSejoursDate()">🧹 Vérifier / supprimer les séjours de cette date</button>
     </div>
     <div class="form-group" id="recettesMoisGroup" style="display:none">
       <label class="form-label">Mois du détail journalier (l'année vient de l'onglet Annuel)</label>
@@ -4549,6 +4771,26 @@ function computePassesPointsTotalMonthPeriode(year, monthIdx, periode){
   });
   return total;
 }
+// Nombre de passes à 2 000 F et à 3 000 F saisies sur un mois (Jour + Nuit).
+function computePassesCountsMonth(year, monthIdx){
+  let n2000 = 0, n3000 = 0;
+  pointsPasses.forEach(p => {
+    if (!p.date) return;
+    const parts = p.date.split('-');
+    if (parts.length !== 3) return;
+    if (parseInt(parts[0],10) === year && (parseInt(parts[1],10) - 1) === monthIdx) { n2000 += (p.nb2000 || 0); n3000 += (p.nb3000 || 0); }
+  });
+  return { n2000, n3000 };
+}
+// Montants de passes qui ont été validés vers les Recettes (onglet Chambre) : ils sont comptés dans les
+// recettes "chambres" du mois (DATA[].r) ; on les retire pour que les passes ne figurent JAMAIS dans les chambres.
+function computePassesValideesRecettesMonth(year, monthIdx){
+  return saisieLog.filter(e => e.type === 'recettes' && e.annee === year && e.moisIdx === monthIdx && typeof e.note === 'string' && e.note.indexOf('Passes du') !== -1)
+    .reduce((t, e) => t + (e.montant || 0), 0);
+}
+function computePassesJourMonthChambresNet(year, monthIdx, r){
+  return Math.max(0, (r || 0) - computePassesValideesRecettesMonth(year, monthIdx));
+}
 function computePassesPointsTotalMonthJour(year, monthIdx){ return computePassesPointsTotalMonthPeriode(year, monthIdx, 'jour'); }
 function computePassesPointsTotalMonthNuit(year, monthIdx){ return computePassesPointsTotalMonthPeriode(year, monthIdx, 'nuit'); }
 // Total Passes du mois, toutes périodes confondues (Jour + Nuit) — c'est ce total qui continue
@@ -4588,19 +4830,34 @@ function savePointPasse(periode){
   periode = periode === 'nuit' ? 'nuit' : 'jour';
   const montantId = periode === 'nuit' ? 'ppNuitMontant' : 'ppMontant';
   const dateId = periode === 'nuit' ? 'ppNuitDateConcernee' : 'ppDateConcernee';
-  const montant = parseMontant(montantId);
-  if (!montant) { showToast('⚠️ Saisissez un montant'); return; }
+  const mode = _ppMode[periode] || 'detail';
+  const cnt = id => Math.max(0, parseInt((document.getElementById(id) || {}).value, 10) || 0);
+  let n2000, n3000, mtClim, mtVent;
+  if (mode === 'recettes') {
+    const rp = periode === 'nuit' ? 'ppRNuit' : 'ppR';
+    n3000 = cnt(rp + 'NbClim'); n2000 = cnt(rp + 'NbVent');
+    mtClim = parseMontant(rp + 'MtClim'); mtVent = parseMontant(rp + 'MtVent');
+    if (!mtClim && n3000) mtClim = n3000 * 3000;   // montant vide → calcul au tarif
+    if (!mtVent && n2000) mtVent = n2000 * 2000;
+  } else {
+    const pre = periode === 'nuit' ? 'ppNuit' : 'pp';
+    n2000 = cnt(pre + 'Nb2000'); n3000 = cnt(pre + 'Nb3000');
+    mtClim = n3000 * 3000; mtVent = n2000 * 2000;
+  }
+  const montant = mtClim + mtVent;
+  if (!montant) { showToast(mode === 'recettes' ? '⚠️ Saisissez le nombre de passes ou le montant' : '⚠️ Saisissez le nombre de passes (2 000 F et/ou 3 000 F)'); return; }
   const dateConcerneeEl = document.getElementById(dateId);
   const dateISO = (dateConcerneeEl && dateConcerneeEl.value) || new Date().toISOString().slice(0,10);
   const dateSaisieISO = new Date().toISOString().slice(0,10);
   const existing = findPointPasseByDate(dateISO, periode);
   if (existing) {
-    existing.montant = montant; existing.dateSaisie = existing.dateSaisie || dateSaisieISO; existing.ts = Date.now();
+    existing.montant = montant; existing.nb2000 = n2000; existing.nb3000 = n3000; existing.nbPasses = n2000 + n3000;
+    existing.mode = mode; existing.nbClim = n3000; existing.nbVent = n2000; existing.montantClim = mtClim; existing.montantVent = mtVent; existing.dateSaisie = existing.dateSaisie || dateSaisieISO; existing.ts = Date.now();
     persistPointsPasses();
     if (existing._docId && fbReady) fbUpdatePointPasse(existing._docId, existing); else fbSavePointPasse(existing);
   } else {
     const localId = 'loc_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-    const entry = { date: dateISO, dateSaisie: dateSaisieISO, montant, periode, ts: Date.now(), _localId: localId };
+    const entry = { date: dateISO, dateSaisie: dateSaisieISO, montant, nb2000: n2000, nb3000: n3000, nbPasses: n2000 + n3000, mode, nbClim: n3000, nbVent: n2000, montantClim: mtClim, montantVent: mtVent, periode, ts: Date.now(), _localId: localId };
     pointsPasses.unshift(entry);
     persistPointsPasses();
     fbSavePointPasse(entry);
@@ -4613,6 +4870,57 @@ function savePointPasse(periode){
 // Quand l'utilisateur change la date concernée : recharge le montant pré-rempli / déjà saisi pour cette date.
 function onPpDateConcerneeChange(){
   renderPointsPasses();
+}
+// Enregistre en une fois les passes Jour et Nuit saisies (une période vide est ignorée).
+function saveBothPasses(){
+  const has = rp => ['NbClim','MtClim','NbVent','MtVent'].some(k => ((document.getElementById(rp + k) || {}).value || '').replace(/\D/g,'') !== '' && parseInt(((document.getElementById(rp + k) || {}).value || '').replace(/\D/g,''),10) > 0);
+  const j = has('ppR'), n = has('ppRNuit');
+  if (!j && !n) { showToast('⚠️ Saisissez les passes de Jour et/ou de Nuit'); return; }
+  const nd = document.getElementById('ppNuitDateConcernee'), jd = document.getElementById('ppDateConcernee');
+  if (nd && jd) nd.value = jd.value;
+  if (j) savePointPasse('jour');
+  if (n) savePointPasse('nuit');
+  if (j && n) showToast('✅ Passes Jour & Nuit enregistrés');
+}
+// Recalcule le total (FCFA) affiché quand on modifie le nombre de passes à 2 000 F / 3 000 F.
+function onPpCountsChange(periode){
+  const pre = periode === 'nuit' ? 'ppNuit' : 'pp';
+  const n2 = parseInt((document.getElementById(pre + 'Nb2000') || {}).value, 10) || 0;
+  const n3 = parseInt((document.getElementById(pre + 'Nb3000') || {}).value, 10) || 0;
+  const tot = document.getElementById(periode === 'nuit' ? 'ppNuitMontant' : 'ppMontant');
+  if (tot) tot.value = (n2 * 2000 + n3 * 3000) ? (n2 * 2000 + n3 * 3000).toLocaleString('fr-FR') : '';
+}
+function ppCountsTxt(p){
+  if (p.mode === 'recettes') {
+    return ` · ❄️ ${p.nbClim || 0} clim. (${fmtFull(p.montantClim || 0)} F) + 🌀 ${p.nbVent || 0} vent. (${fmtFull(p.montantVent || 0)} F)`;
+  }
+  const a = p.nb2000 || 0, b = p.nb3000 || 0;
+  return (a || b) ? ` · ${a} × 2 000 F + ${b} × 3 000 F` : '';
+}
+// Mode de saisie du Point des Passes : 'detail' (nombre de passes à 2 000 / 3 000 F) ou 'recettes' (par type de chambre).
+const _ppMode = { jour: 'recettes', nuit: 'recettes' };
+function ppSetMode(periode, mode){
+  _ppMode[periode] = mode === 'recettes' ? 'recettes' : 'detail';
+  const isRec = _ppMode[periode] === 'recettes';
+  const set = (id, on) => { const el = document.getElementById(id); if (el) el.classList.toggle('active', on); };
+  set('ppTabDetail_' + periode, !isRec); set('ppTabRec_' + periode, isRec);
+  const pd = document.getElementById('ppPanelDetail_' + periode), pr = document.getElementById('ppPanelRec_' + periode);
+  if (pd) pd.style.display = isRec ? 'none' : '';
+  if (pr) pr.style.display = isRec ? '' : 'none';
+}
+function onPpRecChange(periode, type){
+  const rp = periode === 'nuit' ? 'ppRNuit' : 'ppR';
+  const nb = Math.max(0, parseInt((document.getElementById(rp + (type === 'clim' ? 'NbClim' : 'NbVent')) || {}).value, 10) || 0);
+  const mt = document.getElementById(rp + (type === 'clim' ? 'MtClim' : 'MtVent'));
+  const prix = type === 'clim' ? 3000 : 2000;
+  if (mt) mt.value = nb ? (nb * prix).toLocaleString('fr-FR') : '';
+  onPpRecTotal(periode);
+}
+function onPpRecTotal(periode){
+  const rp = periode === 'nuit' ? 'ppRNuit' : 'ppR';
+  const tot = parseMontant(rp + 'MtClim') + parseMontant(rp + 'MtVent');
+  const el = document.getElementById(rp + 'Total');
+  if (el) el.value = tot ? tot.toLocaleString('fr-FR') : '';
 }
 function onPpNuitDateConcerneeChange(){
   renderPointsPasses();
@@ -4647,20 +4955,37 @@ function renderPointPasseBloc(periode){
   if (sub) sub.textContent = `${PASSE_PERIODE_COURT[periode]} · Total des passes détaillées pour le ${formatDateFr(dateISO)} : ${fmtFull(autoTotal)} F`;
   const input = document.getElementById(montantId);
   const already = findPointPasseByDate(dateISO, periode);
-  if (input && document.activeElement !== input) {
-    input.value = already ? (already.montant ? already.montant.toLocaleString('fr-FR') : '') : (autoTotal ? autoTotal.toLocaleString('fr-FR') : '');
+  const pre = periode === 'nuit' ? 'ppNuit' : 'pp';
+  const e2 = document.getElementById(pre + 'Nb2000'), e3 = document.getElementById(pre + 'Nb3000');
+  if (e2 && e3 && document.activeElement !== e2 && document.activeElement !== e3) {
+    e2.value = (already && already.nb2000) ? already.nb2000 : '';
+    e3.value = (already && already.nb3000) ? already.nb3000 : '';
+    if (input) input.value = (already && already.montant) ? already.montant.toLocaleString('fr-FR') : '';
+  }
+  const rp = periode === 'nuit' ? 'ppRNuit' : 'ppR';
+  const rIds = ['NbClim','MtClim','NbVent','MtVent'].map(k => document.getElementById(rp + k));
+  if (rIds.every(Boolean) && !rIds.includes(document.activeElement)) {
+    const f = n => n ? n.toLocaleString('fr-FR') : '';
+    rIds[0].value = already ? (already.nbClim || already.nb3000 || '') : '';
+    rIds[1].value = already ? f(already.montantClim != null ? already.montantClim : (already.nb3000||0)*3000) : '';
+    rIds[2].value = already ? (already.nbVent || already.nb2000 || '') : '';
+    rIds[3].value = already ? f(already.montantVent != null ? already.montantVent : (already.nb2000||0)*2000) : '';
+    onPpRecTotal(periode);
   }
   const list = document.getElementById(listId);
   if (!list) return;
   const sorted = pointsPasses.filter(p => (p.periode||'jour') === periode).sort((a,b) => (b.ts||0) - (a.ts||0)).slice(0, 10);
   if (!sorted.length) { list.innerHTML = ''; return; }
-  list.innerHTML = sorted.map(p => `
+  const hdr = `<div style="font-size:12px;font-weight:800;color:var(--navy);margin:6px 0 8px 2px">${periode === 'nuit' ? '🌙 Historique — Passes de Nuit' : '☀️ Historique — Passes de Jour'}</div>`;
+  list.innerHTML = hdr + sorted.map(p => `
     <div class="recent-item" style="margin-bottom:8px">
-      <div class="ri-left"><div class="ri-icon out">🎫</div><div><div class="ri-desc">${PASSE_PERIODE_COURT[periode]} — Point Passes</div><div class="ri-date">📅 Concernée : ${formatDateFr(p.date)}${p.dateSaisie ? ` · 🖊️ Saisie le ${formatDateFr(p.dateSaisie)}` : ''}</div></div></div>
+      <div class="ri-left"><div class="ri-icon out">🎫</div><div><div class="ri-desc">${PASSE_PERIODE_COURT[periode]} — Point Passes${ppCountsTxt(p)}</div><div class="ri-date">📅 Concernée : ${formatDateFr(p.date)}${p.dateSaisie ? ` · 🖊️ Saisie le ${formatDateFr(p.dateSaisie)}` : ''}</div></div></div>
       <div class="ri-right"><div class="ri-amount navy">${fmtFull(p.montant)} F</div><button class="ri-delete" onclick="deletePointPasse('${p._localId||''}','${p._docId||''}')" title="Supprimer">✕</button></div>
     </div>`).join('');
 }
 function renderPointsPasses(){
+  const _jd = document.getElementById('ppDateConcernee'), _nd = document.getElementById('ppNuitDateConcernee');
+  if (_jd && _nd && _jd.value) _nd.value = _jd.value;
   renderPointPasseBloc('jour');
   renderPointPasseBloc('nuit');
 }
@@ -9838,6 +10163,29 @@ function buildPrintContent() {
     return html;
   }
 
+  if (choice === 'mensuel_complet') {
+    const sel = document.getElementById('yearSelect');
+    const year = sel ? parseInt(sel.value) : new Date().getFullYear();
+    const moisSel = document.getElementById('recettesMoisSel');
+    const moisIdx = moisSel && moisSel.value !== '' ? parseInt(moisSel.value) : new Date().getMonth();
+    const d = computeRapportMensuelComplet(year, moisIdx);
+    const dash = n => n > 0 ? fmtFull(n) : '-';
+    html = `<h1 style="text-align:center">RAPPORT FINANCIER MENSUEL</h1>
+      <p style="text-align:center;font-size:12px;margin-top:-8px">${d.monthLabel} ${d.year} — Édité le ${now}</p>
+      <h2>SYNTHÈSE DU MOIS</h2>
+      <table><thead><tr><th>Mois</th><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead><tbody>
+      <tr><td>${d.monthLabel} ${d.year}</td><td>${fmtFull(d.tot.rec)}</td><td>${dash(d.tot.d)}</td><td>${fmtFull(d.tot.net)}</td><td>${marge(d.tot.rec, d.tot.d)}</td></tr></tbody></table>
+      <h2 style="margin-top:18px">DÉTAIL JOURNALIER</h2>
+      <table><thead><tr><th style="text-align:left">Jours ${d.monthLabel} ${d.year}</th><th>Nuitées (chambres)</th><th>Passes Jour</th><th>Passes Nuit</th><th>Nb passes 2 000</th><th>Nb passes 3 000</th><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead><tbody>`;
+    d.rows.forEach(r => {
+      const actif = (r.rec + r.d) > 0;
+      html += `<tr><td style="text-align:left">${r.label}</td><td>${dash(r.ch)}</td><td>${dash(r.pj)}</td><td>${dash(r.pn)}</td><td>${dash(r.n2)}</td><td>${dash(r.n3)}</td><td>${dash(r.rec)}</td><td>${dash(r.d)}</td><td>${actif ? fmtFull(r.net) : '-'}</td><td>${actif ? marge(r.rec, r.d) : '-'}</td></tr>`;
+    });
+    html += `</tbody><tfoot><tr><td>TOTAL</td><td>${fmtFull(d.tot.ch)}</td><td>${fmtFull(d.tot.pj)}</td><td>${fmtFull(d.tot.pn)}</td><td>${fmtFull(d.tot.n2)}</td><td>${fmtFull(d.tot.n3)}</td><td>${fmtFull(d.tot.rec)}</td><td>${fmtFull(d.tot.d)}</td><td>${fmtFull(d.tot.net)}</td><td>${marge(d.tot.rec, d.tot.d)}</td></tr></tfoot></table>`;
+    html += `<div class="print-footer">Auberge Tamar · AubergeGest · Édité le ${now}</div>`;
+    return html;
+  }
+
   if (choice === 'fiche_mensuel') {
     const sel = document.getElementById('yearSelect');
     const year = sel ? parseInt(sel.value) : new Date().getFullYear();
@@ -9952,16 +10300,17 @@ function buildPrintContent() {
     const sel = document.getElementById('yearSelect');
     const year = sel ? parseInt(sel.value) : 2026;
     const {data:months} = getMonthData(year);
-    html += `<h2>Détail Mensuel — ${year}</h2><table><thead><tr><th>Mois</th><th>Nuitées (chambres)</th><th>Passes Jour</th><th>Passes Nuit</th><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead><tbody>`;
-    let tCh=0, tPJ=0, tPN=0, td=0;
+    html += `<h2>Détail Mensuel — ${year}</h2><table><thead><tr><th>Mois</th><th>Nuitées (chambres)</th><th>Passes Jour</th><th>Passes Nuit</th><th>Nb passes 2 000</th><th>Nb passes 3 000</th><th>Recettes (FCFA)</th><th>Dépenses (FCFA)</th><th>Net (FCFA)</th><th>Marge</th></tr></thead><tbody>`;
+    let tCh=0, tPJ=0, tPN=0, td=0, tN2=0, tN3=0;
     months.forEach((m,i) => {
-      const ch = m.r || 0, pj = computePassesPointsTotalMonthJour(year, i), pn = computePassesPointsTotalMonthNuit(year, i);
+      const ch = computePassesJourMonthChambresNet(year, i, m.r), pj = computePassesPointsTotalMonthJour(year, i), pn = computePassesPointsTotalMonthNuit(year, i);
+      const cnt = computePassesCountsMonth(year, i);
       const rec = ch + pj + pn, net = rec - m.d;
-      tCh+=ch; tPJ+=pj; tPN+=pn; td+=m.d;
-      html += `<tr><td>${m.m}</td><td>${fmtFull(ch)}</td><td>${pj>0?fmtFull(pj):'-'}</td><td>${pn>0?fmtFull(pn):'-'}</td><td>${fmtFull(rec)}</td><td>${m.d>0?fmtFull(m.d):'-'}</td><td>${fmtFull(net)}</td><td>${marge(rec,m.d)}</td></tr>`;
+      tCh+=ch; tPJ+=pj; tPN+=pn; td+=m.d; tN2+=cnt.n2000; tN3+=cnt.n3000;
+      html += `<tr><td>${m.m}</td><td>${fmtFull(ch)}</td><td>${pj>0?fmtFull(pj):'-'}</td><td>${pn>0?fmtFull(pn):'-'}</td><td>${cnt.n2000>0?cnt.n2000:'-'}</td><td>${cnt.n3000>0?cnt.n3000:'-'}</td><td>${fmtFull(rec)}</td><td>${m.d>0?fmtFull(m.d):'-'}</td><td>${fmtFull(net)}</td><td>${marge(rec,m.d)}</td></tr>`;
     });
     const tRec = tCh + tPJ + tPN;
-    html += `</tbody><tfoot><tr><td>TOTAL</td><td>${fmtFull(tCh)}</td><td>${fmtFull(tPJ)}</td><td>${fmtFull(tPN)}</td><td>${fmtFull(tRec)}</td><td>${fmtFull(td)}</td><td>${fmtFull(tRec-td)}</td><td>${marge(tRec,td)}</td></tr></tfoot></table>`;
+    html += `</tbody><tfoot><tr><td>TOTAL</td><td>${fmtFull(tCh)}</td><td>${fmtFull(tPJ)}</td><td>${fmtFull(tPN)}</td><td>${fmtFull(tN2)}</td><td>${fmtFull(tN3)}</td><td>${fmtFull(tRec)}</td><td>${fmtFull(td)}</td><td>${fmtFull(tRec-td)}</td><td>${marge(tRec,td)}</td></tr></tfoot></table>`;
   }
 
   if (choice === 'mensuel') {
@@ -10009,8 +10358,8 @@ function onPrintContentChange(){
   }
   const rGrp = document.getElementById('recettesMoisGroup');
   if (rGrp) {
-    rGrp.style.display = (choice === 'recettes' || choice === 'fiche_mensuel') ? '' : 'none';
-    if (choice === 'recettes' || choice === 'fiche_mensuel') populateRecettesMoisSel();
+    rGrp.style.display = (choice === 'recettes' || choice === 'fiche_mensuel' || choice === 'mensuel_complet') ? '' : 'none';
+    if (choice === 'recettes' || choice === 'fiche_mensuel' || choice === 'mensuel_complet') populateRecettesMoisSel();
   }
   const faGrp = document.getElementById('ficheAnnuelInfo');
   if (faGrp) faGrp.style.display = (choice === 'fiche_annuel') ? '' : 'none';
@@ -10019,6 +10368,58 @@ function onPrintContentChange(){
     mGrp.style.display = (choice === 'mouvements') ? '' : 'none';
     if (choice === 'mouvements') initRecapMouvementsForm();
   }
+}
+
+
+// ===== CONTRÔLE / SUPPRESSION DES SÉJOURS D'UNE DATE (fiche de rapport journalier) =====
+// Liste, pour la date choisie, chaque séjour compté dans la fiche (même règle que computeFicheJournaliereData)
+// et permet de supprimer ceux qui sont erronés (ex. chambres 2 à 7 du 21/09).
+let _sjItems = [];
+function sjEsc(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function openSejoursDate(){
+  const fd = document.getElementById('ficheDate');
+  const dateISO = (fd && fd.value) ? fd.value : new Date().toISOString().slice(0,10);
+  _sjItems = [];
+  ROOMS.slice(0, 21).forEach(r => {
+    const stays = roomHistory.filter(h => h.chambre === r.num && h.arrivee && (h.dateSortie || h.depart) && dateISO >= h.arrivee && (dateISO < (h.dateSortie || h.depart) || h.arrivee === (h.dateSortie || h.depart)));
+    stays.forEach(h => _sjItems.push({ kind:'hist', num:r.num, h }));
+    if (!stays.length && r.status === 'occupee' && r.arrivee && r.depart && dateISO >= r.arrivee && (dateISO < r.depart || r.arrivee === r.depart)) _sjItems.push({ kind:'room', num:r.num, r });
+  });
+  document.getElementById('sjIntro').textContent = `Séjours pris en compte dans la fiche du ${formatDateFr(dateISO)} : ${_sjItems.length}. Cochez ceux à supprimer.`;
+  const list = document.getElementById('sjList');
+  list.innerHTML = _sjItems.length ? _sjItems.map((it, i) => {
+    const src = it.kind === 'hist' ? it.h : it.r;
+    const arr = src.arrivee, dep = it.kind === 'hist' ? (src.dateSortie || src.depart) : src.depart;
+    const prix = it.kind === 'hist' ? (src.prixNuit || 0) : (src.prix || 0);
+    const client = it.kind === 'hist' ? (src.client || '') : (src.client || '');
+    return `<label class="sj-row"><input type="checkbox" id="sjChk${i}"><div><div class="sj-main">Chambre ${sjEsc(it.num)} — ${fmtFull(prix)} F / nuit</div><div class="sj-sub">${arr ? formatDateFr(arr) : '—'} → ${dep ? formatDateFr(dep) : '—'}${client ? ' · ' + sjEsc(client) : ''}${it.kind === 'room' ? ' · chambre actuellement marquée occupée' : ''}</div></div></label>`;
+  }).join('') : '<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:18px 0">Aucun séjour pour cette date.</div>';
+  document.getElementById('sjDeleteBtn').style.display = _sjItems.length ? '' : 'none';
+  openModal('modalSejoursDate');
+}
+function supprimerSejoursSelectionnes(){
+  const chosen = _sjItems.filter((it, i) => { const c = document.getElementById('sjChk' + i); return c && c.checked; });
+  if (!chosen.length) { showToast('ℹ️ Cochez au moins un séjour'); return; }
+  if (!confirm(`Supprimer définitivement ${chosen.length} séjour(s) (chambre${chosen.length > 1 ? 's' : ''} ${chosen.map(c => c.num).join(', ')}) ? Cette action concerne tous les appareils.`)) return;
+  chosen.forEach(it => {
+    if (it.kind === 'hist') {
+      const h = it.h;
+      if (h._docId && fbReady) window._deleteDoc(window._doc(window._db, 'historique_chambres', h._docId)).catch(e => showToast('⚠️ Erreur suppression : ' + e.message));
+      else { const idx = roomHistory.indexOf(h); if (idx > -1) roomHistory.splice(idx, 1); }
+      liberateRoomIfMatchesHistory(h);
+    } else {
+      const room = it.r;
+      room.client=''; room.contact=''; room.arrivee=null; room.heureArrivee=null; room.depart=null; room.heureDepart=null; room.prix=null;
+      room.status = computeRoomStatus(room);
+      fbSaveChambre(room);
+    }
+  });
+  persistRoomHistory();
+  try { renderRooms(); } catch(e) {}
+  try { renderRoomHistory(); } catch(e) {}
+  closeModal('modalSejoursDate');
+  showToast(`🗑️ ${chosen.length} séjour(s) supprimé(s)`);
+  refreshAll();
 }
 
 // ===== RÉCAP DES MOUVEMENTS (registre des taxes de séjour) =====
@@ -10127,7 +10528,8 @@ function computeFicheJournaliereData(dateISO){
     let type = r.type || '';
     // Occupe dateISO si : dateISO est dans [arrivee, depart[ (séjour classique),
     // OU si arrivee === depart (chambre de passage / séjour même-jour, sinon jamais comptée).
-    const stay = roomHistory.find(h => h.chambre === r.num && h.arrivee && h.depart && dateISO >= h.arrivee && (dateISO < h.depart || h.arrivee === h.depart));
+    // Date de sortie RÉELLE (dateSortie) en priorité : un départ anticipé ne doit plus compter la chambre les jours suivants.
+    const stay = roomHistory.find(h => { const sortie = h.dateSortie || h.depart; return h.chambre === r.num && h.arrivee && sortie && dateISO >= h.arrivee && (dateISO < sortie || h.arrivee === sortie); });
     if (stay) { valeur = stay.prixNuit || 0; type = stay.type || type; }
     else if (r.status === 'occupee' && r.arrivee && r.depart && dateISO >= r.arrivee && (dateISO < r.depart || r.arrivee === r.depart)) valeur = r.prix || 0;
     return { num: r.num, valeur, type };
@@ -10160,7 +10562,7 @@ function computeFicheJournaliereData(dateISO){
     const point = pointsPasses.find(p => p.date === dateISO && (p.periode||'jour') === periode);
     const montant = point ? (point.montant || 0) : detail.reduce((t,p) => t + (p.montantPaye||0), 0);
     const nb = (point && point.nbPasses) ? point.nbPasses : detail.length;
-    return { nb, montant };
+    return { nb, montant, n2000: point ? (point.nb2000 || 0) : 0, n3000: point ? (point.nb3000 || 0) : 0 };
   };
   const passesJour = passesPeriode('jour'), passesNuit = passesPeriode('nuit');
   const nbPassesJour = passesJour.nb, valeurPassesJour = passesJour.montant;
@@ -10175,10 +10577,12 @@ function computeFicheJournaliereData(dateISO){
     .map(e => ({ montant: e.montant || 0, heure: e.heure || '', personne: e.personne || '', note: e.note || '' }))
     .sort((a,b) => (a.heure||'').localeCompare(b.heure||''));
 
-  return { dateISO, dateFr, roomsData, nbOccupees, valeurOccupees, nbNonOccupees,
+  const roomsOccupees = roomsData.filter(r => r.valeur > 0); // affichage : uniquement les chambres occupées
+  return { dateISO, dateFr, roomsData, roomsOccupees, nbOccupees, valeurOccupees, nbNonOccupees,
     nbOccupeesClim, nbOccupeesVent, valeurOccupeesClim, valeurOccupeesVent,
     sorties, totalSorties, versement, versementsDetail,
-    nbPassesJour, valeurPassesJour, nbPassesNuit, valeurPassesNuit, nbPassesTotal, valeurPassesTotal, totalRecettesJour };
+    nbPassesJour, valeurPassesJour, nbPassesNuit, valeurPassesNuit, nbPassesTotal, valeurPassesTotal, totalRecettesJour,
+    nbPasses2000: passesJour.n2000 + passesNuit.n2000, nbPasses3000: passesJour.n3000 + passesNuit.n3000 };
 }
 
 // Construit le document de la Fiche de Rapport Journalier avec un jeu de tailles donné
@@ -10691,6 +11095,113 @@ function genererBilanRecettesPDF(){
   });
 }
 
+
+// ===== RAPPORT MENSUEL COMPLET — même style que le Rapport Complet annuel, un ligne par jour =====
+// Synthèse du mois + détail de TOUS les jours du mois : Nuitées, Passes Jour, Passes Nuit,
+// Recettes, Dépenses, Net, Marge (mêmes colonnes que le "Détail mensuel" du rapport annuel).
+function computeRapportMensuelComplet(year, moisIdx){
+  const nbJ = new Date(year, moisIdx + 1, 0).getDate();
+  const JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const rows = [];
+  let tCh = 0, tPJ = 0, tPN = 0, tD = 0, tN2 = 0, tN3 = 0;
+  for (let j = 1; j <= nbJ; j++) {
+    const dd = String(j).padStart(2,'0'), mm = String(moisIdx + 1).padStart(2,'0');
+    const f = computeFicheJournaliereData(`${year}-${mm}-${dd}`);
+    const ch = f.valeurOccupees || 0, pj = f.valeurPassesJour || 0, pn = f.valeurPassesNuit || 0, d = f.totalSorties || 0;
+    const n2 = f.nbPasses2000 || 0, n3 = f.nbPasses3000 || 0;
+    const rec = ch + pj + pn;
+    rows.push({ jour: j, dow: new Date(year, moisIdx, j).getDay(), label: `${JOURS[new Date(year, moisIdx, j).getDay()]} ${dd}/${mm}`, ch, pj, pn, n2, n3, rec, d, net: rec - d });
+    tCh += ch; tPJ += pj; tPN += pn; tD += d; tN2 += n2; tN3 += n3;
+  }
+  const tRec = tCh + tPJ + tPN;
+  // Chiffres du même mois dans l'onglet Annuel (pour signaler un éventuel écart)
+  const md = (getMonthData(year).data || [])[moisIdx] || { r: 0, d: 0 };
+  const refRec = computePassesJourMonthChambresNet(year, moisIdx, md.r) + computePassesPointsTotalMonthJour(year, moisIdx) + computePassesPointsTotalMonthNuit(year, moisIdx);
+  const refD = md.d || 0;
+  return { year, moisIdx, monthLabel: MOIS_FULL[moisIdx], nbJ, rows,
+    tot: { ch: tCh, pj: tPJ, pn: tPN, n2: tN2, n3: tN3, rec: tRec, d: tD, net: tRec - tD },
+    ecartRec: tRec - refRec, ecartD: tD - refD };
+}
+
+function genererRapportMensuelCompletPDF(){
+  const sel = document.getElementById('yearSelect');
+  const year = sel ? parseInt(sel.value) : new Date().getFullYear();
+  const moisSel = document.getElementById('recettesMoisSel');
+  const moisIdx = moisSel && moisSel.value !== '' ? parseInt(moisSel.value) : new Date().getMonth();
+  const d = computeRapportMensuelComplet(year, moisIdx);
+  loadJsPDF(() => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const margin = 14;
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    let y = pdfAddHeader(doc, 'RAPPORT FINANCIER MENSUEL', [`${d.monthLabel} ${d.year}`, `Édité le ${new Date().toLocaleDateString('fr-FR')}`]);
+
+    function sectionTitle(title, color) {
+      if (y > pageH - 30) { doc.addPage(); y = 20; }
+      doc.setFillColor(...color); doc.rect(margin, y, 3, 5.5, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(...PDF_NAVY);
+      doc.text(title, margin + 6, y + 4.3);
+      doc.setDrawColor(216,226,236); doc.setLineWidth(.3);
+      doc.line(margin, y + 8, pageW - margin, y + 8);
+      y += 14;
+    }
+    const isTotal = (c) => c.row.section === 'body' && c.row.raw[0] === 'TOTAL';
+
+    // --- SYNTHÈSE DU MOIS ---
+    sectionTitle('SYNTHÈSE DU MOIS', PDF_ORANGE);
+    doc.autoTable({
+      startY: y, margin: { left: margin, right: margin },
+      head: [['Mois','Recettes (FCFA)','Dépenses (FCFA)','Net (FCFA)','Marge']],
+      body: [[`${d.monthLabel} ${d.year}`, fmtPdf(d.tot.rec), d.tot.d > 0 ? fmtPdf(d.tot.d) : '-', fmtPdf(d.tot.net), marge(d.tot.rec, d.tot.d)]],
+      theme: 'grid',
+      styles: { fontSize: 13, cellPadding: 2.4, minCellHeight: 7, halign: 'center' },
+      headStyles: { fillColor: PDF_NAVY, textColor: 255, fontStyle: 'bold' }
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // --- DÉTAIL JOURNALIER (tous les jours du mois) ---
+    sectionTitle('DÉTAIL JOURNALIER', PDF_GREEN);
+    const body = d.rows.map(r => {
+      const actif = (r.rec + r.d) > 0;
+      return [r.label,
+        r.ch > 0 ? fmtPdf(r.ch) : '-', r.pj > 0 ? fmtPdf(r.pj) : '-', r.pn > 0 ? fmtPdf(r.pn) : '-',
+        r.n2 > 0 ? r.n2 : '-', r.n3 > 0 ? r.n3 : '-',
+        r.rec > 0 ? fmtPdf(r.rec) : '-', r.d > 0 ? fmtPdf(r.d) : '-',
+        actif ? fmtPdf(r.net) : '-', actif ? marge(r.rec, r.d) : '-'];
+    });
+    body.push(['TOTAL', fmtPdf(d.tot.ch), fmtPdf(d.tot.pj), fmtPdf(d.tot.pn), d.tot.n2, d.tot.n3, fmtPdf(d.tot.rec), fmtPdf(d.tot.d), fmtPdf(d.tot.net), marge(d.tot.rec, d.tot.d)]);
+    doc.autoTable({
+      startY: y, margin: { left: margin, right: margin, bottom: 18 },
+      head: [[`Jours ${d.monthLabel} ${d.year}`,'Nuitées (chambres)','Passes Jour','Passes Nuit','Nb passes 2 000','Nb passes 3 000','Recettes (FCFA)','Dépenses (FCFA)','Net (FCFA)','Marge']],
+      body, theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2.4, minCellHeight: 7, halign: 'center' },
+      headStyles: { fillColor: PDF_NAVY, textColor: 255, fontStyle: 'bold' },
+      didParseCell: (c) => {
+        if (isTotal(c)) { c.cell.styles.fontStyle = 'bold'; c.cell.styles.fillColor = [224,232,240]; return; }
+        if (c.row.section === 'body') {
+          const r = d.rows[c.row.index];
+          if (r && r.dow === 0) c.cell.styles.fillColor = [244,246,249];      // dimanche : léger fond gris
+          if (c.column.index === 8 && r && r.net < 0) c.cell.styles.textColor = [192,57,43]; // net négatif en rouge
+        }
+      }
+    });
+    y = doc.lastAutoTable.finalY + 6;
+
+    // Note d'écart éventuel avec l'onglet Annuel
+    if (d.ecartRec !== 0 || d.ecartD !== 0) {
+      if (y > pageH - 30) { doc.addPage(); y = 20; }
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(8); doc.setTextColor(...PDF_GREY);
+      doc.text(`Note : écart avec l'onglet Annuel pour ce mois — recettes ${fmtPdf(d.ecartRec)} F, dépenses ${fmtPdf(d.ecartD)} F.`, margin, y);
+    }
+
+    pdfAddFooter(doc);
+    doc.save(`AubergeTamar_rapport_mensuel_${d.monthLabel}${d.year}.pdf`);
+    closeModal('modalPrint');
+    showToast('📄 Rapport mensuel complet généré (PDF)');
+  });
+}
+
 // Rapport financier — PDF autonome (portrait, sections annuel / mensuel / transactions / complet)
 function genererRapportFinancierPDF(choice){
   loadJsPDF(() => {
@@ -10734,20 +11245,21 @@ function genererRapportFinancierPDF(choice){
       const selC = document.getElementById('yearSelect');
       const yearC = selC ? parseInt(selC.value) : new Date().getFullYear();
       const {data:monthsC} = getMonthData(yearC);
-      let tCh=0, tPJ=0, tPN=0, tdC=0;
+      let tCh=0, tPJ=0, tPN=0, tdC=0, tN2=0, tN3=0;
       const rowsC = monthsC.map((m,i) => {
-        const ch = m.r || 0, pj = computePassesPointsTotalMonthJour(yearC, i), pn = computePassesPointsTotalMonthNuit(yearC, i);
+        const ch = computePassesJourMonthChambresNet(yearC, i, m.r), pj = computePassesPointsTotalMonthJour(yearC, i), pn = computePassesPointsTotalMonthNuit(yearC, i);
+        const cnt = computePassesCountsMonth(yearC, i);
         const rec = ch + pj + pn, net = rec - m.d;
-        tCh+=ch; tPJ+=pj; tPN+=pn; tdC+=m.d;
-        return [m.m, fmtPdf(ch), pj>0?fmtPdf(pj):'-', pn>0?fmtPdf(pn):'-', fmtPdf(rec), m.d>0?fmtPdf(m.d):'-', fmtPdf(net), marge(rec,m.d)];
+        tCh+=ch; tPJ+=pj; tPN+=pn; tdC+=m.d; tN2+=cnt.n2000; tN3+=cnt.n3000;
+        return [m.m, fmtPdf(ch), pj>0?fmtPdf(pj):'-', pn>0?fmtPdf(pn):'-', cnt.n2000>0?cnt.n2000:'-', cnt.n3000>0?cnt.n3000:'-', fmtPdf(rec), m.d>0?fmtPdf(m.d):'-', fmtPdf(net), marge(rec,m.d)];
       });
       const tRecC = tCh + tPJ + tPN;
-      rowsC.push(['TOTAL', fmtPdf(tCh), fmtPdf(tPJ), fmtPdf(tPN), fmtPdf(tRecC), fmtPdf(tdC), fmtPdf(tRecC-tdC), marge(tRecC,tdC)]);
+      rowsC.push(['TOTAL', fmtPdf(tCh), fmtPdf(tPJ), fmtPdf(tPN), tN2, tN3, fmtPdf(tRecC), fmtPdf(tdC), fmtPdf(tRecC-tdC), marge(tRecC,tdC)]);
       doc.autoTable({
         startY: y, margin: { left: margin, right: margin, bottom: 18 },
-        head: [[`Mois ${yearC}`,'Nuitées (chambres)','Passes Jour','Passes Nuit','Recettes (FCFA)','Dépenses (FCFA)','Net (FCFA)','Marge']],
+        head: [[`Mois ${yearC}`,'Nuitées (chambres)','Passes Jour','Passes Nuit','Nb passes 2 000','Nb passes 3 000','Recettes (FCFA)','Dépenses (FCFA)','Net (FCFA)','Marge']],
         body: rowsC, theme: 'grid',
-        styles: { fontSize: 9.5, cellPadding: 2.4, minCellHeight: 7, halign: 'center' },
+        styles: { fontSize: 8, cellPadding: 2.4, minCellHeight: 7, halign: 'center' },
         headStyles: { fillColor: PDF_NAVY, textColor: 255, fontStyle: 'bold' },
         didParseCell: (c) => { if (c.row.section === 'body' && c.row.raw[0] === 'TOTAL') { c.cell.styles.fontStyle = 'bold'; c.cell.styles.fillColor = [224,232,240]; } }
       });
@@ -10787,6 +11299,7 @@ function exportPDF() {
   const choice = document.getElementById('printContent').value;
   if (choice === 'fiche') { genererFicheJournalierePDF(false); return; }
   if (choice === 'fiche_mensuel') { genererFicheMensuellePDF(); return; }
+  if (choice === 'mensuel_complet') { genererRapportMensuelCompletPDF(); return; }
   if (choice === 'fiche_annuel') { genererFicheAnnuellePDF(); return; }
   if (choice === 'mouvements') { genererRecapMouvementsPDF(); return; }
   if (choice === 'recettes') { genererBilanRecettesPDF(); return; }
@@ -10813,6 +11326,12 @@ function exportWord(){
       const moisSel = document.getElementById('recettesMoisSel');
       const moisIdx = moisSel && moisSel.value !== '' ? parseInt(moisSel.value) : new Date().getMonth();
       filename = `Synthese_Mensuelle_${MOIS_FULL[moisIdx]}${year}_AubergeTamar`;
+    } else if (choice === 'mensuel_complet') {
+      const sel = document.getElementById('yearSelect');
+      const year = sel ? parseInt(sel.value) : new Date().getFullYear();
+      const moisSel = document.getElementById('recettesMoisSel');
+      const moisIdx = moisSel && moisSel.value !== '' ? parseInt(moisSel.value) : new Date().getMonth();
+      filename = `Rapport_Mensuel_${MOIS_FULL[moisIdx]}${year}_AubergeTamar`;
     } else if (choice === 'fiche_annuel') {
       const sel = document.getElementById('yearSelect');
       const year = sel ? parseInt(sel.value) : new Date().getFullYear();
@@ -10986,6 +11505,36 @@ function exportExcel() {
       sheet.views = [{ state: 'frozen', ySplit: headRow }];
       xlSetPageSetup(sheet, 'portrait', true);
       xlDownload(wb, `Fiche_Rapport_Journalier_${dateISO}_AubergeTamar.xlsx`);
+      closeModal('modalPrint');
+      showToast('📊 Fichier Excel téléchargé');
+      return;
+    }
+
+    // ----- Rapport Mensuel Complet (portrait, 8 colonnes, tous les jours du mois) -----
+    if (choice === 'mensuel_complet') {
+      const sel = document.getElementById('yearSelect');
+      const year = sel ? parseInt(sel.value) : new Date().getFullYear();
+      const moisSel = document.getElementById('recettesMoisSel');
+      const moisIdx = moisSel && moisSel.value !== '' ? parseInt(moisSel.value) : new Date().getMonth();
+      const d = computeRapportMensuelComplet(year, moisIdx);
+      const sheet = wb.addWorksheet('Rapport Mensuel');
+      sheet.columns = [14,18,14,14,14,14,16,16,16,10].map(w => ({ width: w, style: { font: { size: 12 } } }));
+      sheet.properties.defaultRowHeight = 20;
+      let r = xlAddLetterhead(sheet, 'RAPPORT FINANCIER MENSUEL', [`${d.monthLabel} ${d.year}`], 10);
+      sheet.getRow(r).values = ['Date','Nuitées (chambres)','Passes Jour','Passes Nuit','Nb passes 2 000','Nb passes 3 000','Recettes (FCFA)','Dépenses (FCFA)','Net (FCFA)','Marge'];
+      xlStyleHeaderRow(sheet, r);
+      const headRow = r; r++;
+      d.rows.forEach(row => {
+        sheet.getRow(r).values = [row.label, row.ch, row.pj, row.pn, row.n2, row.n3, row.rec, row.d, row.net, marge(row.rec, row.d)];
+        r++;
+      });
+      sheet.getRow(r).values = ['TOTAL', d.tot.ch, d.tot.pj, d.tot.pn, d.tot.n2, d.tot.n3, d.tot.rec, d.tot.d, d.tot.net, marge(d.tot.rec, d.tot.d)];
+      xlHighlightTotalRow(sheet, r, 10);
+      xlBorderRange(sheet, headRow, r, 1, 10);
+      xlZebraStripe(sheet, headRow + 1, r - 1, 1, 10);
+      sheet.views = [{ state: 'frozen', ySplit: headRow }];
+      xlSetPageSetup(sheet, 'portrait');
+      xlDownload(wb, `Rapport_Mensuel_${d.monthLabel}${d.year}_AubergeTamar.xlsx`);
       closeModal('modalPrint');
       showToast('📊 Fichier Excel téléchargé');
       return;
@@ -11231,23 +11780,24 @@ function exportExcel() {
       const sheet = wb.addWorksheet(`Détail Mensuel ${year}`);
       sheet.columns = [{width:12, style:{font:{size:13}}},{width:18, style:{font:{size:13}}},{width:14, style:{font:{size:13}}},{width:14, style:{font:{size:13}}},{width:16, style:{font:{size:13}}},{width:16, style:{font:{size:13}}},{width:16, style:{font:{size:13}}},{width:10, style:{font:{size:13}}}];
       sheet.properties.defaultRowHeight = 20;
-      let r = xlAddLetterhead(sheet, `DÉTAIL MENSUEL — ${year}`, [`Édité le ${now}`], 8);
-      sheet.getRow(r).values = ['Mois','Nuitées (chambres)','Passes Jour','Passes Nuit','Recettes (FCFA)','Dépenses (FCFA)','Net (FCFA)','Marge %'];
+      let r = xlAddLetterhead(sheet, `DÉTAIL MENSUEL — ${year}`, [`Édité le ${now}`], 10);
+      sheet.getRow(r).values = ['Mois','Nuitées (chambres)','Passes Jour','Passes Nuit','Nb passes 2 000','Nb passes 3 000','Recettes (FCFA)','Dépenses (FCFA)','Net (FCFA)','Marge %'];
       xlStyleHeaderRow(sheet, r);
       const headRow = r; r++;
-      let tCh=0, tPJ=0, tPN=0, td=0;
+      let tCh=0, tPJ=0, tPN=0, td=0, tN2=0, tN3=0;
       months.forEach((m,i) => {
-        const ch = m.r || 0, pj = computePassesPointsTotalMonthJour(year, i), pn = computePassesPointsTotalMonthNuit(year, i);
+        const ch = computePassesJourMonthChambresNet(year, i, m.r), pj = computePassesPointsTotalMonthJour(year, i), pn = computePassesPointsTotalMonthNuit(year, i);
+        const cnt = computePassesCountsMonth(year, i);
         const rec = ch + pj + pn;
-        tCh+=ch; tPJ+=pj; tPN+=pn; td+=m.d;
-        sheet.getRow(r).values = [m.m, ch, pj, pn, rec, m.d, rec-m.d, parseFloat(margeNum(rec,m.d).toFixed(1))];
+        tCh+=ch; tPJ+=pj; tPN+=pn; td+=m.d; tN2+=cnt.n2000; tN3+=cnt.n3000;
+        sheet.getRow(r).values = [m.m, ch, pj, pn, cnt.n2000, cnt.n3000, rec, m.d, rec-m.d, parseFloat(margeNum(rec,m.d).toFixed(1))];
         r++;
       });
       const tRec = tCh + tPJ + tPN;
-      sheet.getRow(r).values = ['TOTAL', tCh, tPJ, tPN, tRec, td, tRec-td, parseFloat(margeNum(tRec,td).toFixed(1))];
-      xlHighlightTotalRow(sheet, r, 8);
-      xlBorderRange(sheet, headRow, r, 1, 8);
-      xlZebraStripe(sheet, headRow+1, r-1, 1, 8);
+      sheet.getRow(r).values = ['TOTAL', tCh, tPJ, tPN, tN2, tN3, tRec, td, tRec-td, parseFloat(margeNum(tRec,td).toFixed(1))];
+      xlHighlightTotalRow(sheet, r, 10);
+      xlBorderRange(sheet, headRow, r, 1, 10);
+      xlZebraStripe(sheet, headRow+1, r-1, 1, 10);
       sheet.views = [{ state: 'frozen', ySplit: headRow }];
       xlSetPageSetup(sheet, 'portrait');
     }
@@ -12469,6 +13019,52 @@ setTimeout(() => {
   }
 }, 8000);
 
+</script>
+
+<script>
+// ===== POINT DES CHAMBRES — saisie des recettes chambres (date commune, clim 8 000 F / vent 6 000 F) =====
+var CHM_PRIX = { clim: 8000, vent: 6000 };
+function onChmChange(type){
+  var nb = Math.max(0, parseInt(document.getElementById(type === 'clim' ? 'chmNbClim' : 'chmNbVent').value, 10) || 0);
+  var mt = document.getElementById(type === 'clim' ? 'chmMtClim' : 'chmMtVent');
+  mt.value = nb ? (nb * CHM_PRIX[type]).toLocaleString('fr-FR') : '';
+  onChmTotal();
+}
+function onChmTotal(){
+  var tot = parseMontant('chmMtClim') + parseMontant('chmMtVent');
+  document.getElementById('chmTotal').value = tot ? tot.toLocaleString('fr-FR') : '';
+}
+function saveChambresRecettes(){
+  var mClim = parseMontant('chmMtClim'), mVent = parseMontant('chmMtVent');
+  var montant = mClim + mVent;
+  if (!montant || montant <= 0) { showToast('⚠️ Montant invalide'); return; }
+  var dateVal = document.getElementById('chmDate').value || new Date().toISOString().slice(0,10);
+  var d = new Date(dateVal + 'T00:00:00');
+  var moisIdx = d.getMonth(), mois = MOIS_FULL[moisIdx], annee = d.getFullYear();
+  var dateStr = d.toLocaleDateString('fr-FR');
+  var nbC = parseInt(document.getElementById('chmNbClim').value, 10) || 0;
+  var nbV = parseInt(document.getElementById('chmNbVent').value, 10) || 0;
+  var parts = [];
+  if (mClim) parts.push('Climatisées' + (nbC ? ' ×' + nbC : '') + ' : ' + fmtFull(mClim) + ' F');
+  if (mVent) parts.push('Ventilées' + (nbV ? ' ×' + nbV : '') + ' : ' + fmtFull(mVent) + ' F');
+  var note = 'Chambres — ' + parts.join(' · ');
+  if (isDuplicateRecette(mois, annee, montant, dateStr)) {
+    showToast('⚠️ Recette identique déjà saisie — supprimez-la dans l\'historique des recettes pour la ressaisir');
+    return;
+  }
+  var localId = 'loc_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+  var entry = { type:'recettes', mois:mois, moisIdx:moisIdx, annee:annee, montant:montant, date:dateStr, note:note, _localId:localId, ts:Date.now() };
+  if (fbReady) {
+    fbSaveSaisie(entry);
+    showToast('⏳ Enregistrement en cours...');
+  } else {
+    saisieLog.unshift(entry);
+    persistSaisieLog();
+    refreshAll('✅ Chambres ' + mois + ' ' + annee + ' : +' + fmtFull(montant) + ' F');
+  }
+  ['chmNbClim','chmMtClim','chmNbVent','chmMtVent','chmTotal'].forEach(function(id){ document.getElementById(id).value = ''; });
+}
+document.getElementById('chmDate').value = new Date().toISOString().slice(0,10);
 </script>
 </body>
 </html>
