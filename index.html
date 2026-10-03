@@ -428,16 +428,8 @@ window.dispatchEvent(new Event('firebaseReady'));
   .ri-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
   .ri-delete{width:26px;height:26px;border-radius:50%;border:none;background:rgba(220,53,69,.12);color:#dc3545;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
   .ri-delete:active{background:rgba(220,53,69,.28)}
-  .ri-delete.ri-trash{width:34px;height:34px;border-radius:11px;border:1px solid rgba(255,255,255,.35);background:linear-gradient(145deg,#ff5f6d 0%,#e02437 55%,#b3122a 100%);color:#fff;padding:0;box-shadow:0 3px 8px rgba(200,20,45,.45),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .12s,box-shadow .12s}
-  .ri-delete.ri-trash svg{width:58%;height:58%;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
-  .ri-delete.ri-trash:active{transform:scale(.9);background:linear-gradient(145deg,#e02437,#8f0d20);box-shadow:0 1px 3px rgba(200,20,45,.5),inset 0 2px 4px rgba(0,0,0,.25)}
   .ri-edit{width:26px;height:26px;border-radius:50%;border:none;background:rgba(26,58,92,.1);color:var(--navy);font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
   .ri-edit:active{background:rgba(26,58,92,.25)}
-  .ri-edit.ri-pen{width:34px;height:34px;border-radius:11px;border:1px solid rgba(255,255,255,.35);background:linear-gradient(145deg,#4a86c8 0%,#2a5f9e 55%,#1a3a5c 100%);color:#fff;padding:0;box-shadow:0 3px 8px rgba(26,58,92,.4),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .12s,box-shadow .12s}
-  .ri-edit.ri-pen svg{width:56%;height:56%;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
-  .ri-edit.ri-pen:active{transform:scale(.9);background:linear-gradient(145deg,#2a5f9e,#12294a)}
-  @keyframes ppFlash{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,0)}30%{box-shadow:0 0 0 4px rgba(245,166,35,.55)}}
-  .pp-flash{animation:ppFlash 1.4s ease 1}
   .ri-call{width:26px;height:26px;border-radius:50%;border:none;background:rgba(40,167,69,.14);color:#28a745;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;text-decoration:none}
   .ri-call:active{background:rgba(40,167,69,.3)}
   .pay-btn{font-size:9.5px;font-weight:800;padding:5px 9px;border-radius:20px;border:none;cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px;font-family:'Nunito',sans-serif}
@@ -1653,15 +1645,7 @@ window.dispatchEvent(new Event('firebaseReady'));
   <div class="table-card" style="padding:14px">
     <div id="pFormTitle" style="font-size:13px;font-weight:800;color:var(--text-muted);margin-bottom:10px">➕ Nouveau membre du personnel</div>
     <div class="form-group"><label class="form-label">Fonction</label>
-      <select class="form-select" id="pFonction" onchange="updateNomDatalist()"></select>
-    </div>
-    <div class="form-row" style="display:none">
-      <div class="form-group"><label class="form-label">Nom</label>
-        <input class="form-input" type="text" id="pNom" list="pNomList" placeholder="Nom de la personne" autocomplete="off" oninput="selectExistingByName()">
-        <datalist id="pNomList"></datalist>
-      </div>
-      <div class="form-group"><label class="form-label">Contact</label>
-        <input class="form-input" type="tel" id="pContact" placeholder="Ex: 07 00 00 00 00"></div>
+      <select class="form-select" id="pFonction"></select>
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Date de recrutement</label>
@@ -1729,24 +1713,8 @@ window.dispatchEvent(new Event('firebaseReady'));
     </div>
     <button type="button" class="action-btn" style="background:var(--border);color:var(--text);box-shadow:none;padding:11px;font-size:13px" onclick="openCategoriesModal()">⚙️ Gérer les catégories / sous-catégories</button>
     <div id="dSalaireTools" style="display:none">
-      <button type="button" class="action-btn" style="background:linear-gradient(135deg,var(--orange),var(--orange-light));box-shadow:0 4px 16px rgba(232,98,26,.3);margin-bottom:10px" onclick="openChoixPersonnelModal()">👥 Choisir dans la liste du personnel</button>
-      <div class="form-group"><label class="form-label">Personnel enregistré</label>
-        <select class="form-select" id="dSalExistant" onchange="applyPersonnelSelection()">
-          <option value="">— Nouvelle saisie —</option>
-        </select>
-      </div>
       <div class="form-group"><label class="form-label">Fonction</label>
-        <select class="form-select" id="dSalFonction" onchange="filterPersonnelByFonction()"></select>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Nom</label>
-          <input class="form-input" type="text" id="dSalNom" placeholder="Nom de la personne"></div>
-        <div class="form-group"><label class="form-label">Contact</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input class="form-input" type="tel" id="dSalContact" placeholder="Ex: 07 00 00 00 00" style="flex:1" oninput="updateDSalCallBtn()">
-            <a class="ri-call" id="dSalCallBtn" href="#" title="Appeler" style="display:none">📞</a>
-          </div>
-        </div>
+        <select class="form-select" id="dSalFonction"></select>
       </div>
       <button type="button" class="action-btn" style="background:linear-gradient(135deg,var(--navy),#2c4f77);box-shadow:0 4px 16px rgba(26,58,92,.3);margin-top:2px" onclick="closeModal('modalDepense');switchSection('personnel')">👥 Gérer le personnel</button>
     </div>
@@ -1755,16 +1723,6 @@ window.dispatchEvent(new Event('firebaseReady'));
   </div>
 </div>
 
-<!-- ===== MODAL CHOIX PERSONNEL POUR SALAIRE ===== -->
-<div class="modal-overlay" id="modalChoixPersonnel" onclick="closeModalOutside(event,'modalChoixPersonnel')">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">👥 Choisir un membre du personnel</div>
-    <div id="choixPersonnelListContainer" style="max-height:48vh;overflow-y:auto;margin-bottom:10px"></div>
-    <button type="button" class="action-btn" style="background:var(--border);color:var(--text);box-shadow:none" onclick="choisirSaisieLibre()">✍️ Saisie libre (personne non enregistrée)</button>
-    <button type="button" class="action-btn" style="background:var(--border);color:var(--text);box-shadow:none" onclick="closeModal('modalChoixPersonnel')">Fermer</button>
-  </div>
-</div>
 
 <!-- ===== MODAL GESTION DES CATÉGORIES / SOUS-CATÉGORIES DE DÉPENSES ===== -->
 <div class="modal-overlay" id="modalCategories" onclick="closeModalOutside(event,'modalCategories')">
@@ -1928,8 +1886,6 @@ window.dispatchEvent(new Event('firebaseReady'));
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">✏️ Modifier la ligne d'historique</div>
-    <div class="form-group"><label class="form-label">Client</label><input class="form-input" type="text" id="ehClient"></div>
-    <div class="form-group"><label class="form-label">Contact</label><input class="form-input" type="text" id="ehContact"></div>
     <div class="form-group"><label class="form-label">Arrivée</label><input class="form-input" type="date" id="ehArrivee" onchange="ehCalcNuitees()"><input class="form-input" type="time" id="ehHeureArr" style="margin-top:6px"></div>
     <div class="form-group"><label class="form-label">Départ</label><input class="form-input" type="date" id="ehDepart" onchange="ehCalcNuitees()"><input class="form-input" type="time" id="ehHeureDep" style="margin-top:6px"></div>
     <div class="form-group"><label class="form-label">Nuitées</label><input class="form-input" type="number" min="1" id="ehNuitees"></div>
@@ -1979,7 +1935,7 @@ window.dispatchEvent(new Event('firebaseReady'));
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">📷 Scanner un document</div>
-    <div class="form-group"><label class="form-label">Nom du document</label><input class="form-input" type="text" id="docNom" placeholder="Ex: CNI Client Koffi, Facture SODECI juin..."></div>
+    <div class="form-group"><label class="form-label">Nom du document</label><input class="form-input" type="text" id="docNom" placeholder="Ex: Facture SODECI juin, Contrat fournisseur..."></div>
     <div class="form-group"><label class="form-label">Catégorie</label>
       <select class="form-select" id="docCategorie">
         <option>Client</option>
@@ -2011,19 +1967,6 @@ window.dispatchEvent(new Event('firebaseReady'));
       </div>
       <div class="form-group"><label class="form-label">Type de chambres (Ventilées ou climatisées)</label>
         <select class="form-select" id="cType"><option>Ventilée</option><option>Climatisée</option></select>
-      </div>
-    </div>
-    <div class="form-row" style="display:none">
-      <div class="form-group" style="position:relative">
-        <label class="form-label">Nom Client</label>
-        <input class="form-input" type="text" id="cNom" placeholder="Nom complet" autocomplete="off" oninput="onCNomInput()" onfocus="onCNomInput()">
-        <div id="cNomSuggestions" style="display:none;position:absolute;left:0;right:0;top:100%;z-index:200;background:#0b1f38;border:2px solid #f5a623;border-radius:10px;margin-top:6px;max-height:240px;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,.55)"></div>
-      </div>
-      <div class="form-group"><label class="form-label">Contact</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input class="form-input" type="tel" id="cContact" placeholder="Ex: 07 00 00 00 00" oninput="updateCContactCallBtn()" style="flex:1">
-          <a class="ri-call" id="cContactCallBtn" href="#" title="Appeler" style="display:none">📞</a>
-        </div>
       </div>
     </div>
     <div class="form-row">
@@ -2075,7 +2018,7 @@ window.dispatchEvent(new Event('firebaseReady'));
     </div>
     <div id="cInfoHint" style="font-size:10.5px;color:var(--text-muted);margin:-6px 0 14px 2px">💡 Une date d'arrivée future crée automatiquement une réservation (affichée en jaune). L'heure de départ par défaut est 12h00 : passée cette heure le jour J, la chambre s'affiche "Chambre libérée" en jaune poussin.</div>
     <button class="action-btn" onclick="saveChambre()">✅ Enregistrer</button>
-    <button class="action-btn" id="btnViderChambre" style="background:var(--red)" onclick="viderChambre(document.getElementById('cNum').value)">🧹 Vider cette chambre (effacer client &amp; contact)</button>
+    <button class="action-btn" id="btnViderChambre" style="background:var(--red)" onclick="viderChambre(document.getElementById('cNum').value)">🧹 Vider cette chambre</button>
     <button class="action-btn" id="btnResetChambre" style="display:none;background:var(--orange)" onclick="resetChambreFromModal()">🔄 Réinitialiser (Client sorti)</button>
     <button class="action-btn" onclick="closeModal('modalChambre')" style="background:var(--border);color:var(--text);box-shadow:none">Annuler</button>
   </div>
@@ -2117,10 +2060,6 @@ window.dispatchEvent(new Event('firebaseReady'));
       <div class="form-group"><label class="form-label">Type</label>
         <select class="form-select" id="rType"><option>Ventilée</option><option>Climatisée</option></select>
       </div>
-    </div>
-    <div class="form-row" style="display:none">
-      <div class="form-group"><label class="form-label">Nom Client</label><input class="form-input" type="text" id="rNom" placeholder="Nom complet"></div>
-      <div class="form-group"><label class="form-label">Contact</label><input class="form-input" type="tel" id="rContact" placeholder="Ex: 07 00 00 00 00"></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Arrivée</label><input class="form-input" type="date" id="rArrivee" onchange="onReservationArriveeChange()"></div>
@@ -3283,7 +3222,7 @@ function renderDashboardRecents() {
     const detail = txDetail(e, true);
     const el = document.createElement('div');
     el.className = 'recent-item';
-    el.innerHTML = `<div class="ri-left"><div class="ri-icon ${isR?'in':'out'}">${isR?'💰':'💸'}</div><div><div class="ri-desc">${isR?'Recettes':'Dépenses'} ${e.mois} ${e.annee}${detail?` (${detail})`:''}</div><div class="ri-date">${e.date}</div></div></div><div class="ri-right"><div class="ri-amount ${isR?'green':'orange'}">${isR?'+':'-'}${fmtFull(e.montant)} F</div><button class="ri-delete ri-trash" onclick="deleteSaisie('${e._localId||''}','${e._docId||''}')" title="Supprimer cette saisie"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button></div>`;
+    el.innerHTML = `<div class="ri-left"><div class="ri-icon ${isR?'in':'out'}">${isR?'💰':'💸'}</div><div><div class="ri-desc">${isR?'Recettes':'Dépenses'} ${e.mois} ${e.annee}${detail?` (${detail})`:''}</div><div class="ri-date">${e.date}</div></div></div><div class="ri-right"><div class="ri-amount ${isR?'green':'orange'}">${isR?'+':'-'}${fmtFull(e.montant)} F</div><button class="ri-delete" onclick="deleteSaisie('${e._localId||''}','${e._docId||''}')" title="Supprimer cette saisie">✕</button></div>`;
     list.appendChild(el);
   });
 }
@@ -3540,7 +3479,7 @@ function renderMensuelDetail(year, monthIdx){
   const rBody = document.getElementById('mensuelDetailRevenusBody');
   const rFoot = document.getElementById('mensuelDetailRevenusFoot');
   if (revenus.length) {
-    rBody.innerHTML = revenus.map(e => `<tr><td>${e.date}</td><td>Recettes hôtel${e.note ? ' — '+e.note : ''}</td><td class="td-recettes">${fmtFull(e.montant)}</td><td style="padding:4px 2px;text-align:right;white-space:nowrap"><button class="ri-edit" style="width:20px;height:20px;font-size:10px" onclick="editRecetteEntry('${e._localId||''}','${e._docId||''}')" title="Modifier">✎</button><button class="ri-delete ri-trash" style="width:20px;height:20px;font-size:10px;margin-left:3px" onclick="deleteSaisie('${e._localId||''}','${e._docId||''}')" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button></td></tr>`).join('');
+    rBody.innerHTML = revenus.map(e => `<tr><td>${e.date}</td><td>Recettes hôtel${e.note ? ' — '+e.note : ''}</td><td class="td-recettes">${fmtFull(e.montant)}</td><td style="padding:4px 2px;text-align:right;white-space:nowrap"><button class="ri-edit" style="width:20px;height:20px;font-size:10px" onclick="editRecetteEntry('${e._localId||''}','${e._docId||''}')" title="Modifier">✎</button><button class="ri-delete" style="width:20px;height:20px;font-size:10px;margin-left:3px" onclick="deleteSaisie('${e._localId||''}','${e._docId||''}')" title="Supprimer">✕</button></td></tr>`).join('');
     const totalRev = revenus.reduce((s,e) => s + e.montant, 0);
     rFoot.innerHTML = `<tr><td colspan="2">TOTAL</td><td class="td-recettes">${fmtFull(totalRev)}</td><td></td></tr>`;
   } else {
@@ -3554,8 +3493,8 @@ function renderMensuelDetail(year, monthIdx){
     dBody.innerHTML = depenses.map(e => {
       let sousCat;
       if (e.categorie === 'Salaire du personnel') {
-        const label = [e.fonction, e.nomPersonnel].filter(Boolean).join(' · ');
-        const pers = findPersonnelByFonctionNom(e.fonction, e.nomPersonnel);
+        const label = e.fonction || 'Salaire du personnel';
+        const pers = findPersonnelByFonctionNom(e.fonction);
         if (pers && estApresFinContrat(pers, e.annee, e.moisIdx)) {
           sousCat = `<span style="color:var(--red);font-weight:700">${label} — Fin de contrat</span>`;
         } else {
@@ -3564,7 +3503,7 @@ function renderMensuelDetail(year, monthIdx){
       } else {
         sousCat = e.sousCategorie || '-';
       }
-      return `<tr><td>${e.date}</td><td>${e.categorie || '-'}</td><td>${sousCat}</td><td class="td-depenses">${fmtFull(e.montant)}</td><td style="padding:4px 2px;text-align:right;white-space:nowrap"><button class="ri-edit" style="width:20px;height:20px;font-size:10px" onclick="editDepenseEntry('${e._localId||''}','${e._docId||''}')" title="Modifier">✎</button><button class="ri-delete ri-trash" style="width:20px;height:20px;font-size:10px;margin-left:3px" onclick="deleteSaisie('${e._localId||''}','${e._docId||''}')" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button></td></tr>`;
+      return `<tr><td>${e.date}</td><td>${e.categorie || '-'}</td><td>${sousCat}</td><td class="td-depenses">${fmtFull(e.montant)}</td><td style="padding:4px 2px;text-align:right;white-space:nowrap"><button class="ri-edit" style="width:20px;height:20px;font-size:10px" onclick="editDepenseEntry('${e._localId||''}','${e._docId||''}')" title="Modifier">✎</button><button class="ri-delete" style="width:20px;height:20px;font-size:10px;margin-left:3px" onclick="deleteSaisie('${e._localId||''}','${e._docId||''}')" title="Supprimer">✕</button></td></tr>`;
     }).join('');
     const totalDep = depenses.reduce((s,e) => s + e.montant, 0);
     dFoot.innerHTML = `<tr><td colspan="3">TOTAL</td><td class="td-depenses">${fmtFull(totalDep)}</td><td></td></tr>`;
@@ -3731,6 +3670,7 @@ const ROOMS=[
 
 // ===== HISTORIQUE D'OCCUPATION =====
 const ROOM_HISTORY_STORAGE_KEY = 'aubergeTamar_roomHistory';
+const CLIENT_MARQUEUR = 'Séjour'; // valeur interne neutre : indique qu'une chambre est occupée/réservée (aucun nom de client n'est saisi ni affiché)
 let roomHistory = [];
 function persistRoomHistory(){
   try { localStorage.setItem(ROOM_HISTORY_STORAGE_KEY, JSON.stringify(roomHistory)); } catch(e) {}
@@ -3738,7 +3678,7 @@ function persistRoomHistory(){
 function loadRoomHistory(){
   try {
     const raw = localStorage.getItem(ROOM_HISTORY_STORAGE_KEY);
-    if (raw) { const saved = JSON.parse(raw); if (Array.isArray(saved)) roomHistory = saved; }
+    if (raw) { const saved = JSON.parse(raw); if (Array.isArray(saved)) { roomHistory = saved; roomHistory.forEach(h => { if (h.client) h.client = CLIENT_MARQUEUR; h.contact = ''; }); } }
   } catch(e) {}
 }
 loadRoomHistory();
@@ -3999,7 +3939,7 @@ function renderRooms(){
           <div class="ri-left">
             <div class="ri-icon out">🔸</div>
             <div>
-              <div class="ri-desc">Chambre non précisée (${h.typeSouhaite||'Type non précisé'}) — ${h.client||'—'}</div>
+              <div class="ri-desc">Chambre non précisée (${h.typeSouhaite||'Type non précisé'})</div>
               <div class="ri-date">🛎️ Arrivée : ${formatDateHeureFr(h.arrivee, h.heureArrivee)}</div>
               <div class="ri-date">🚪 Départ : ${formatDateHeureFr(h.dateSortie, h.heureDepart)} · ${h.nuitees} nuitée${h.nuitees>1?'s':''}</div>
             </div>
@@ -4299,7 +4239,7 @@ function renderMontantAttendu(){
         <div class="ri-left">
           <div class="ri-icon out">🛏️</div>
           <div>
-            <div class="ri-desc">Chambre ${d.num} — ${d.client}${typeTag}</div>
+            <div class="ri-desc">Chambre ${d.num}${typeTag}</div>
             <div class="ri-date">🛎️ Arrivée : ${formatDateFr(d.arrivee)} · ${d.nuitees} nuitée${d.nuitees>1?'s':''}</div>
             ${payLine}
           </div>
@@ -4328,7 +4268,7 @@ function openPaiementModal(localId, docId, mode){
   const montantInput = document.getElementById('pMontant');
   const recap = document.getElementById('paiementRecapLine');
   const today = new Date().toISOString().slice(0,10);
-  recap.textContent = `Chambre ${h.chambre} — ${h.client || ''} · Montant attendu : ${fmtFull(h.montantAttendu || h.montant)} F`;
+  recap.textContent = `Chambre ${h.chambre} · Montant attendu : ${fmtFull(h.montantAttendu || h.montant)} F`;
   if (mode === 'avance') {
     titleEl.textContent = '💰 Enregistrer une avance';
     montantGroup.style.display = '';
@@ -4423,8 +4363,6 @@ function renderRoomHistory(){
       const cls = h.type.toLowerCase().startsWith('clim') ? 'climatisee' : 'ventilee';
       typeTag = ` <span class="room-type-tag ${cls}">${h.type.toLowerCase().startsWith('clim') ? '❄️' : '🌬️'} ${h.type}</span>`;
     }
-    const contactLine = h.contact ? `<div class="ri-date">📞 ${h.contact}</div>` : '';
-    const callBtn = h.contact ? `<a class="ri-call" href="tel:${h.contact.replace(/\s+/g,'')}" title="Appeler ${h.client||''}">📞</a>` : '';
     const chambreLabel = h.sansChambre ? `Chambre non précisée (${h.typeSouhaite||'type non précisé'})` : `Chambre ${h.chambre}`;
     const assignBtn = h.sansChambre ? `<button class="ri-edit" onclick="assignRoomToReservation('${h._localId||''}','${h._docId||''}')" title="Assigner une chambre">🎯</button>` : '';
     const ref = h._localId || h._docId;
@@ -4442,23 +4380,19 @@ function renderRoomHistory(){
       <div class="ri-left">
         <div class="ri-icon out">🛏️</div>
         <div>
-          <div class="ri-desc">${chambreLabel} — ${h.client||'—'}${badge}${typeTag}</div>
+          <div class="ri-desc">${chambreLabel}${badge}${typeTag}</div>
           <div class="ri-date">🛎️ Arrivée : ${formatDateHeureFr(h.arrivee, h.heureArrivee)}</div>
           <div class="ri-date">🚪 Départ : ${formatDateHeureFr(h.dateSortie, h.heureDepart)} · ${h.nuitees} nuitée${h.nuitees>1?'s':''}</div>
-          ${contactLine}
           ${payLine}
         </div>
       </div>
       <div class="ri-right" style="align-items:flex-end;gap:6px">
         <div class="ri-amount navy">${fmtFull(h.montant)} F</div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          ${payCtrl ? `<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;align-items:center">${payCtrl}</div>` : ''}
-          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
-          ${callBtn}
+        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
           ${assignBtn}
+          ${payCtrl}
           <button class="ri-edit" onclick="openEditHist('${h._localId||''}','${h._docId||''}')" title="Modifier cette ligne">✎</button>
-          <button class="ri-delete ri-trash" onclick="deleteHistorique('${h._localId||''}','${h._docId||''}')" title="Supprimer cette ligne"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button>
-          </div>
+          <button class="ri-delete" onclick="deleteHistorique('${h._localId||''}','${h._docId||''}')" title="Supprimer cette ligne">✕</button>
         </div>
       </div>`;
     list.appendChild(el);
@@ -4511,7 +4445,7 @@ function openEditHist(localId, docId){
   const h = findHist(localId, docId); if (!h){ showToast('⚠️ Ligne introuvable'); return; }
   _editHistRef = { localId, docId };
   const set=(id,v)=>{ document.getElementById(id).value = v==null?'':v; };
-  set('ehClient',h.client); set('ehContact',h.contact); set('ehArrivee',h.arrivee); set('ehHeureArr',h.heureArrivee);
+  set('ehArrivee',h.arrivee); set('ehHeureArr',h.heureArrivee);
   set('ehDepart',h.dateSortie); set('ehHeureDep',h.heureDepart); set('ehNuitees',h.nuitees); set('ehMontant',h.montant?fmtFull(h.montant):'');
   openModal('modalEditHist');
 }
@@ -4522,7 +4456,7 @@ function ehCalcNuitees(){
 function saveEditHist(){
   const h = _editHistRef && findHist(_editHistRef.localId, _editHistRef.docId); if (!h) return;
   const g=id=>document.getElementById(id).value;
-  h.client=g('ehClient').trim(); h.contact=g('ehContact').trim();
+  h.client=CLIENT_MARQUEUR; h.contact='';
   h.arrivee=g('ehArrivee'); h.heureArrivee=g('ehHeureArr'); h.dateSortie=g('ehDepart'); h.heureDepart=g('ehHeureDep');
   h.nuitees=parseInt(g('ehNuitees'))||h.nuitees; h.montant=parseMontant('ehMontant')||0; h.ts=Date.now();
   if (h._docId && fbReady) fbUpdateHistorique(h._docId, h); else persistRoomHistory();
@@ -4680,7 +4614,7 @@ function renderPasses(){
       <div class="ri-right">
         <div class="ri-amount navy">${fmtFull(p.montantPaye)} F</div>
         <button class="ri-edit" onclick="openPasseModal('${p._localId||''}','${p._docId||''}')" title="Modifier">✎</button>
-        <button class="ri-delete ri-trash" onclick="deletePasse('${p._localId||''}','${p._docId||''}')" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button>
+        <button class="ri-delete" onclick="deletePasse('${p._localId||''}','${p._docId||''}')" title="Supprimer">✕</button>
       </div>
     </div>`).join('') + (sorted.length > _pLim ? `<button class="action-btn" style="background:var(--border);color:var(--text);box-shadow:none" onclick="window._passesLimit=${_pLim+30};renderPasses()">Afficher plus (${sorted.length-_pLim} restants)</button>` : '');
   renderPassesParJour();
@@ -4836,7 +4770,7 @@ function renderChambreBilanForCurrentMensuelSelection(){
 // (Mensuel / Annuel) et compte dans les autres totaux — ce n'est plus une valeur purement informative.
 // Enregistre (ou met à jour) le Point du Jour pour une période donnée ('jour' ou 'nuit').
 // Un même jour calendaire peut ainsi porter un point Jour ET un point Nuit, distincts.
-function savePointPasse(periode, differerRendu){
+function savePointPasse(periode){
   periode = periode === 'nuit' ? 'nuit' : 'jour';
   const montantId = periode === 'nuit' ? 'ppNuitMontant' : 'ppMontant';
   const dateId = periode === 'nuit' ? 'ppNuitDateConcernee' : 'ppDateConcernee';
@@ -4872,9 +4806,6 @@ function savePointPasse(periode, differerRendu){
     persistPointsPasses();
     fbSavePointPasse(entry);
   }
-  // Enregistrement Jour + Nuit d'un seul coup : on diffère l'actualisation de l'écran jusqu'à la 2e période,
-  // sinon le rendu vide les champs Nuit (pas encore enregistrés) avant leur lecture.
-  if (differerRendu) return;
   showToast(periode === 'nuit' ? '✅ Point de nuit enregistré' : '✅ Point du jour enregistré');
   renderPointsPasses();
   refreshAll();
@@ -4891,7 +4822,7 @@ function saveBothPasses(){
   if (!j && !n) { showToast('⚠️ Saisissez les passes de Jour et/ou de Nuit'); return; }
   const nd = document.getElementById('ppNuitDateConcernee'), jd = document.getElementById('ppDateConcernee');
   if (nd && jd) nd.value = jd.value;
-  if (j) savePointPasse('jour', n);
+  if (j) savePointPasse('jour');
   if (n) savePointPasse('nuit');
   if (j && n) showToast('✅ Passes Jour & Nuit enregistrés');
 }
@@ -4939,21 +4870,6 @@ function onPpNuitDateConcerneeChange(){
   renderPointsPasses();
 }
 
-// Modifier un Point des Passes : recharge le formulaire (date concernée + valeurs Jour/Nuit déjà saisies)
-// puis remonte à la saisie. L'enregistrement met à jour le point existant de cette date.
-function editPointPasse(localId, docId){
-  const p = pointsPasses.find(x => (localId && x._localId === localId) || (docId && x._docId === docId));
-  if (!p) { showToast('⚠️ Point introuvable'); return; }
-  const jd = document.getElementById('ppDateConcernee'), nd = document.getElementById('ppNuitDateConcernee');
-  if (!jd) return;
-  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-  jd.value = p.date; if (nd) nd.value = p.date;
-  renderPointsPasses();
-  const card = jd.closest('.table-card') || jd;
-  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  card.classList.remove('pp-flash'); void card.offsetWidth; card.classList.add('pp-flash');
-  showToast('✏️ Modifiez les valeurs puis « Enregistrer Jour & Nuit »');
-}
 function deletePointPasse(localId, docId){
   if (!confirm('Supprimer ce point ?')) return;
   if (docId && fbReady) {
@@ -5008,7 +4924,7 @@ function renderPointPasseBloc(periode){
   list.innerHTML = hdr + sorted.map(p => `
     <div class="recent-item" style="margin-bottom:8px">
       <div class="ri-left"><div class="ri-icon out">🎫</div><div><div class="ri-desc">${PASSE_PERIODE_COURT[periode]} — Point Passes${ppCountsTxt(p)}</div><div class="ri-date">📅 Concernée : ${formatDateFr(p.date)}${p.dateSaisie ? ` · 🖊️ Saisie le ${formatDateFr(p.dateSaisie)}` : ''}</div></div></div>
-      <div class="ri-right" style="flex-direction:column;align-items:flex-end;gap:6px"><div class="ri-amount navy">${fmtFull(p.montant)} F</div><div style="display:flex;gap:6px;align-items:center"><button class="ri-edit ri-pen" onclick="editPointPasse('${p._localId||''}','${p._docId||''}')" title="Modifier"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="ri-delete ri-trash" onclick="deletePointPasse('${p._localId||''}','${p._docId||''}')" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button></div></div>
+      <div class="ri-right"><div class="ri-amount navy">${fmtFull(p.montant)} F</div><button class="ri-delete" onclick="deletePointPasse('${p._localId||''}','${p._docId||''}')" title="Supprimer">✕</button></div>
     </div>`).join('');
 }
 function renderPointsPasses(){
@@ -5140,7 +5056,7 @@ function renderChambresParJour(){
       <div class="ri-left">
         <div class="ri-icon out">🛏️</div>
         <div>
-          <div class="ri-desc">Chambre ${h.chambre} — ${h.client||'—'}${typeTag}${fractionBadge}</div>
+          <div class="ri-desc">Chambre ${h.chambre}${typeTag}${fractionBadge}</div>
           <div class="ri-date">🛎️ ${formatDateFr(h.arrivee)} → ${formatDateFr(h.dateSortie||h.depart)}</div>
         </div>
       </div>
@@ -5316,44 +5232,6 @@ function renderPointDuJour(){
   }
 }
 
-// Autocomplétion client : propose les clients déjà connus (via l'historique des chambres)
-// dès qu'on tape un nom, que ce soit en cliquant sur une chambre ou via "Enregistrer une entrée".
-function onCNomInput(){
-  const val = (document.getElementById('cNom').value || '').trim().toLowerCase();
-  const box = document.getElementById('cNomSuggestions');
-  if (!box) return;
-  if (val.length < 2) { box.style.display = 'none'; box.innerHTML = ''; return; }
-  const seen = new Set();
-  const matches = [];
-  // Les entrées les plus récentes d'abord
-  [...roomHistory].sort((a,b) => (b.ts||0) - (a.ts||0)).forEach(h => {
-    if (!h.client) return;
-    const key = h.client.trim().toLowerCase();
-    if (!key.includes(val) || seen.has(key)) return;
-    seen.add(key);
-    matches.push(h);
-  });
-  if (!matches.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
-  box.innerHTML = matches.slice(0, 6).map(h => `
-    <div onclick="selectClientSuggestion('${(h.client||'').replace(/'/g,"\\'")}','${(h.contact||'').replace(/'/g,"\\'")}')"
-         style="padding:9px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.08)">
-      <div style="font-weight:700;font-size:13px">${h.client}</div>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:2px">📞 ${h.contact || '—'} · ✓ déjà saisi (Chambre ${h.chambre}, ${formatDateFr(h.arrivee)} → ${formatDateFr(h.dateSortie||h.depart)}, ${h.nuitees || nightsBetween(h.arrivee, h.dateSortie||h.depart) || 1} nuitée${(h.nuitees||1)>1?'s':''})</div>
-    </div>`).join('');
-  box.style.display = '';
-}
-function selectClientSuggestion(nom, contact){
-  document.getElementById('cNom').value = nom;
-  document.getElementById('cContact').value = contact;
-  updateCContactCallBtn();
-  const box = document.getElementById('cNomSuggestions');
-  if (box) { box.style.display = 'none'; box.innerHTML = ''; }
-}
-document.addEventListener('click', (e) => {
-  const box = document.getElementById('cNomSuggestions');
-  if (!box) return;
-  if (e.target.id !== 'cNom' && !box.contains(e.target)) { box.style.display = 'none'; }
-});
 
 function openChambreModal(num){
   document.getElementById('cNum').value = num;
@@ -5375,9 +5253,6 @@ function fillChambreForm(num){
   const libInfo = document.getElementById('cLibereeInfo');
   if (room && (room.status === 'occupee' || room.status === 'reservee' || room.status === 'liberee') && room.client) {
     document.getElementById('cType').value = room.type;
-    document.getElementById('cNom').value = room.client;
-    document.getElementById('cContact').value = room.contact || '';
-    updateCContactCallBtn();
     document.getElementById('cArrivee').value = room.arrivee || '';
     document.getElementById('cHeureArrivee').value = room.heureArrivee || '';
     document.getElementById('cDepart').value = room.depart || '';
@@ -5431,7 +5306,7 @@ function fillChambreForm(num){
     if (room.status === 'occupee' && room.resClient) {
       info.innerHTML = `<div style="font-size:11px;font-weight:700;color:#1a9c00">🟢 CHAMBRE ACTUELLEMENT OCCUPÉE</div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Utilisez "Réinitialiser" quand le client quitte réellement la chambre.</div>
-        <div style="font-size:11px;color:#b9790a;font-weight:700;margin-top:6px">🟡 Réservation en attente : ${room.resClient} à partir du ${room.resArrivee}
+        <div style="font-size:11px;color:#b9790a;font-weight:700;margin-top:6px">🟡 Réservation en attente à partir du ${room.resArrivee}
           <a href="#" style="color:var(--red);font-weight:800;margin-left:6px" onclick="event.preventDefault();cancelResSuivante('${num}')">Annuler</a>
         </div>`;
     } else if (info) {
@@ -5440,9 +5315,6 @@ function fillChambreForm(num){
     }
   } else {
     document.getElementById('cType').value = room ? room.type : 'Ventilée';
-    document.getElementById('cNom').value = '';
-    document.getElementById('cContact').value = '';
-    updateCContactCallBtn();
     document.getElementById('cArrivee').value = new Date().toISOString().slice(0,10);
     document.getElementById('cHeureArrivee').value = '';
     const dep = new Date(); dep.setDate(dep.getDate()+1);
@@ -5465,7 +5337,7 @@ function fillChambreForm(num){
 function cancelResSuivante(num){
   const room = ROOMS.find(r => r.num === num);
   if (!room || !room.resClient) return;
-  if (!confirm(`Annuler la réservation en attente de ${room.resClient} pour la chambre ${num} ?`)) return;
+  if (!confirm(`Annuler la réservation en attente pour la chambre ${num} ?`)) return;
   room.resClient=''; room.resContact=''; room.resArrivee=null; room.resHeureArrivee=null; room.resDepart=null; room.resHeureDepart=null; room.resPrix=null;
   fbSaveChambre(room);
   renderRooms();
@@ -5478,7 +5350,7 @@ function cancelResSuivante(num){
 function viderChambre(num){
   const room = ROOMS.find(r => r.num === num);
   if (!room) return;
-  if (!confirm(`Vider complètement la chambre ${num} ?\n\nLe client, le contact et toute réservation en attente seront effacés (sans archivage dans l'historique).`)) return;
+  if (!confirm(`Vider complètement la chambre ${num} ?\n\nLe séjour et toute réservation en attente seront effacés (sans archivage dans l'historique).`)) return;
   room.client=''; room.contact=''; room.arrivee=null; room.heureArrivee=null; room.depart=null; room.heureDepart=null; room.prix=null;
   room.resClient=''; room.resContact=''; room.resArrivee=null; room.resHeureArrivee=null; room.resDepart=null; room.resHeureDepart=null; room.resPrix=null;
   room.status='libre';
@@ -5498,7 +5370,7 @@ function resetChambre(num){
   if (!room || !room.client) { showToast('ℹ️ Chambre déjà libre'); return; }
   if (room.status === 'reservee') {
     // Réservation future jamais entamée : pas d'historique d'occupation à archiver, simple annulation
-    if (!confirm(`Annuler la réservation de ${room.client} pour la chambre ${num} ?`)) return;
+    if (!confirm(`Annuler la réservation de la chambre ${num} ?`)) return;
     room.client=''; room.contact=''; room.arrivee=null; room.heureArrivee=null; room.depart=null; room.heureDepart=null; room.prix=null;
     room.status = 'libre';
     fbSaveChambre(room);
@@ -5508,7 +5380,7 @@ function resetChambre(num){
     showToast(`✅ Réservation annulée — Chambre ${num}`);
     return;
   }
-  if (!confirm(`Libérer la chambre ${num} ? Le séjour de ${room.client} sera archivé dans l'historique.`)) return;
+  if (!confirm(`Libérer la chambre ${num} ? Le séjour sera archivé dans l'historique.`)) return;
   checkOutRoom(room, false);
   const promue = promoteReservationIfAny(room);
   room.status = computeRoomStatus(room);
@@ -5517,7 +5389,7 @@ function resetChambre(num){
   renderRooms();
   closeModal('modalChambre');
   pdjRefreshIfOpen();
-  showToast(promue ? `✅ Chambre ${num} libérée — réservation de ${room.client} activée` : `✅ Chambre ${num} libérée`);
+  showToast(promue ? `✅ Chambre ${num} libérée — réservation suivante activée` : `✅ Chambre ${num} libérée`);
 }
 
 // ===== SAISIE LOG (in-memory ledger) =====
@@ -5674,10 +5546,10 @@ const TEST_DATA_2026_SEED = [
     "montant": 50000,
     "date": "27/01/2026",
     "categorie": "Salaire du personnel",
-    "sousCategorie": "Yao Kouadio",
+    "sousCategorie": "Cuisinier",
     "fonction": "Cuisinier",
-    "nomPersonnel": "Yao Kouadio",
-    "contact": "0736455681",
+    "nomPersonnel": "",
+    "contact": "",
     "_localId": "loc_test_0_d2",
     "ts": 1776408300000
   },
@@ -6677,10 +6549,10 @@ const TEST_DATA_2026_SEED = [
     "montant": 55000,
     "date": "06/05/2026",
     "categorie": "Salaire du personnel",
-    "sousCategorie": "Adjoua Brou",
+    "sousCategorie": "Femme de ménage",
     "fonction": "Femme de ménage",
-    "nomPersonnel": "Adjoua Brou",
-    "contact": "0746861642",
+    "nomPersonnel": "",
+    "contact": "",
     "_localId": "loc_test_4_d0",
     "ts": 1786626200000
   },
@@ -7140,10 +7012,10 @@ const TEST_DATA_2026_SEED = [
     "montant": 50000,
     "date": "14/07/2026",
     "categorie": "Salaire du personnel",
-    "sousCategorie": "Aya Konan",
+    "sousCategorie": "Réceptionniste",
     "fonction": "Réceptionniste",
-    "nomPersonnel": "Aya Konan",
-    "contact": "0784645060",
+    "nomPersonnel": "",
+    "contact": "",
     "_localId": "loc_test_6_d0",
     "ts": 1791827000000
   },
@@ -7245,10 +7117,10 @@ const TEST_DATA_2026_SEED = [
     "montant": 40000,
     "date": "20/07/2026",
     "categorie": "Salaire du personnel",
-    "sousCategorie": "Kouassi N’Guessan",
+    "sousCategorie": "Gardien",
     "fonction": "Gardien",
-    "nomPersonnel": "Kouassi N’Guessan",
-    "contact": "0769256663",
+    "nomPersonnel": "",
+    "contact": "",
     "_localId": "loc_test_6_d7",
     "ts": 1792457600000
   },
@@ -7466,10 +7338,10 @@ const TEST_DATA_2026_SEED = [
     "montant": 45000,
     "date": "02/08/2026",
     "categorie": "Salaire du personnel",
-    "sousCategorie": "Aya Konan",
+    "sousCategorie": "Réceptionniste",
     "fonction": "Réceptionniste",
-    "nomPersonnel": "Aya Konan",
-    "contact": "0770382653",
+    "nomPersonnel": "",
+    "contact": "",
     "_localId": "loc_test_7_d1",
     "ts": 1794515800000
   },
@@ -7739,7 +7611,7 @@ function renderBanque(){
       </div>
       <div class="ri-right">
         <div class="ri-amount ${meta.amtClass}">${meta.sign>0?'+':'-'}${fmtFull(e.montant)} F</div>
-        <button class="ri-delete ri-trash" onclick="deleteBanque('${e._localId||''}','${e._docId||''}')" title="Supprimer cette opération"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button>
+        <button class="ri-delete" onclick="deleteBanque('${e._localId||''}','${e._docId||''}')" title="Supprimer cette opération">✕</button>
       </div>`;
     list.appendChild(el);
   });
@@ -7902,7 +7774,7 @@ function renderTxList(listEl, entries, emptyMsg) {
       <div class="ri-right">
         <div class="ri-amount ${isR?'green':'orange'}">${isR?'+':'-'}${fmtFull(e.montant)} F</div>
         <button class="ri-delete" style="background:none;color:var(--navy)" onclick="${isR?'editRecetteEntry':'editDepenseEntry'}('${e._localId||''}','${e._docId||''}')" title="Modifier le montant">✏️</button>
-        <button class="ri-delete ri-trash" onclick="deleteSaisie('${e._localId||''}','${e._docId||''}')" title="Supprimer cette saisie"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button>
+        <button class="ri-delete" onclick="deleteSaisie('${e._localId||''}','${e._docId||''}')" title="Supprimer cette saisie">✕</button>
       </div>`;
     listEl.appendChild(el);
   });
@@ -8143,10 +8015,6 @@ function editDepenseEntry(localId, docId){
   updateSousCategorie();
   if (e.categorie === 'Salaire du personnel') {
     document.getElementById('dSalFonction').value = e.fonction || '';
-    populateDSalExistant();
-    document.getElementById('dSalNom').value = e.nomPersonnel || '';
-    document.getElementById('dSalContact').value = e.contact || '';
-    updateDSalCallBtn();
   } else {
     const sel = document.getElementById('dSousCategorie');
     if (sel) sel.value = e.sousCategorie || '';
@@ -8258,10 +8126,9 @@ function updateSousCategorie(){
   const salaireTools = document.getElementById('dSalaireTools');
   if (salaireTools) salaireTools.style.display = (cat === 'Salaire du personnel') ? '' : 'none';
   if (cat === 'Salaire du personnel') {
-    // Pas de sous-catégorie : on saisit directement Fonction / Nom / Contact
+    // Pas de sous-catégorie : on choisit uniquement la Fonction
     group.style.display = 'none';
     sel.innerHTML = '';
-    populateDSalExistant();
   } else if (SOUS_CATEGORIES[cat] && SOUS_CATEGORIES[cat].length) {
     group.style.display = '';
     sel.innerHTML = SOUS_CATEGORIES[cat].map(s => `<option>${s}</option>`).join('');
@@ -8278,83 +8145,11 @@ updateSousCategorie();
 function onCategorieChange(){
   updateSousCategorie();
   const cat = document.getElementById('dCategorie').value;
-  if (cat === 'Salaire du personnel') openChoixPersonnelModal();
 }
 
-// Ouvre la fenêtre de choix du personnel (groupé par catégorie : Gérant, Caissière, Entretien, Buanderie, Sécurité...)
-function openChoixPersonnelModal(){
-  renderChoixPersonnelList();
-  openModal('modalChoixPersonnel');
-}
 
-function renderChoixPersonnelList(){
-  const container = document.getElementById('choixPersonnelListContainer');
-  if (!container) return;
-  if (!personnelList.length){
-    container.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:12px;font-weight:600;padding:14px 4px">Aucun personnel enregistré pour le moment. Utilise la saisie libre ci-dessous, ou ajoute du personnel dans l\'onglet Personnel.</div>';
-    return;
-  }
-  const groupes = {};
-  personnelList.forEach(p => {
-    const f = p.fonction || 'Autre';
-    if (!groupes[f]) groupes[f] = [];
-    groupes[f].push(p);
-  });
-  const ordreFinal = [...FONCTIONS_ORDRE.filter(f => groupes[f]), ...Object.keys(groupes).filter(f => !FONCTIONS_ORDRE.includes(f))];
-  container.innerHTML = ordreFinal.map(fonction => {
-    const couleur = FONCTIONS_COLORS[fonction] || '#6b7c8d';
-    const items = groupes[fonction].map(p => {
-      const termine = contratEstTermine(p);
-      return `
-      <div class="recent-item" style="margin-bottom:8px;cursor:pointer" onclick="choisirPersonnelDepense('${p.id}')">
-        <div class="ri-left">
-          <div class="ri-icon in">👤</div>
-          <div>
-            <div class="ri-desc" style="${termine ? 'color:var(--red);font-weight:800' : ''}">${p.nom}${termine ? ' <span style="font-size:9px;background:var(--red);color:#fff;padding:2px 6px;border-radius:8px;margin-left:6px;vertical-align:middle">FIN DE CONTRAT</span>' : ''}</div>
-            <div class="ri-date">${p.contact ? p.contact : 'Sans contact'}${termine && p.dateFinContrat ? ' · Fin : '+formatDateFRLong(p.dateFinContrat) : ''}</div>
-          </div>
-        </div>
-      </div>
-    `;
-    }).join('');
-    return `
-      <div style="margin-bottom:16px">
-        <div style="font-weight:800;color:${couleur};font-size:13px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid ${couleur}">${fonction}</div>
-        ${items}
-      </div>
-    `;
-  }).join('');
-}
 
-// Sélectionne un membre du personnel dans la liste : remplit Fonction / Nom / Contact du formulaire de dépense
-function choisirPersonnelDepense(id){
-  const p = personnelList.find(x => x.id === id);
-  if (!p) return;
-  if (contratEstTermine(p)) {
-    const ok = confirm(`⚠️ Le contrat de ${p.nom} a pris fin le ${formatDateFRLong(p.dateFinContrat)}.\n\nConfirmer quand même cette saisie (ex: solde de tout compte) ?`);
-    if (!ok) return;
-  }
-  document.getElementById('dSalFonction').value = p.fonction;
-  document.getElementById('dSalNom').value = p.nom;
-  document.getElementById('dSalContact').value = p.contact || '';
-  const existant = document.getElementById('dSalExistant');
-  if (existant) { populateDSalExistant(); existant.value = p.id; }
-  updateDSalCallBtn();
-  closeModal('modalChoixPersonnel');
-  showToast(`✅ ${p.nom} sélectionné(e)`);
-}
 
-// Permet de saisir manuellement une personne non enregistrée dans le personnel
-function choisirSaisieLibre(){
-  document.getElementById('dSalNom').value = '';
-  document.getElementById('dSalContact').value = '';
-  const existant = document.getElementById('dSalExistant');
-  if (existant) existant.value = '';
-  updateDSalCallBtn();
-  closeModal('modalChoixPersonnel');
-  const nomInput = document.getElementById('dSalNom');
-  if (nomInput) nomInput.focus();
-}
 
 // Ouvre la fenêtre de gestion des catégories/sous-catégories de dépenses
 function openCategoriesModal(){
@@ -8534,7 +8329,6 @@ function addFonction(){
   input.value = '';
   renderFonctionsList();
   refreshFonctionSelects();
-  populateDSalExistant();
   showToast('✅ Fonction ajoutée');
 }
 
@@ -8545,8 +8339,6 @@ function deleteFonction(fonction){
   persistFonctions();
   renderFonctionsList();
   refreshFonctionSelects();
-  populateDSalExistant();
-  updateNomDatalist();
   showToast('🗑️ Fonction supprimée');
 }
 
@@ -8565,6 +8357,12 @@ function loadPersonnelFromStorage(){
   } catch(e) { personnelList = []; }
 }
 loadPersonnelFromStorage();
+// Purge : on retire les noms et contacts du personnel déjà enregistré (seule la fonction est conservée)
+(function purgerNomsContactsPersonnel(){
+  let modifie = false;
+  personnelList.forEach(p => { if ('nom' in p || 'contact' in p) { delete p.nom; delete p.contact; modifie = true; } });
+  if (modifie) { try { localStorage.setItem(PERSONNEL_STORAGE_KEY, JSON.stringify(personnelList)); } catch(e) {} }
+})();
 
 // Migration : renomme l'ancienne fonction "Caissier" en "Caissière" (personnel + liste des fonctions)
 // et ajoute automatiquement les catégories manquantes (ex: "Sécurité") pour les installations existantes
@@ -8607,111 +8405,24 @@ function estApresFinContrat(p, annee, moisIdx){
   return (annee > fin.y) || (annee === fin.y && moisIdx > fin.m);
 }
 // Retrouve la fiche personnel correspondant à une Fonction + Nom saisis sur une dépense de salaire
-function findPersonnelByFonctionNom(fonction, nom){
-  if (!nom) return null;
-  return personnelList.find(x => x.fonction === fonction && x.nom === nom) || personnelList.find(x => x.nom === nom) || null;
+function findPersonnelByFonctionNom(fonction){
+  if (!fonction) return null;
+  return personnelList.find(x => x.fonction === fonction) || null;
 }
 
-// Remplit le menu déroulant "Personnel enregistré" du formulaire de dépense,
-// filtré sur la Fonction actuellement sélectionnée (Gérant, Caissier, Entretien, Buanderie...)
-function populateDSalExistant(){
-  const sel = document.getElementById('dSalExistant');
-  if (!sel) return;
-  const fonctionSel = document.getElementById('dSalFonction');
-  const fonction = fonctionSel ? fonctionSel.value : '';
-  const current = sel.value;
-  const filtres = personnelList.filter(p => !fonction || p.fonction === fonction);
-  sel.innerHTML = '<option value="">— Nouvelle saisie —</option>' +
-    filtres.map(p => `<option value="${p.id}">${p.nom}${p.contact ? ' — ' + p.contact : ''}</option>`).join('');
-  if (filtres.some(p => p.id === current)) sel.value = current;
-}
 refreshFonctionSelects();
-populateDSalExistant();
 
-// Appelé quand on change la Fonction : on ré-filtre la liste du personnel enregistré
-// pour n'afficher que les personnes ayant cette fonction (ex: tous les Gérants avec leur contact)
-function filterPersonnelByFonction(){
-  const sel = document.getElementById('dSalExistant');
-  if (sel) sel.value = '';
-  document.getElementById('dSalNom').value = '';
-  document.getElementById('dSalContact').value = '';
-  updateDSalCallBtn();
-  populateDSalExistant();
-}
 
-// Met à jour le bouton d'appel (📞) selon le contact saisi/sélectionné
-function updateDSalCallBtn(){
-  const btn = document.getElementById('dSalCallBtn');
-  const contact = document.getElementById('dSalContact').value.trim();
-  if (!btn) return;
-  if (contact) {
-    btn.href = 'tel:' + contact.replace(/\s+/g,'');
-    btn.style.display = '';
-  } else {
-    btn.style.display = 'none';
-  }
-}
 
-// Met à jour le bouton d'appel (📞) du formulaire chambre selon le contact saisi
-function updateCContactCallBtn(){
-  const btn = document.getElementById('cContactCallBtn');
-  const input = document.getElementById('cContact');
-  if (!btn || !input) return;
-  const contact = input.value.trim();
-  if (contact) {
-    btn.href = 'tel:' + contact.replace(/\s+/g,'');
-    btn.style.display = '';
-  } else {
-    btn.style.display = 'none';
-  }
-}
 
-// Pré-remplit Nom / Contact quand on choisit un personnel déjà enregistré dans la liste filtrée
-function applyPersonnelSelection(){
-  const sel = document.getElementById('dSalExistant');
-  const p = personnelList.find(x => x.id === sel.value);
-  if (!p) return;
-  document.getElementById('dSalFonction').value = p.fonction;
-  document.getElementById('dSalNom').value = p.nom;
-  document.getElementById('dSalContact').value = p.contact || '';
-  updateDSalCallBtn();
-}
 
-// Remplit la liste de suggestions (menu déroulant) du champ Nom avec les personnes
-// déjà enregistrées pour la Fonction actuellement sélectionnée (Gérant, Entretien...)
-function updateNomDatalist(){
-  const list = document.getElementById('pNomList');
-  if (!list) return;
-  const fonction = document.getElementById('pFonction').value;
-  const noms = personnelList.filter(p => p.fonction === fonction);
-  list.innerHTML = noms.map(p => `<option value="${p.nom}">${p.contact ? p.contact : ''}</option>`).join('');
-}
 
-// Quand on tape/choisit un nom déjà enregistré (même fonction), on précharge son contact
-// et on bascule en mode modification pour cette personne
-function selectExistingByName(){
-  const fonction = document.getElementById('pFonction').value;
-  const nom = document.getElementById('pNom').value.trim();
-  const match = personnelList.find(p => p.fonction === fonction && p.nom.toLowerCase() === nom.toLowerCase());
-  if (match) {
-    editingPersonnelId = match.id;
-    document.getElementById('pContact').value = match.contact || '';
-    document.getElementById('pFormTitle').textContent = '✎ Modifier le personnel';
-    document.getElementById('pCancelEdit').style.display = '';
-  } else if (editingPersonnelId) {
-    // Le nom ne correspond plus à une personne existante : on repasse en création
-    editingPersonnelId = null;
-    document.getElementById('pFormTitle').textContent = '➕ Nouveau membre du personnel';
-    document.getElementById('pCancelEdit').style.display = 'none';
-  }
-}
 
 function renderPersonnelTab(){
   cancelEditPersonnel();
   renderFonctionsList();
   refreshFonctionSelects();
   renderPersonnelList();
-  updateNomDatalist();
 }
 
 function renderPersonnelList(){
@@ -8742,16 +8453,14 @@ function renderPersonnelList(){
         <div class="ri-left">
           <div class="ri-icon in">👤</div>
           <div>
-            <div class="ri-desc" style="${termine ? 'color:var(--red);font-weight:800' : ''}">${p.nom}${termine ? ' <span style="font-size:9px;background:var(--red);color:#fff;padding:2px 6px;border-radius:8px;margin-left:6px;letter-spacing:.3px;vertical-align:middle">FIN DE CONTRAT</span>' : ''}</div>
-            <div class="ri-date">${p.contact ? p.contact : 'Sans contact'}</div>
+            <div class="ri-desc" style="${termine ? 'color:var(--red);font-weight:800' : ''}">${p.fonction || 'Personnel'}${termine ? ' <span style="font-size:9px;background:var(--red);color:#fff;padding:2px 6px;border-radius:8px;margin-left:6px;letter-spacing:.3px;vertical-align:middle">FIN DE CONTRAT</span>' : ''}</div>
             <div style="font-size:10.5px;color:var(--text-muted);font-weight:700;margin-top:3px">${recruLabel}</div>
             ${finLabel ? `<div style="font-size:10.5px;font-weight:700;margin-top:2px;color:${termine ? 'var(--red)' : 'var(--text-muted)'}">${finLabel}</div>` : ''}
           </div>
         </div>
         <div class="ri-right">
-          ${p.contact ? `<a class="ri-call" href="tel:${p.contact.replace(/\s+/g,'')}" title="Appeler">📞</a>` : ''}
           <button class="ri-edit" onclick="editPersonnel('${p.id}')" title="Modifier">✎</button>
-          <button class="ri-delete ri-trash" onclick="deletePersonnel('${p.id}')" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button>
+          <button class="ri-delete" onclick="deletePersonnel('${p.id}')" title="Supprimer">✕</button>
         </div>
       </div>
     `;
@@ -8773,9 +8482,6 @@ function editPersonnel(id){
   if (!p) return;
   editingPersonnelId = id;
   document.getElementById('pFonction').value = p.fonction;
-  updateNomDatalist();
-  document.getElementById('pNom').value = p.nom;
-  document.getElementById('pContact').value = p.contact || '';
   document.getElementById('pDateRecrutement').value = p.dateRecrutement || '';
   document.getElementById('pDateFinContrat').value = p.dateFinContrat || '';
   document.getElementById('pFormTitle').textContent = '✎ Modifier le personnel';
@@ -8787,46 +8493,37 @@ function editPersonnel(id){
 function cancelEditPersonnel(){
   editingPersonnelId = null;
   document.getElementById('pFonction').value = 'Gérant';
-  document.getElementById('pNom').value = '';
-  document.getElementById('pContact').value = '';
   document.getElementById('pDateRecrutement').value = '';
   document.getElementById('pDateFinContrat').value = '';
   document.getElementById('pFormTitle').textContent = '➕ Nouveau membre du personnel';
   document.getElementById('pCancelEdit').style.display = 'none';
-  updateNomDatalist();
 }
 
 function savePersonnel(){
   const fonction = document.getElementById('pFonction').value;
-  const nom = document.getElementById('pNom').value.trim();
-  const contact = document.getElementById('pContact').value.trim();
   const dateRecrutement = document.getElementById('pDateRecrutement').value || '';
   const dateFinContrat = document.getElementById('pDateFinContrat').value || '';
-  if (!nom) { showToast('⚠️ Entrez le nom du/de la salarié(e)'); return; }
   if (dateRecrutement && dateFinContrat && dateFinContrat < dateRecrutement) {
     showToast('⚠️ La date de fin de contrat ne peut pas précéder la date de recrutement');
     return;
   }
   if (editingPersonnelId){
     const p = personnelList.find(x => x.id === editingPersonnelId);
-    if (p) { p.fonction = fonction; p.nom = nom; p.contact = contact; p.dateRecrutement = dateRecrutement; p.dateFinContrat = dateFinContrat; }
+    if (p) { p.fonction = fonction; delete p.nom; delete p.contact; p.dateRecrutement = dateRecrutement; p.dateFinContrat = dateFinContrat; }
     showToast('✅ Personnel modifié');
   } else {
-    personnelList.unshift({ id: 'pers_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), fonction, nom, contact, dateRecrutement, dateFinContrat });
+    personnelList.unshift({ id: 'pers_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), fonction, dateRecrutement, dateFinContrat });
     showToast('✅ Personnel enregistré');
   }
   persistPersonnel();
   cancelEditPersonnel();
   renderPersonnelList();
-  populateDSalExistant();
 }
 
 function deletePersonnel(id){
   personnelList = personnelList.filter(x => x.id !== id);
   persistPersonnel();
   renderPersonnelList();
-  populateDSalExistant();
-  updateNomDatalist();
   showToast('🗑️ Personnel supprimé');
 }
 
@@ -8842,10 +8539,8 @@ function saveDepense() {
   let sousCategorie = '', fonction = '', nomPersonnel = '', contact = '';
   if (categorie === 'Salaire du personnel') {
     fonction = document.getElementById('dSalFonction').value;
-    nomPersonnel = document.getElementById('dSalNom').value.trim();
-    contact = document.getElementById('dSalContact').value.trim();
-    if (!nomPersonnel) { showToast('⚠️ Entrez le nom du/de la salarié(e)'); return; }
-    sousCategorie = nomPersonnel;
+    if (!fonction) { showToast('⚠️ Choisissez la fonction'); return; }
+    sousCategorie = fonction;
   } else {
     const sousCatSel = document.getElementById('dSousCategorie');
     sousCategorie = sousCatSel.options.length ? sousCatSel.value : '';
@@ -8867,10 +8562,6 @@ function saveDepense() {
     closeModal('modalDepense');
     document.getElementById('dMontant').value = '';
     document.getElementById('dDateSaisie').value = new Date().toISOString().slice(0,10);
-    document.getElementById('dSalNom').value = '';
-    document.getElementById('dSalContact').value = '';
-    const dSalExistant0 = document.getElementById('dSalExistant');
-    if (dSalExistant0) dSalExistant0.value = '';
     return;
   }
 
@@ -8888,10 +8579,6 @@ function saveDepense() {
   closeModal('modalDepense');
   document.getElementById('dMontant').value = '';
   document.getElementById('dDateSaisie').value = new Date().toISOString().slice(0,10);
-  document.getElementById('dSalNom').value = '';
-  document.getElementById('dSalContact').value = '';
-  const dSalExistant = document.getElementById('dSalExistant');
-  if (dSalExistant) dSalExistant.value = '';
 }
 
 // ===== NOUVELLE RÉSERVATION (créneau indépendant de l'occupation en cours) =====
@@ -8911,8 +8598,6 @@ function openReservationModal(){
   }).join('');
   const freeRoom = ROOMS.find(r => r.status === 'libre');
   sel.value = freeRoom ? freeRoom.num : '';
-  document.getElementById('rNom').value = '';
-  document.getElementById('rContact').value = '';
   document.getElementById('rType').value = 'Ventilée';
   document.getElementById('rPrix').value = '';
   const arr = new Date(); arr.setDate(arr.getDate()+1);
@@ -8940,8 +8625,6 @@ function assignRoomToReservation(localId, docId){
   }).join('');
   const freeRoom = ROOMS.find(r => r.status === 'libre' && r.type === entry.typeSouhaite) || ROOMS.find(r => r.status === 'libre');
   sel.value = freeRoom ? freeRoom.num : (ROOMS.find(r => r.status !== 'maintenance')||ROOMS[0]).num;
-  document.getElementById('rNom').value = entry.client||'';
-  document.getElementById('rContact').value = entry.contact||'';
   document.getElementById('rArrivee').value = entry.arrivee||'';
   document.getElementById('rHeureArrivee').value = entry.heureArrivee||'';
   document.getElementById('rDepart').value = entry.dateSortie||entry.depart||'';
@@ -8961,9 +8644,9 @@ function onReservationRoomChange(){
   if (!room) { info.textContent = ''; return; }
   document.getElementById('rType').value = room.type;
   if (room.client && (room.status === 'occupee' || room.status === 'liberee')) {
-    info.textContent = `💡 Chambre actuellement occupée par ${room.client} jusqu'au ${room.depart} (${room.heureDepart||'12:00'}) — la réservation doit commencer après cette date/heure.`;
+    info.textContent = `💡 Chambre actuellement occupée jusqu'au ${room.depart} (${room.heureDepart||'12:00'}) — la réservation doit commencer après cette date/heure.`;
   } else if (room.resClient) {
-    info.textContent = `⚠️ Cette chambre a déjà une réservation en attente pour ${room.resClient} le ${room.resArrivee} — l'enregistrer remplacera cette réservation.`;
+    info.textContent = `⚠️ Cette chambre a déjà une réservation en attente le ${room.resArrivee} — l'enregistrer remplacera cette réservation.`;
   } else {
     info.textContent = '';
   }
@@ -9013,8 +8696,8 @@ function removeReservationEditee(){
 
 function saveReservation(){
   const num = document.getElementById('rNum').value;
-  const nom = document.getElementById('rNom').value.trim() || 'Client sans nom';
-  const contact = document.getElementById('rContact').value.trim();
+  const nom = CLIENT_MARQUEUR;
+  const contact = '';
   const arrivee = document.getElementById('rArrivee').value;
   const heureArrivee = document.getElementById('rHeureArrivee').value || '';
   const depart = document.getElementById('rDepart').value;
@@ -9065,7 +8748,7 @@ function saveReservation(){
       showToast(`⚠️ Conflit — la chambre ${num} est occupée jusqu'au ${room.depart} (${room.heureDepart||'12:00'})`);
       return;
     }
-    if (room.resClient && !confirm(`Remplacer la réservation existante de ${room.resClient} pour cette chambre ?`)) return;
+    if (room.resClient && !confirm(`Remplacer la réservation existante pour cette chambre ?`)) return;
     room.resClient = nom; room.resContact = contact; room.resArrivee = arrivee; room.resHeureArrivee = heureArrivee;
     room.resDepart = depart; room.resHeureDepart = heureDepart; room.resPrix = prix||null;
     fbSaveChambre(room);
@@ -9078,7 +8761,7 @@ function saveReservation(){
   }
 
   // Chambre libre (ou déjà réservée sans occupation en cours) : créneau principal, comme une entrée classique
-  if (room.client && room.status === 'reservee' && !confirm(`Remplacer la réservation existante de ${room.client} pour cette chambre ?`)) return;
+  if (room.client && room.status === 'reservee' && !confirm(`Remplacer la réservation existante pour cette chambre ?`)) return;
   room.client = nom; room.contact = contact; room.arrivee = arrivee; room.heureArrivee = heureArrivee;
   room.depart = depart; room.heureDepart = heureDepart; room.prix = prix||null;
   room.status = computeRoomStatus(room);
@@ -9092,8 +8775,8 @@ function saveReservation(){
 
 function saveChambre(){
   const num = document.getElementById('cNum').value;
-  const nom = document.getElementById('cNom').value.trim() || 'Client sans nom';
-  const contact = document.getElementById('cContact').value.trim();
+  const nom = CLIENT_MARQUEUR;
+  const contact = '';
   const arrivee = document.getElementById('cArrivee').value;
   const heureArrivee = document.getElementById('cHeureArrivee').value || '';
   const depart = document.getElementById('cDepart').value;
@@ -9105,7 +8788,7 @@ function saveChambre(){
   if (room && room.resClient && room.resArrivee) {
     const finNouvelle = new Date(depart); const [fh,fm]=(heureDepart||'12:00').split(':').map(Number); finNouvelle.setHours(fh||12,fm||0,0,0);
     const debutRes = new Date(room.resArrivee); const [rh,rm]=(room.resHeureArrivee||'00:00').split(':').map(Number); debutRes.setHours(rh||0,rm||0,0,0);
-    if (finNouvelle > debutRes) { showToast(`⚠️ Conflit — ${room.resClient} est déjà réservé(e) le ${room.resArrivee} pour cette chambre`); return; }
+    if (finNouvelle > debutRes) { showToast(`⚠️ Conflit — cette chambre est déjà réservée le ${room.resArrivee} pour cette chambre`); return; }
   }
   // Met à jour localement
   if (room) {
@@ -9143,9 +8826,6 @@ function saveChambre(){
   // Sync Firebase
   closeModal('modalChambre');
   showToast(room && room.status==='reservee' ? `🟡 Réservation enregistrée — Chambre ${num}` : `✅ Client enregistré — Chambre ${num}`);
-  document.getElementById('cNom').value='';
-  document.getElementById('cContact').value='';
-  updateCContactCallBtn();
   // Envoi Firebase et rendu lourd après l'affichage (renderRooms rend déjà Montant attendu + Historique)
   setTimeout(() => { if (room) fbSaveChambre(room); renderRooms(); pdjRefreshIfOpen(); }, 0);
 }
@@ -9159,8 +8839,7 @@ function txDetail(e, htmlMode){
   let termine = false;
   if (e.categorie === 'Salaire du personnel') {
     if (e.fonction) parts.push(e.fonction);
-    if (e.nomPersonnel) parts.push(e.nomPersonnel);
-    const pers = findPersonnelByFonctionNom(e.fonction, e.nomPersonnel);
+    const pers = findPersonnelByFonctionNom(e.fonction);
     if (pers && estApresFinContrat(pers, e.annee, e.moisIdx)) termine = true;
   } else if (e.sousCategorie) {
     parts.push(e.sousCategorie);
@@ -9255,15 +8934,15 @@ function startFirebaseSync() {
       const data = d.data();
       const room = ROOMS.find(r => r.num === data.num);
       if (room) {
-        room.client = data.client || '';
-        room.contact = data.contact || '';
+        room.client = data.client ? CLIENT_MARQUEUR : '';
+        room.contact = '';
         room.arrivee = data.arrivee || null;
         room.heureArrivee = data.heureArrivee || null;
         room.depart = data.depart || null;
         room.heureDepart = data.heureDepart || '12:00';
         room.prix = data.prix || null;
-        room.resClient = data.resClient || '';
-        room.resContact = data.resContact || '';
+        room.resClient = data.resClient ? CLIENT_MARQUEUR : '';
+        room.resContact = '';
         room.resArrivee = data.resArrivee || null;
         room.resHeureArrivee = data.resHeureArrivee || null;
         room.resDepart = data.resDepart || null;
@@ -9280,7 +8959,7 @@ function startFirebaseSync() {
   const qH = window._collection(window._db, 'historique_chambres');
   window._onSnapshot(qH, (snap) => {
     roomHistory = [];
-    snap.forEach(d => { const data = d.data(); data._docId = d.id; roomHistory.push(data); });
+    snap.forEach(d => { const data = d.data(); data._docId = d.id; if (data.client) data.client = CLIENT_MARQUEUR; data.contact = ''; roomHistory.push(data); });
     roomHistory.sort((a,b) => (b.ts||0) - (a.ts||0));
     persistRoomHistory();
     renderRoomHistory();
@@ -10265,11 +9944,11 @@ function buildPrintContent() {
     html = `<h1 style="text-align:center">AUBERGE TAMAR — BILAN RÉCAPITULATIF DES MOUVEMENTS</h1>
       <p style="text-align:center;font-size:12px;margin-top:-8px">N° ${data.numRegistre} — Période du ${formatDateFr(data.dateDebut)} au ${formatDateFr(data.dateFin)}</p>
       <p style="font-size:10px;color:#666;margin:10px 0 14px">TE = ${fmtFull(data.te)} F/client (si PN &gt; 5 000 F) · TDT = ${data.tdtPct}% du montant chambre (PN × Nuitées) · TCN = ${fmtFull(data.tcn)} F/nuitée/personne · PN NET = PN + (TE+TDT+TCN)</p>
-      <table><thead><tr><th>N°</th><th>DATE</th><th style="text-align:left">NOM ET PRÉNOMS</th><th>CHBRE</th><th>NUIT.</th><th>PN</th><th>TE</th><th>TDT</th><th>TCN</th><th>N° FACT.</th><th>PN NET</th></tr></thead><tbody>`;
+      <table><thead><tr><th>N°</th><th>DATE</th><th>CHBRE</th><th>NUIT.</th><th>PN</th><th>TE</th><th>TDT</th><th>TCN</th><th>N° FACT.</th><th>PN NET</th></tr></thead><tbody>`;
     data.rows.forEach(r => {
-      html += `<tr><td>${r.numOrdre}</td><td>${formatDateFr(r.date)}</td><td style="text-align:left">${r.client}</td><td>${r.chambre}</td><td>${r.nuitees}</td><td>${fmtFull(r.pn)}</td><td>${fmtFull(r.te)}</td><td>${fmtFull(r.tdt)}</td><td>${fmtFull(r.tcn)}</td><td>${r.numFacture}</td><td>${fmtFull(r.montant)}</td></tr>`;
+      html += `<tr><td>${r.numOrdre}</td><td>${formatDateFr(r.date)}</td><td>${r.chambre}</td><td>${r.nuitees}</td><td>${fmtFull(r.pn)}</td><td>${fmtFull(r.te)}</td><td>${fmtFull(r.tdt)}</td><td>${fmtFull(r.tcn)}</td><td>${r.numFacture}</td><td>${fmtFull(r.montant)}</td></tr>`;
     });
-    html += `</tbody><tfoot><tr><td colspan="5">TOTAL</td><td>${fmtFull(data.totaux.pn)}</td><td>${fmtFull(data.totaux.te)}</td><td>${fmtFull(data.totaux.tdt)}</td><td>${fmtFull(data.totaux.tcn)}</td><td></td><td>${fmtFull(data.totaux.montant)}</td></tr></tfoot></table>`;
+    html += `</tbody><tfoot><tr><td colspan="4">TOTAL</td><td>${fmtFull(data.totaux.pn)}</td><td>${fmtFull(data.totaux.te)}</td><td>${fmtFull(data.totaux.tdt)}</td><td>${fmtFull(data.totaux.tcn)}</td><td></td><td>${fmtFull(data.totaux.montant)}</td></tr></tfoot></table>`;
     html += `<div class="print-footer">Auberge Tamar · AubergeGest · Édité le ${now}</div>`;
     return html;
   }
@@ -10419,8 +10098,7 @@ function openSejoursDate(){
     const src = it.kind === 'hist' ? it.h : it.r;
     const arr = src.arrivee, dep = it.kind === 'hist' ? (src.dateSortie || src.depart) : src.depart;
     const prix = it.kind === 'hist' ? (src.prixNuit || 0) : (src.prix || 0);
-    const client = it.kind === 'hist' ? (src.client || '') : (src.client || '');
-    return `<label class="sj-row"><input type="checkbox" id="sjChk${i}"><div><div class="sj-main">Chambre ${sjEsc(it.num)} — ${fmtFull(prix)} F / nuit</div><div class="sj-sub">${arr ? formatDateFr(arr) : '—'} → ${dep ? formatDateFr(dep) : '—'}${client ? ' · ' + sjEsc(client) : ''}${it.kind === 'room' ? ' · chambre actuellement marquée occupée' : ''}</div></div></label>`;
+    return `<label class="sj-row"><input type="checkbox" id="sjChk${i}"><div><div class="sj-main">Chambre ${sjEsc(it.num)} — ${fmtFull(prix)} F / nuit</div><div class="sj-sub">${arr ? formatDateFr(arr) : '—'} → ${dep ? formatDateFr(dep) : '—'}${it.kind === 'room' ? ' · chambre actuellement marquée occupée' : ''}</div></div></label>`;
   }).join('') : '<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:18px 0">Aucun séjour pour cette date.</div>';
   document.getElementById('sjDeleteBtn').style.display = _sjItems.length ? '' : 'none';
   openModal('modalSejoursDate');
@@ -10522,7 +10200,7 @@ function computeRecapMouvements(){
     // Montant = PN net, c'est-à-dire le prix chambre majoré des taxes
     const montant = pnTotal + (te + tdt + tcn);
     totPN += pnTotal; totTE += te; totTDT += tdt; totTCN += tcn; totMontant += montant;
-    return { numOrdre: f.numOrdreDebut + i, date: h.arrivee, client: h.client || '—', chambre: h.chambre, nuitees, pn, te, tdt, tcn, numFacture: i+1, montant };
+    return { numOrdre: f.numOrdreDebut + i, date: h.arrivee, chambre: h.chambre, nuitees, pn, te, tdt, tcn, numFacture: i+1, montant };
   });
   return Object.assign({}, f, { rows, totaux: { pn: totPN, te: totTE, tdt: totTDT, tcn: totTCN, montant: totMontant } });
 }
@@ -10560,27 +10238,68 @@ function computeFicheJournaliereData(dateISO){
     const stay = roomHistory.find(h => { const sortie = h.dateSortie || h.depart; return h.chambre === r.num && h.arrivee && sortie && dateISO >= h.arrivee && (dateISO < sortie || h.arrivee === sortie); });
     if (stay) { valeur = stay.prixNuit || 0; type = stay.type || type; }
     else if (r.status === 'occupee' && r.arrivee && r.depart && dateISO >= r.arrivee && (dateISO < r.depart || r.arrivee === r.depart)) valeur = r.prix || 0;
+    // Partie supérieure de la fiche : uniquement les vraies chambres (6 000 F ventilée / 8 000 F climatisée).
+    // Tout autre montant (ex : 2 000 F, 3 000 F) est une passe et ne figure pas dans cette partie.
+    // Sans enregistrement par numéro de chambre, aucune ligne n'est remplie : CHBRE-1 à 21 restent vierges.
+    if (valeur !== 6000 && valeur !== 8000) valeur = 0;
     return { num: r.num, valeur, type };
   });
-  const occupees = roomsData.filter(r => r.valeur > 0);
-  const nbOccupees = occupees.length;
-  const valeurOccupees = occupees.reduce((s,r) => s + r.valeur, 0);
-  const nbNonOccupees = roomsData.length - nbOccupees;
+  let occupees = roomsData.filter(r => r.valeur > 0);
+  let nbOccupees = occupees.length;
+  let valeurOccupees = occupees.reduce((s,r) => s + r.valeur, 0);
 
   // Répartition Climatisées / Ventilées parmi les chambres occupées
   const isClim = t => (t||'').toLowerCase().startsWith('clim');
-  const occupeesClim = occupees.filter(r => isClim(r.type));
-  const occupeesVent = occupees.filter(r => !isClim(r.type));
-  const nbOccupeesClim = occupeesClim.length;
-  const nbOccupeesVent = occupeesVent.length;
-  const valeurOccupeesClim = occupeesClim.reduce((s,r) => s + r.valeur, 0);
-  const valeurOccupeesVent = occupeesVent.reduce((s,r) => s + r.valeur, 0);
+  let occupeesClim = occupees.filter(r => isClim(r.type));
+  let occupeesVent = occupees.filter(r => !isClim(r.type));
+  let nbOccupeesClim = occupeesClim.length;
+  let nbOccupeesVent = occupeesVent.length;
+  let valeurOccupeesClim = occupeesClim.reduce((s,r) => s + r.valeur, 0);
+  let valeurOccupeesVent = occupeesVent.reduce((s,r) => s + r.valeur, 0);
+
+  // Le Point des Chambres saisi dans Recettes (« Chambres — Ventilées ×1 : 6 000 F ») fait foi pour la
+  // date, comme le Point des Passes : la fiche ne doit pas contredire ce qui a été saisi dans Recettes.
+  // Sans saisie ce jour-là, on garde le calcul à partir des séjours (comportement d'origine).
+  const ptCh = (function(){
+    const num = t => parseInt(String(t || '').replace(/\D/g, ''), 10) || 0;
+    let nbC = 0, mC = 0, nbV = 0, mV = 0, found = false;
+    saisieLog.filter(e => e.type === 'recettes' && e.date === dateFr && /^\s*Chambres\s*—/i.test(e.note || '')).forEach(e => {
+      const mc = /Climatis[ée]es?\s*(?:×\s*(\d+))?\s*:\s*([\d\s\u00A0\u202F\u2009]+)\s*F/i.exec(e.note);
+      const mv = /Ventil[ée]es?\s*(?:×\s*(\d+))?\s*:\s*([\d\s\u00A0\u202F\u2009]+)\s*F/i.exec(e.note);
+      if (mc) { const m = num(mc[2]); mC += m; nbC += mc[1] ? parseInt(mc[1], 10) : Math.round(m / 8000); found = true; }
+      if (mv) { const m = num(mv[2]); mV += m; nbV += mv[1] ? parseInt(mv[1], 10) : Math.round(m / 6000); found = true; }
+    });
+    return (found && nbC + nbV <= roomsData.length) ? { nbC, mC, nbV, mV } : null;
+  })();
+  // Corrections manuelles (chambres) : priment sur tout le reste pour la date concernée.
+  // nbC = nb de chambres climatisées (8 000 F), nbV = nb de chambres ventilées (6 000 F).
+  const CHAMBRES_CORRIGEES = {
+    '2026-09-29': { nbC: 0, mC: 0, nbV: 2, mV: 12000 },
+    '2026-09-30': { nbC: 0, mC: 0, nbV: 1, mV: 6000 }
+  };
+  const ptFinal = CHAMBRES_CORRIGEES[dateISO] || ptCh;
+  // Avant le 02/10/2026, les numéros de chambres n'ont pas été renseignés : le haut de la fiche
+  // (CHBRE-1 à 21) reste vierge ; seuls les totaux chambres comptent.
+  const SANS_NUMEROS_AVANT = '2026-10-02';
+  if (dateISO < SANS_NUMEROS_AVANT) roomsData.forEach(r => { r.valeur = 0; });
+  if (ptFinal) {
+    const memeQueSejours = nbOccupeesClim === ptFinal.nbC && nbOccupeesVent === ptFinal.nbV
+      && valeurOccupeesClim === ptFinal.mC && valeurOccupeesVent === ptFinal.mV;
+    // Les séjours enregistrés ne correspondent pas au Point des Chambres : on ne peut pas deviner
+    // quelles chambres (numéros) sont les bonnes, donc les cases CHBRE-n restent vierges.
+    if (!memeQueSejours) roomsData.forEach(r => { r.valeur = 0; });
+    nbOccupeesClim = ptFinal.nbC; nbOccupeesVent = ptFinal.nbV;
+    valeurOccupeesClim = ptFinal.mC; valeurOccupeesVent = ptFinal.mV;
+    nbOccupees = nbOccupeesClim + nbOccupeesVent;
+    valeurOccupees = valeurOccupeesClim + valeurOccupeesVent;
+  }
+  const nbNonOccupees = roomsData.length - nbOccupees;
 
   const sorties = saisieLog.filter(e => e.type === 'depenses' && e.date === dateFr)
-    .map(e => ({ motif: e.categorie === 'Salaire du personnel' ? [e.fonction, e.nomPersonnel].filter(Boolean).join(' - ') : (e.sousCategorie || e.categorie || ''), valeur: e.montant || 0 }));
+    .map(e => ({ motif: e.categorie === 'Salaire du personnel' ? (e.fonction || 'Salaire du personnel') : (e.sousCategorie || e.categorie || ''), valeur: e.montant || 0 }));
   const totalSorties = sorties.reduce((s,x) => s + x.valeur, 0);
 
-  // (le versement est recalculé plus bas : chambres + passes − sorties)
+  // (le versement est recalculé plus bas : total chambres + passes)
 
   // Passes du jour (période Jour / Nuit) : le Point des Passes (pointsPasses) fait foi ; à défaut,
   // repli sur le détail des passes saisies (passesData). Les passes ne figurent PAS dans les
@@ -10598,7 +10317,7 @@ function computeFicheJournaliereData(dateISO){
   const nbPassesTotal = nbPassesJour + nbPassesNuit;
   const valeurPassesTotal = valeurPassesJour + valeurPassesNuit;
   const totalRecettesJour = valeurOccupees + valeurPassesTotal; // chambres (nuitées) + passes
-  const versement = totalRecettesJour - totalSorties; // versement = total chambres + passes − sorties
+  const versement = totalRecettesJour; // versement = total chambres + passes (les sorties/achats n'y sont pas déduites)
 
   // Versements saisis ce jour dans "Recettes" avec heure et personne (pour la fiche journalière)
   const versementsDetail = saisieLog.filter(e => e.type === 'recettes' && e.date === dateFr)
@@ -10724,7 +10443,7 @@ function buildFicheJournalierePDF(doc, d, margin, tier){
     doc.autoTable({
       startY: y,
       head: [['HEURE', 'VERSÉ PAR', 'MONTANT', 'NOTE']],
-      body: d.versementsDetail.map(v => [v.heure || '—', v.personne || '—', fmtPdf(v.montant), v.note || '']),
+      body: d.versementsDetail.map(v => [v.heure || '—', v.personne || '—', fmtPdf(v.montant), String(v.note || '').replace(/[\u00A0\u202F\u2009]/g, ' ')]),
       margin: { left: margin, right: margin },
       styles: { font: 'helvetica', fontSize: T.vers.fs, cellPadding: T.vers.cp, minCellHeight: T.vers.mh, lineColor: [20,40,60], lineWidth: .25 },
       headStyles: { fillColor: PDF_NAVY_L, textColor: 255, fontStyle: 'bold', halign: 'center' },
@@ -11038,19 +10757,18 @@ function genererRecapMouvementsPDF(){
     doc.text(`TE = ${fmtPdf(data.te)} F/client (si PN > 5 000 F)   ·   TDT = ${data.tdtPct}% du montant chambre (PN × Nuitées)   ·   TCN = ${fmtPdf(data.tcn)} F/nuitée/personne   ·   PN NET = PN + (TE+TDT+TCN)`, margin, y);
     y += 6;
 
-    const body = data.rows.map(r => [r.numOrdre, formatDateFr(r.date), r.client, r.chambre, r.nuitees, fmtPdf(r.pn), fmtPdf(r.te), fmtPdf(r.tdt), fmtPdf(r.tcn), r.numFacture, fmtPdf(r.montant)]);
-    body.push(['', '', 'TOTAL', '', '', fmtPdf(data.totaux.pn), fmtPdf(data.totaux.te), fmtPdf(data.totaux.tdt), fmtPdf(data.totaux.tcn), '', fmtPdf(data.totaux.montant)]);
+    const body = data.rows.map(r => [r.numOrdre, formatDateFr(r.date), r.chambre, r.nuitees, fmtPdf(r.pn), fmtPdf(r.te), fmtPdf(r.tdt), fmtPdf(r.tcn), r.numFacture, fmtPdf(r.montant)]);
+    body.push(['', 'TOTAL', '', '', fmtPdf(data.totaux.pn), fmtPdf(data.totaux.te), fmtPdf(data.totaux.tdt), fmtPdf(data.totaux.tcn), '', fmtPdf(data.totaux.montant)]);
     doc.autoTable({
       startY: y,
       margin: { left: margin, right: margin, bottom: 18 },
-      head: [["N°","DATE","NOM ET PRÉNOMS","CHBRE","NUIT.","PN","TE","TDT","TCN","N° FACT.","PN NET"]],
+      head: [["N°","DATE","CHBRE","NUIT.","PN","TE","TDT","TCN","N° FACT.","PN NET"]],
       body: body,
       theme: 'grid',
       styles: { font: 'helvetica', fontSize: 13, cellPadding: 2, minCellHeight: 7, halign: 'center', lineColor: [210,220,230], lineWidth: .2 },
       headStyles: { fillColor: PDF_NAVY, textColor: 255, fontStyle: 'bold' },
-      columnStyles: { 2: { halign: 'left', cellWidth: 44 } },
       didParseCell: (c) => {
-        if (c.row.section === 'body' && c.row.raw[2] === 'TOTAL') { c.cell.styles.fontStyle = 'bold'; c.cell.styles.fillColor = [224,232,240]; }
+        if (c.row.section === 'body' && c.row.raw[1] === 'TOTAL') { c.cell.styles.fontStyle = 'bold'; c.cell.styles.fillColor = [224,232,240]; }
       }
     });
     pdfAddFooter(doc);
@@ -11676,25 +11394,25 @@ function exportExcel() {
       const data = computeRecapMouvements();
       commitRecapMouvementsNumbering(data);
       const sheet = wb.addWorksheet('Récap Mouvements');
-      sheet.columns = [{width:9, style:{font:{size:13}}},{width:11, style:{font:{size:13}}},{width:24, style:{font:{size:13}}},{width:9, style:{font:{size:13}}},{width:10, style:{font:{size:13}}},{width:9, style:{font:{size:13}}},{width:8, style:{font:{size:13}}},{width:8, style:{font:{size:13}}},{width:8, style:{font:{size:13}}},{width:11, style:{font:{size:13}}},{width:13, style:{font:{size:13}}}];
+      sheet.columns = [{width:9, style:{font:{size:13}}},{width:11, style:{font:{size:13}}},{width:9, style:{font:{size:13}}},{width:10, style:{font:{size:13}}},{width:9, style:{font:{size:13}}},{width:8, style:{font:{size:13}}},{width:8, style:{font:{size:13}}},{width:8, style:{font:{size:13}}},{width:11, style:{font:{size:13}}},{width:13, style:{font:{size:13}}}];
       sheet.properties.defaultRowHeight = 20;
       let r = xlAddLetterhead(sheet, 'BILAN RÉCAPITULATIF DES MOUVEMENTS', [
         `N° ${data.numRegistre} — Période du ${formatDateFr(data.dateDebut)} au ${formatDateFr(data.dateFin)}`,
         `TE = ${fmtFull(data.te)} F/client (si PN > 5 000 F) · TDT = ${data.tdtPct}% du montant chambre (PN × Nuitées) · TCN = ${fmtFull(data.tcn)} F/nuitée/personne · PN NET = PN + (TE+TDT+TCN)`
-      ], 11);
+      ], 10);
 
-      sheet.getRow(r).values = ["N° D'ORDRE",'DATE','NOM ET PRÉNOMS','N° CHBRE','NBRE NUITÉE','PN','TE','TDT','TCN','N° FACTURE','PN NET'];
+      sheet.getRow(r).values = ["N° D'ORDRE",'DATE','N° CHBRE','NBRE NUITÉE','PN','TE','TDT','TCN','N° FACTURE','PN NET'];
       xlStyleHeaderRow(sheet, r);
       const headRow = r; r++;
       data.rows.forEach(row => {
-        sheet.getRow(r).values = [row.numOrdre, formatDateFr(row.date), row.client, row.chambre, row.nuitees, row.pn, row.te, row.tdt, row.tcn, row.numFacture, row.montant];
+        sheet.getRow(r).values = [row.numOrdre, formatDateFr(row.date), row.chambre, row.nuitees, row.pn, row.te, row.tdt, row.tcn, row.numFacture, row.montant];
         r++;
       });
-      sheet.getRow(r).values = [null, null, 'TOTAL', null, null, data.totaux.pn, data.totaux.te, data.totaux.tdt, data.totaux.tcn, null, data.totaux.montant];
-      xlHighlightTotalRow(sheet, r, 11);
-      xlBorderRange(sheet, headRow, r, 1, 11);
-      xlZebraStripe(sheet, headRow+1, r-1, 1, 11);
-      xlCenterCols(sheet, headRow+1, r-1, [4]); // N° CHBRE (texte) — non couvert par la détection numérique
+      sheet.getRow(r).values = [null, 'TOTAL', null, null, data.totaux.pn, data.totaux.te, data.totaux.tdt, data.totaux.tcn, null, data.totaux.montant];
+      xlHighlightTotalRow(sheet, r, 10);
+      xlBorderRange(sheet, headRow, r, 1, 10);
+      xlZebraStripe(sheet, headRow+1, r-1, 1, 10);
+      xlCenterCols(sheet, headRow+1, r-1, [3]); // N° CHBRE (texte) — non couvert par la détection numérique
 
       sheet.views = [{ state: 'frozen', ySplit: headRow }];
       xlSetPageSetup(sheet, 'landscape');
@@ -11994,7 +11712,7 @@ function renderDocuments(){
       </div>
       <div class="ri-right" style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
         <button class="device-btn allow" onclick="window.open('${d.url}','_blank')">📂 Ouvrir</button>
-        <button class="ri-delete ri-trash" onclick="deleteDocument('${d.id}','${(d.storagePath||'').replace(/'/g,"\\'")}')" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4.2A1.2 1.2 0 0 1 9.2 3h5.6A1.2 1.2 0 0 1 16 4.2V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6"/><path d="M14 10.5v6"/></svg></button>
+        <button class="ri-delete" onclick="deleteDocument('${d.id}','${(d.storagePath||'').replace(/'/g,"\\'")}')" title="Supprimer">✕</button>
       </div>
     </div>`).join('');
 }
@@ -12250,8 +11968,8 @@ function buildBilanMensuelPDF(year, monthIdx) {
       g.items.slice().sort((a, b) => parseFrDate(a.date) - parseFrDate(b.date)).forEach(it => {
         let detail, finContrat = false;
         if (cat === 'Salaire du personnel') {
-          detail = [it.fonction, it.nomPersonnel].filter(Boolean).join(' — ');
-          const pers = findPersonnelByFonctionNom(it.fonction, it.nomPersonnel);
+          detail = it.fonction || 'Salaire du personnel';
+          const pers = findPersonnelByFonctionNom(it.fonction);
           if (pers && estApresFinContrat(pers, it.annee, it.moisIdx)) { finContrat = true; detail += ' (FIN DE CONTRAT)'; }
         } else {
           detail = it.sousCategorie || '—';
@@ -13073,8 +12791,8 @@ function saveChambresRecettes(){
   var nbC = parseInt(document.getElementById('chmNbClim').value, 10) || 0;
   var nbV = parseInt(document.getElementById('chmNbVent').value, 10) || 0;
   var parts = [];
-  if (mClim) parts.push('Climatisées' + (nbC ? ' ×' + nbC : '') + ' : ' + fmtFull(mClim) + ' F');
-  if (mVent) parts.push('Ventilées' + (nbV ? ' ×' + nbV : '') + ' : ' + fmtFull(mVent) + ' F');
+  if (mClim) parts.push('Climatisées' + (nbC ? ' ×' + nbC : '') + ' : ' + fmtPdf(mClim) + ' F');
+  if (mVent) parts.push('Ventilées' + (nbV ? ' ×' + nbV : '') + ' : ' + fmtPdf(mVent) + ' F');
   var note = 'Chambres — ' + parts.join(' · ');
   if (isDuplicateRecette(mois, annee, montant, dateStr)) {
     showToast('⚠️ Recette identique déjà saisie — supprimez-la dans l\'historique des recettes pour la ressaisir');
